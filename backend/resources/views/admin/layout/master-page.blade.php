@@ -20,6 +20,15 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css" integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous"/>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+        <style>
+            .icon-eye{
+                position: absolute;
+                right: 10px;
+                top:55%;
+                cursor: pointer;
+                z-index: 2;
+            }
+        </style>
     </head>
     <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
         <div class="app-wrapper">

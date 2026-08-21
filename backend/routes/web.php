@@ -15,16 +15,13 @@ Route::group(['middleware' => [SystemAuth::class]], function () {
     Route::group(['middleware' => [AdminAuth::class]], function () {
         Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
         Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
+        Route::get('/admin/change-password', [AdminController::class, 'changePassword'])->name('change_password');
         Route::get('/admin/company', [CompanyController::class, 'show'])->name('company');
         Route::post('/admin/company', [CompanyController::class, 'save'])->name('save_company');
     });
     Route::group(['middleware' => [LoginAuth::class]], function () {
         Route::get('/admin/login', function () {return view('admin.login');})->name('login');
         Route::post('/admin/login', [AdminController::class, 'login'])->name('login');
-    });
-
-    Route::get('/', function () {
-        return view('welcome');
     });
 });
 

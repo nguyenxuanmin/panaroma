@@ -23,6 +23,7 @@
                         <p>{{Auth::User()->name}}</p>
                     </li>
                     <li class="user-footer">
+                        <a href="{{route('change_password')}}" class="btn btn-info btn-flat float-start">Đổi mật khẩu</a>
                         <a href="{{route('logout')}}" class="btn btn-default btn-flat float-end">Đăng xuất</a>
                     </li>
                 </ul>
