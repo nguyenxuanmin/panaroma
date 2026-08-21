@@ -1,0 +1,15 @@
+/* ===== Main CSS Entry Point ===== */
+/* Import all modular stylesheets */
+
+/* Variables and base styles */
+@import "./variables.css";
+
+/* Component styles */
+@import "./components/navbar.css";
+@import "./components/hotspot.css";
+@import "./components/panorama.css";
+@import "./components/settings.css";
+@import "./components/branding.css";
+
+/* Responsive styles - must be last */
+@import "./responsive.css";

@@ -1,0 +1,80 @@
+/* ===== CSS Variables ===== */
+:root {
+  /* Colors */
+  --color-primary: #1a5d4a;
+  --color-primary-light: #2d8a6e;
+  --color-primary-dark: #134537;
+  --color-accent: #c9a227;
+  --color-white: #ffffff;
+  --color-text: #1a5d4a;
+  --color-text-light: #64748b;
+
+  /* Background */
+  --bg-white: rgba(255, 255, 255, 0.95);
+  --bg-white-solid: rgba(255, 255, 255, 0.98);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Border */
+  --border-light: rgba(26, 93, 74, 0.15);
+  --border-medium: rgba(26, 93, 74, 0.2);
+  --border-dark: rgba(26, 93, 74, 0.3);
+
+  /* Shadow */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(26, 93, 74, 0.2);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 4px 16px rgba(26, 93, 74, 0.35);
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  /* Transition */
+  --transition-fast: 0.3s ease;
+  --transition-normal: 0.4s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Z-index */
+  --z-panorama: 1;
+  --z-overlay: 10;
+  --z-navbar: 100;
+  --z-submenu: 200;
+
+  /* Font sizes */
+  --font-xs: 0.6rem;
+  --font-sm: 0.85rem;
+  --font-base: 0.9rem;
+  --font-md: 0.95rem;
+  --font-lg: 1rem;
+  --font-xl: 1.1rem;
+}
+
+/* ===== Reset & Base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== App Container ===== */
+.App {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
