@@ -1,4 +1,4 @@
-@extends('admin.layout.master-page')
+@extends('admin.layouts.master-page')
 
 @section('title')
     Đổi mật khẩu admin
@@ -21,26 +21,28 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card card-primary card-outline mb-4">
-                <form id="submitForm" data-url-submit="{{route('save_company')}}" data-url-complete="">
+                <form id="submitForm" data-url-submit="{{route('save_change_password')}}" data-url-complete="{{route('admin')}}">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 mb-3">
+                                <button class="btn btn-primary">Lưu</button>
+                            </div>
+                            <div class="col-12 col-md-4">
                                 <div class="mb-3 position-relative">
                                     <label for="old" class="form-label">Mật khẩu cũ</label>
-                                    <input type="password" class="form-control pr" name="old" value="">
-                                    <i class="bi bi-eye icon-eye" onclick="togglePassword('old', this)"></i>
+                                    <input type="password" class="form-control" name="old" value="">
+                                    <i class="bi bi-eye icon-eye" onclick="togglePassword('old')"></i>
                                 </div>
                                 <div class="mb-3 position-relative">
                                     <label for="new" class="form-label">Mật khẩu mới</label>
                                     <input type="password" class="form-control" name="new" value="">
+                                    <i class="bi bi-eye icon-eye" onclick="togglePassword('new')"></i>
                                 </div>
                                 <div class="mb-3 position-relative">
                                     <label for="confirm" class="form-label">Xác nhận lại mật khẩu mới</label>
                                     <input type="password" class="form-control" name="confirm" value="">
+                                    <i class="bi bi-eye icon-eye" onclick="togglePassword('confirm')"></i>
                                 </div>
-                            </div>
-                            <div class="col-12 mb-3 text-end">
-                                <button class="btn btn-primary">Lưu</button>
                             </div>
                         </div>
                     </div>
@@ -48,35 +50,19 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-            document.getElementById('logo').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageUrl = e.target.result;
-                        const imgElement = document.getElementById('logoContent'); 
-                        imgElement.src = imageUrl; 
-                        imgElement.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
+@endsection
 
-            document.getElementById('favicon').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageUrl = e.target.result;
-                        const imgElement = document.getElementById('faviconContent'); 
-                        imgElement.src = imageUrl; 
-                        imgElement.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
+@section('script')
+    <script>
+        function togglePassword(inputName) {
+            let inputChange = document.querySelector(`input[name="${inputName}"]`);
+            if (!inputChange) return;
+
+            if (inputChange.type === 'password') {
+                inputChange.type = 'text';
+            } else {
+                inputChange.type = 'password';
+            }
+        }
     </script>
 @endsection

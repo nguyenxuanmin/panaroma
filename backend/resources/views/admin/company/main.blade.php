@@ -1,4 +1,4 @@
-@extends('admin.layout.master-page')
+@extends('admin.layouts.master-page')
 
 @section('title')
     Thông tin công ty

@@ -86,10 +86,10 @@ class SystemController extends Controller
                 'message' => $emailAdmin. ' không phải là email hợp lệ.',
             ]);
         }
-        if (strlen($passWordAdmin) < 6) {
+        if (strlen($passWordAdmin) < 8) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+                'message' => 'Mật khẩu phải có ít nhất 8 ký tự.',
             ]);
         }
         

@@ -17,25 +17,25 @@ class AdminService
             mkdir($uploadDir, 0777, true);
         }
         if ($check === false) {
-            $message = "Tệp không phải là hình ảnh.";
+            $message = "The file is not an image.";
             return $message;
         }
         if (file_exists($targetFile)) {
-            $message = "Xin lỗi, tệp này đã tồn tại.";
+            $message = "Sorry, this file already exists.";
             return $message;
         }
-        if ($image["size"] > 5000000) {
-            $message = "Xin lỗi, tệp của bạn quá lớn.";
+        if ($image["size"] > 20000000) {
+            $message = "Sorry, your file is too large.";
             return $message;
         }
         if ($imageFileType != "jpg" && $imageFileType != "jpeg" && $imageFileType != "png" && $imageFileType != "gif" && $imageFileType != "webp") {
-            $message = "Xin lỗi, chỉ các tệp JPG, JPEG, PNG, GIF, WEBP được phép.";
+            $message = "Sorry, only JPG, JPEG, PNG, GIF, and WEBP files are allowed.";
             return $message;
         }
         if (move_uploaded_file($image["tmp_name"], $uploadDir . basename($image['name']))) {
             return $message;
         } else {
-            $message = "Có lỗi xảy ra khi tải tệp lên.";
+            $message = "An error occurred while uploading the file.";
             return $message;
         }
     }

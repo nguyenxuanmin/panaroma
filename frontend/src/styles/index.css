@@ -1,15 +1,28 @@
 /* ===== Main CSS Entry Point ===== */
-/* Import all modular stylesheets */
-
-/* Variables and base styles */
 @import "./variables.css";
 
-/* Component styles */
-@import "./components/navbar.css";
-@import "./components/hotspot.css";
-@import "./components/panorama.css";
+/* Component Styles */
 @import "./components/settings.css";
-@import "./components/branding.css";
+@import "../components/FloorSidebar/FloorSidebar.css";
+@import "../components/BuildingSidebar/BuildingSidebar.css";
+@import "../components/FloorMap/FloorMap.css";
+@import "../components/FooterCarousel/FooterCarousel.css";
+@import "../components/TopHeader/TopHeader.css";
+@import "../components/PanoramaViewer/PanoramaViewer.css";
 
-/* Responsive styles - must be last */
-@import "./responsive.css";
+/* App Layout */
+.app-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.main-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
