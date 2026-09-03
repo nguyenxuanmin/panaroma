@@ -1,16 +1,108 @@
-# React + Vite
+# Pano Frontend - React + Vite + Photo Sphere Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Frontend panorama 360° cho hệ thống `pano-admin` (Laravel). Build ra `dist/` rồi copy vào `pano-admin/public/pano` để chạy same-origin, không CORS.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🇻🇳 Tiếng Việt
 
-## React Compiler
+### 1. Yêu cầu
+- Node 20+, npm/pnpm
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Cài đặt khi clone
 
-## Expanding the ESLint configuration
+```bash
+git clone <repo-pano>  # hoặc copy folder D:\pano
+cd D:\pano
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 3. Chạy dev
+```bash
+npm run dev          # http://localhost:5173 (Vite proxy /api -> http://pano-admin.test)
+# hoặc
+npm run deploy       # build + copy sang D:\laragon\www\pano-admin\public\pano (xem deploy.ps1:8)
+```
+
+`vite.config.js:13-24` proxy `/api` và `/storage` về `http://pano-admin.test` để dev không bị CORS. Đổi `VITE_PROXY_TARGET` nếu `pano-admin` ở host khác.
+
+### 4. Build & Deploy
+```bash
+npm run build        # ra dist/
+npm run deploy       # powershell -ExecutionPolicy Bypass -File ./deploy.ps1
+                     # 1. vite build
+                     # 2. xóa D:\laragon\www\pano-admin\public\pano cũ
+                     # 3. copy dist/* -> public/pano + public/assets
+```
+
+Nếu dời `pano-admin` sang folder khác, sửa `deploy.ps1:8`:
+```ps
+$LaravelPublicPano = "D:\duong\dan\moi\pano-admin\public\pano"
+```
+Rồi chạy lại `npm run deploy`.
+
+Sau đó trong `pano-admin`:
+```bash
+cd D:\laragon\www\pano-admin
+git add public/pano public/assets
+git commit -m "update pano viewer"
+git push  # Actions sẽ FTP lên InfinityFree
+```
+
+### 5. Cấu trúc
+```
+src/
+  App.jsx                 # useSiteSettings (đổi title/favicon theo /api/site-settings)
+  components/
+    TopHeader/            # th-menu-btn ẩn/hiện toàn bộ UI, Admin button theo role
+    PanoramaViewer/       # preload + backdrop blur, zoom 2s vào hotspot rồi sang pano đích
+    BuildingSidebar/      # scrollable, responsive
+    FloorMap/ FloorSidebar/ FooterCarousel/ LoginScreen/
+  hooks/
+    useSiteSettings.jsx   # fetch /api/site-settings -> document.title
+    useAuth.jsx           # /api/auth/me, session 10p
+  styles/
+    index.css + responsive.css (100dvh + safe-area)
+```
+
+### 6. Hiệu ứng chuyển cảnh
+- Click hotspot -> `viewer.animate({ yaw, pitch, zoom:75, speed:2000 })` 2s -> preload ảnh đích -> switch ngay kích thước thật, không đen (backdrop blur).
+
+---
+
+## 🇬🇧 English
+
+### 1. Requirements
+- Node 20+
+
+### 2. Setup after clone
+```bash
+git clone <pano-repo>
+cd pano
+npm install
+```
+
+### 3. Run dev
+```bash
+npm run dev     # Vite dev with proxy /api -> http://pano-admin.test
+npm run deploy  # build + copy to pano-admin/public/pano
+```
+
+Edit `vite.config.js` `VITE_PROXY_TARGET` if `pano-admin` is elsewhere.
+
+### 4. Build & Deploy
+```bash
+npm run build
+npm run deploy  # see deploy.ps1 for steps
+```
+If you move `pano-admin` folder, update `deploy.ps1:8` `$LaravelPublicPano` then re-run `npm run deploy`. Then commit `public/pano` in `pano-admin` and `git push`.
+
+### 5. Features
+- TopHeader with role-based Admin link, fullscreen, help modal
+- PanoramaViewer with 2s zoom-to-hotspot, preloaded, blurred backdrop (no black flash)
+- Responsive (iPhone 13 fixed, BuildingSidebar scrollable)
+
+---
+
+## License
+MIT

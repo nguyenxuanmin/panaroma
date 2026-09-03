@@ -25,8 +25,9 @@
   cursor: pointer;
   box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
 }
-.collapse-icon { font-size: 11px; color: #fff; line-height: 1; }
-.collapse-icon.up { transform: rotate(180deg); }
+.collapse-icon { font-size: 11px; color: #fff; line-height: 1; display: inline-block; transition: transform 0.15s; }
+.collapse-icon.up { transform: none; }
+.collapse-icon.down { transform: none; }
 
 .footer-wrap.collapsed .footer-collapse-bar { margin-top: 0; }
 

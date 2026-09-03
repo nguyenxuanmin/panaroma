@@ -11,7 +11,7 @@ export default function MapHotspot({ panorama, isActive, onClick, onHover }) {
       onClick={(e) => { e.stopPropagation(); onClick(panorama); }}
       onMouseEnter={() => onHover && onHover(panorama)}
       onMouseLeave={() => onHover && onHover(null)}
-      title={`${displayLabel} (Bấm để xem 360°)`}
+      title={`${displayLabel} (Click to view 360°)`}
     >
       {/* Black label bar + leader line wrapper */}
       <div className="hotspot-label-wrap">

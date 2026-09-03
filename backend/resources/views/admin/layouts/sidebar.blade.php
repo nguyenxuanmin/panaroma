@@ -26,6 +26,11 @@
                         <p>Hotspot</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{route('list_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
+                        <p>User</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

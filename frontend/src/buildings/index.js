@@ -1,9 +1,6 @@
-import { buildingPresetList } from "./presets/index.js";
+import buildingsData from "./buildingsData";
 
-// Re-export presets as canonical source (thay cho buildingsData monolith)
-export const buildings = buildingPresetList;
-export { buildingPresets, buildingPresetList } from "./presets/index.js";
-export { getBuildingById as getBuildingByIdFromService, getBuildingsByIds, getAllBuildings, getBuildingIds } from "./buildingService.js";
+export const buildings = buildingsData;
 
 // Flatten helper: lấy floor object từ building hoặc building single
 export function getBuildingById(id) {
@@ -41,9 +38,11 @@ export function findPanoramaById(panoramaId) {
   return null;
 }
 
-// Lấy floor hiện tại đang active để render map
+// Lấy floor hiện tại đang active để render map - building tách rời nên có thể null
 export function getActiveFloor(building, floorId) {
+  if (!building) return null;
   if (building.type === "single") return building;
+  if (!building.floors || building.floors.length === 0) return building;
   if (!floorId) return building.floors[0];
   return building.floors.find((f) => f.id === floorId) || building.floors[0];
 }

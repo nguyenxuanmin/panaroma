@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "powershell -ExecutionPolicy Bypass -File ./deploy.ps1",
+    "deploy:bash": "npm run build && rm -rf ../pano-admin/public/pano && mkdir -p ../pano-admin/public/pano && cp -r dist/* ../pano-admin/public/pano/"
   },
   "dependencies": {
     "@photo-sphere-viewer/core": "^5.14.0",

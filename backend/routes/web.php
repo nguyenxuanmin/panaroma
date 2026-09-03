@@ -30,10 +30,11 @@ Route::group(['middleware' => [SystemAuth::class]], function () {
         Route::get('/floor/edit/{id}', [FloorController::class, 'edit'])->name('edit_floor');
         // Project
         Route::get('/project', [ProjectController::class, 'show'])->name('list_project');
-        Route::get('/project/add', [ProjectController::class, 'add'])->name('add_project');
+        //Route::get('/project/add', [ProjectController::class, 'add'])->name('add_project');
         Route::post('/project/save', [ProjectController::class, 'save'])->name('save_project');
-        Route::post('/project/delete', [ProjectController::class, 'delete'])->name('delete_project');
+        //Route::post('/project/delete', [ProjectController::class, 'delete'])->name('delete_project');
         Route::get('/project/edit/{id}', [ProjectController::class, 'edit'])->name('edit_project');
+        Route::get('/project/change-password/{id}', [ProjectController::class, 'changePassword'])->name('change_password_project');
         // Panorama
         Route::get('/panorama', [PanoramaController::class, 'show'])->name('list_panorama');
         Route::get('/panorama/add', [PanoramaController::class, 'add'])->name('add_panorama');

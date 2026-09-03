@@ -18,7 +18,10 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden; /* Prevent scrollbars if not needed */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 h1 {

@@ -1,3 +1,20 @@
+/**
+ * FLOORS DATA
+ * -----------
+ * Cấu trúc dữ liệu tập trung cho tất cả các tầng.
+ * Khi tích hợp Database, thay toàn bộ mảng này bằng kết quả từ API:
+ *
+ *   const floors = await fetch('/api/floors').then(r => r.json());
+ *
+ * Mỗi floor gồm:
+ *   - id, name, shortLabel, description, planImage: metadata tầng
+ *   - defaultPanoramaId: panorama mặc định khi chọn tầng
+ *   - videos[]: danh sách video giới thiệu của tầng / dự án (dễ dàng đổ data từ Database sau này)
+ *     └─ { id, title, label, description, thumbnail, videoUrl }
+ *   - panoramas[]: danh sách điểm panorama trong tầng
+ */
+
+// Video mẫu cho dự án (Dễ dàng thay đổi hoặc lấy trực tiếp từ Database)
 const sampleVideos = [
   {
     id: "mov-1",
@@ -44,118 +61,58 @@ const floorsData = [
     videos: sampleVideos,
     panoramas: [
       {
-        id: "exterior-1",
-        name: "外観1",
-        code: "外観1",
-        number: 1,
-        thumbnail: "/images/pana1.jpg",
-        url: "/images/pana1.jpg",
+        id: "exterior-1", name: "外観1", code: "外観1", number: 1,
+        thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 42.5, y: 76.5, angle: 0 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-ext1-2",
-            yaw: 35,
-            pitch: -2,
-            tooltip: "Đến 外観2",
-            targetPanorama: "exterior-2",
-          },
-        ],
+          { id: "hs-ext1-2", yaw: 35, pitch: -2, tooltip: "Đến 外観2", targetPanorama: "exterior-2" }
+        ]
       },
       {
-        id: "exterior-2",
-        name: "外観2",
-        code: "外観2",
-        number: 2,
-        thumbnail: "/images/pana2.jpg",
-        url: "/images/pana2.jpg",
+        id: "exterior-2", name: "外観2", code: "外観2", number: 2,
+        thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg",
         mapPosition: { x: 49.0, y: 52.0, angle: -20 },
         defaultView: { yaw: 30, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-ext2-1",
-            yaw: 215,
-            pitch: -2,
-            tooltip: "Về 外観1",
-            targetPanorama: "exterior-1",
-          },
-          {
-            id: "hs-ext2-3",
-            yaw: 75,
-            pitch: 0,
-            tooltip: "Đến 外観3",
-            targetPanorama: "exterior-3",
-          },
-        ],
+          { id: "hs-ext2-1", yaw: 215, pitch: -2, tooltip: "Về 外観1", targetPanorama: "exterior-1" },
+          { id: "hs-ext2-3", yaw: 75, pitch: 0, tooltip: "Đến 外観3", targetPanorama: "exterior-3" }
+        ]
       },
       {
-        id: "exterior-3",
-        name: "外観3",
-        code: "外観3",
-        number: 3,
-        thumbnail: "/images/pana3.jpg",
-        url: "/images/pana3.jpg",
+        id: "exterior-3", name: "外観3", code: "外観3", number: 3,
+        thumbnail: "/images/pana3.jpg", url: "/images/pana3.jpg",
         mapPosition: { x: 38.0, y: 38.5, angle: 45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-ext3-2",
-            yaw: 250,
-            pitch: -2,
-            tooltip: "Về 外観2",
-            targetPanorama: "exterior-2",
-          },
-          {
-            id: "hs-ext3-4",
-            yaw: 40,
-            pitch: 0,
-            tooltip: "Đến 外観4",
-            targetPanorama: "exterior-4",
-          },
-        ],
+          { id: "hs-ext3-2", yaw: 250, pitch: -2, tooltip: "Về 外観2", targetPanorama: "exterior-2" },
+          { id: "hs-ext3-4", yaw: 40, pitch: 0, tooltip: "Đến 外観4", targetPanorama: "exterior-4" }
+        ]
       },
       {
-        id: "exterior-4",
-        name: "外観4",
-        code: "外観4",
-        number: 4,
-        thumbnail: "/images/pana4.jpg",
-        url: "/images/pana4.jpg",
+        id: "exterior-4", name: "外観4", code: "外観4", number: 4,
+        thumbnail: "/images/pana4.jpg", url: "/images/pana4.jpg",
         mapPosition: { x: 58.5, y: 24.0, angle: 135 },
         defaultView: { yaw: 180, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-ext4-3",
-            yaw: 220,
-            pitch: -2,
-            tooltip: "Về 外観3",
-            targetPanorama: "exterior-3",
-          },
-        ],
+          { id: "hs-ext4-3", yaw: 220, pitch: -2, tooltip: "Về 外観3", targetPanorama: "exterior-3" }
+        ]
       },
       {
-        id: "exterior-5",
-        name: "外観5",
-        code: "外観5",
-        number: 5,
-        thumbnail: "/images/pana1.jpg",
-        url: "/images/pana1.jpg",
+        id: "exterior-5", name: "外観5", code: "外観5", number: 5,
+        thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 74.0, y: 44.0, angle: -85 },
         defaultView: { yaw: 0, pitch: 0 },
-        hotspots: [],
+        hotspots: []
       },
       {
-        id: "exterior-6",
-        name: "外観6",
-        code: "外観6",
-        number: 6,
-        thumbnail: "/images/pana2.jpg",
-        url: "/images/pana2.jpg",
+        id: "exterior-6", name: "外観6", code: "外観6", number: 6,
+        thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg",
         mapPosition: { x: 23.0, y: 75.0, angle: 40 },
         defaultView: { yaw: 45, pitch: 0 },
-        hotspots: [],
-      },
-    ],
+        hotspots: []
+      }
+    ]
   },
 
   {
@@ -168,81 +125,41 @@ const floorsData = [
     videos: sampleVideos,
     panoramas: [
       {
-        id: "1fl-1",
-        name: "1Fl-1",
-        code: "1Fl-1",
-        number: 1,
-        thumbnail: "/images/pana1.jpg",
-        url: "/images/pana1.jpg",
+        id: "1fl-1", name: "1Fl-1", code: "1Fl-1", number: 1,
+        thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 26.0, y: 55.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-1fl1-2",
-            yaw: 45,
-            pitch: 0,
-            tooltip: "Đến Khu Kệ Hàng 2",
-            targetPanorama: "1fl-2",
-          },
-        ],
+          { id: "hs-1fl1-2", yaw: 45, pitch: 0, tooltip: "Đến Khu Kệ Hàng 2", targetPanorama: "1fl-2" }
+        ]
       },
       {
-        id: "1fl-2",
-        name: "1Fl-2",
-        code: "1Fl-2",
-        number: 2,
-        thumbnail: "/images/pana2.jpg",
-        url: "/images/pana2.jpg",
+        id: "1fl-2", name: "1Fl-2", code: "1Fl-2", number: 2,
+        thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg",
         mapPosition: { x: 50.0, y: 55.0, angle: 0 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-1fl2-1",
-            yaw: 180,
-            pitch: 0,
-            tooltip: "Về Điểm 1",
-            targetPanorama: "1fl-1",
-          },
-          {
-            id: "hs-1fl2-3",
-            yaw: 0,
-            pitch: 0,
-            tooltip: "Đến Cửa Xuất Hàng",
-            targetPanorama: "1fl-3",
-          },
-        ],
+          { id: "hs-1fl2-1", yaw: 180, pitch: 0, tooltip: "Về Điểm 1", targetPanorama: "1fl-1" },
+          { id: "hs-1fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Cửa Xuất Hàng", targetPanorama: "1fl-3" }
+        ]
       },
       {
-        id: "1fl-3",
-        name: "1Fl-3",
-        code: "1Fl-3",
-        number: 3,
-        thumbnail: "/images/pana3.jpg",
-        url: "/images/pana3.jpg",
+        id: "1fl-3", name: "1Fl-3", code: "1Fl-3", number: 3,
+        thumbnail: "/images/pana3.jpg", url: "/images/pana3.jpg",
         mapPosition: { x: 45.0, y: 28.0, angle: -90 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-1fl3-4",
-            yaw: 90,
-            pitch: 0,
-            tooltip: "Sang Khu Văn Phòng",
-            targetPanorama: "1fl-4",
-          },
-        ],
+          { id: "hs-1fl3-4", yaw: 90, pitch: 0, tooltip: "Sang Khu Văn Phòng", targetPanorama: "1fl-4" }
+        ]
       },
       {
-        id: "1fl-4",
-        name: "1Fl-4",
-        code: "1Fl-4",
-        number: 4,
-        thumbnail: "/images/pana4.jpg",
-        url: "/images/pana4.jpg",
+        id: "1fl-4", name: "1Fl-4", code: "1Fl-4", number: 4,
+        thumbnail: "/images/pana4.jpg", url: "/images/pana4.jpg",
         mapPosition: { x: 80.0, y: 60.0, angle: 180 },
         defaultView: { yaw: 180, pitch: 0 },
-        hotspots: [],
-      },
-    ],
+        hotspots: []
+      }
+    ]
   },
 
   {
@@ -255,74 +172,40 @@ const floorsData = [
     videos: sampleVideos,
     panoramas: [
       {
-        id: "2fl-1",
-        name: "2Fl-1",
-        code: "2Fl-1",
-        number: 1,
-        thumbnail: "/images/pana1.jpg",
-        url: "/images/pana1.jpg",
+        id: "2fl-1", name: "2Fl-1", code: "2Fl-1", number: 1,
+        thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 30.0, y: 35.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-2fl1-2",
-            yaw: 90,
-            pitch: 0,
-            tooltip: "Đến Khu Kệ B",
-            targetPanorama: "2fl-2",
-          },
-        ],
+          { id: "hs-2fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Khu Kệ B", targetPanorama: "2fl-2" }
+        ]
       },
       {
-        id: "2fl-2",
-        name: "2Fl-2",
-        code: "2Fl-2",
-        number: 2,
-        thumbnail: "/images/pana2.jpg",
-        url: "/images/pana2.jpg",
+        id: "2fl-2", name: "2Fl-2", code: "2Fl-2", number: 2,
+        thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg",
         mapPosition: { x: 30.0, y: 70.0, angle: 180 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-2fl2-3",
-            yaw: 0,
-            pitch: 0,
-            tooltip: "Đến Sảnh Thang Bộ",
-            targetPanorama: "2fl-3",
-          },
-        ],
+          { id: "hs-2fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Sảnh Thang Bộ", targetPanorama: "2fl-3" }
+        ]
       },
       {
-        id: "2fl-3",
-        name: "2Fl-3",
-        code: "2Fl-3",
-        number: 3,
-        thumbnail: "/images/pana3.jpg",
-        url: "/images/pana3.jpg",
+        id: "2fl-3", name: "2Fl-3", code: "2Fl-3", number: 3,
+        thumbnail: "/images/pana3.jpg", url: "/images/pana3.jpg",
         mapPosition: { x: 62.0, y: 65.0, angle: -45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-2fl3-4",
-            yaw: -45,
-            pitch: 0,
-            tooltip: "Đến Phòng Họp",
-            targetPanorama: "2fl-4",
-          },
-        ],
+          { id: "hs-2fl3-4", yaw: -45, pitch: 0, tooltip: "Đến Phòng Họp", targetPanorama: "2fl-4" }
+        ]
       },
       {
-        id: "2fl-4",
-        name: "2Fl-4",
-        code: "2Fl-4",
-        number: 4,
-        thumbnail: "/images/pana4.jpg",
-        url: "/images/pana4.jpg",
+        id: "2fl-4", name: "2Fl-4", code: "2Fl-4", number: 4,
+        thumbnail: "/images/pana4.jpg", url: "/images/pana4.jpg",
         mapPosition: { x: 78.0, y: 35.0, angle: 0 },
         defaultView: { yaw: 180, pitch: 0 },
-        hotspots: [],
-      },
-    ],
+        hotspots: []
+      }
+    ]
   },
 
   {
@@ -335,75 +218,41 @@ const floorsData = [
     videos: sampleVideos,
     panoramas: [
       {
-        id: "3fl-1",
-        name: "3Fl-1",
-        code: "3Fl-1",
-        number: 1,
-        thumbnail: "/images/pana1.jpg",
-        url: "/images/pana1.jpg",
+        id: "3fl-1", name: "3Fl-1", code: "3Fl-1", number: 1,
+        thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 26.0, y: 48.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-3fl1-2",
-            yaw: 90,
-            pitch: 0,
-            tooltip: "Đến Sân Vườn Rooftop",
-            targetPanorama: "3fl-2",
-          },
-        ],
+          { id: "hs-3fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Sân Vườn Rooftop", targetPanorama: "3fl-2" }
+        ]
       },
       {
-        id: "3fl-2",
-        name: "3Fl-2",
-        code: "3Fl-2",
-        number: 2,
-        thumbnail: "/images/pana2.jpg",
-        url: "/images/pana2.jpg",
+        id: "3fl-2", name: "3Fl-2", code: "3Fl-2", number: 2,
+        thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg",
         mapPosition: { x: 30.0, y: 75.0, angle: 0 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-3fl2-3",
-            yaw: 0,
-            pitch: 0,
-            tooltip: "Vào Sảnh Lễ Tân",
-            targetPanorama: "3fl-3",
-          },
-        ],
+          { id: "hs-3fl2-3", yaw: 0, pitch: 0, tooltip: "Vào Sảnh Lễ Tân", targetPanorama: "3fl-3" }
+        ]
       },
       {
-        id: "3fl-3",
-        name: "3Fl-3",
-        code: "3Fl-3",
-        number: 3,
-        thumbnail: "/images/pana3.jpg",
-        url: "/images/pana3.jpg",
+        id: "3fl-3", name: "3Fl-3", code: "3Fl-3", number: 3,
+        thumbnail: "/images/pana3.jpg", url: "/images/pana3.jpg",
         mapPosition: { x: 62.0, y: 52.0, angle: -45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          {
-            id: "hs-3fl3-4",
-            yaw: 0,
-            pitch: 0,
-            tooltip: "Đến Phòng Hội Nghị",
-            targetPanorama: "3fl-4",
-          },
-        ],
+          { id: "hs-3fl3-4", yaw: 0, pitch: 0, tooltip: "Đến Phòng Hội Nghị", targetPanorama: "3fl-4" }
+        ]
       },
       {
-        id: "3fl-4",
-        name: "3Fl-4",
-        code: "3Fl-4",
-        number: 4,
-        thumbnail: "/images/pana4.jpg",
-        url: "/images/pana4.jpg",
+        id: "3fl-4", name: "3Fl-4", code: "3Fl-4", number: 4,
+        thumbnail: "/images/pana4.jpg", url: "/images/pana4.jpg",
         mapPosition: { x: 80.0, y: 32.0, angle: 180 },
         defaultView: { yaw: 180, pitch: 0 },
-        hotspots: [],
-      },
-    ],
-  },
+        hotspots: []
+      }
+    ]
+  }
 ];
 
 export default floorsData;

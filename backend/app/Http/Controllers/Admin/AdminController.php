@@ -16,7 +16,7 @@ class AdminController extends Controller
         if (empty($user_name) || empty($password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tên đăng nhập và mật khẩu không được để trống.'
+                'message' => 'The username and password must not be left blank.'
             ]);
         }
 
@@ -30,7 +30,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => false,
-            'message' => 'Thông tin đăng nhập không chính xác.'
+            'message' => 'The username or password is incorrect.'
         ]);
     }
 
@@ -51,28 +51,28 @@ class AdminController extends Controller
         if (empty($passwordOld) || empty($passwordNew) || empty($passwordConfirm)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vui lòng nhập đầy đủ thông tin mật khẩu.'
+                'message' => 'Please fill in all password information.'
             ]);
         }
 
         if (!Hash::check($passwordOld, Auth::user()->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mật khẩu cũ không chính xác.'
+                'message' => 'The old password is incorrect.'
             ]);
         }
 
         if (strlen($passwordNew) < 8) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mật khẩu mới phải có ít nhất 8 ký tự.'
+                'message' => 'The new password must be at least 8 characters long.'
             ]);
         }
 
         if ($passwordNew !== $passwordConfirm) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xác nhận mật khẩu mới không khớp.'
+                'message' => 'The confirmation of the new password does not match.'
             ]);
         }
 

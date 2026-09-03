@@ -9,9 +9,20 @@
   flex-direction: column;
   gap: 8px;
   width: 132px;
+  max-height: calc(100vh - 160px);
+  max-height: calc(100dvh - 160px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af transparent;
+  overscroll-behavior: contain;
   pointer-events: auto;
   font-family: "Hiragino Kaku Gothic Pro", "Meiryo", Arial, sans-serif;
 }
+.building-sidebar::-webkit-scrollbar { width: 4px; }
+.building-sidebar::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 2px; }
+.building-sidebar::-webkit-scrollbar-track { background: transparent; }
 
 .bs-btn {
   width: 100%;
@@ -76,25 +87,44 @@
   padding: 6px 8px;
 }
 
-/* responsive - tablet nhỏ lại */
+/* responsive - tablet nhỏ lại - tránh đè lên pano-unified-minimap-wrap */
 @media (max-width: 1024px) {
   .building-sidebar {
-    right: 12px;
-    width: 98px;
-    gap: 5px;
+    right: 10px;
+    width: 90px;
+    gap: 4px;
+    max-height: calc(100vh - 140px);
+    max-height: calc(100dvh - 140px);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 41;
   }
-  .bs-btn { font-size: 10px; padding: 5px 6px; }
-  .bs-group { padding: 5px 4px 4px; gap: 4px; }
-  .bs-group-label { font-size: 10px; }
-  .bs-floor-btn { font-size: 10px; padding: 5px 6px; }
+  .bs-btn { font-size: 10px; padding: 5px 4px; }
+  .bs-group { padding: 4px 3px 3px; gap: 3px; }
+  .bs-group-label { font-size: 9px; }
+  .bs-floor-btn { font-size: 9px; padding: 4px 4px; }
 }
 @media (max-width: 768px) {
   .building-sidebar {
-    right: 8px;
-    width: 86px;
-    gap: 4px;
+    right: 6px;
+    width: 82px;
+    gap: 3px;
+    max-height: calc(100vh - 130px);
+    max-height: calc(100dvh - 130px);
+    top: 52%;
   }
-  .bs-btn { font-size: 9px; padding: 4px 5px; }
-  .bs-group { padding: 4px 3px 3px; }
-  .bs-floor-btn { font-size: 9px; padding: 4px 5px; }
+  .bs-btn { font-size: 9px; padding: 4px 3px; line-height: 1.2; }
+  .bs-group { padding: 3px 2px 2px; }
+  .bs-group-label { font-size: 8px; }
+  .bs-floor-btn { font-size: 8px; padding: 3px 3px; }
+}
+@media (max-width: 480px) {
+  .building-sidebar {
+    right: 4px;
+    width: 74px;
+    gap: 3px;
+    max-height: calc(100vh - 120px);
+    max-height: calc(100dvh - 120px);
+  }
+  .bs-btn { font-size: 8px; padding: 3px 2px; }
 }

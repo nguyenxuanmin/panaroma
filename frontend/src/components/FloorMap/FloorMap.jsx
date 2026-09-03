@@ -13,13 +13,13 @@ export default function FloorMap({ floor, building, activePanorama, onSelectPano
       <div className="map-minimap-wrap">
         {showMinimap && <MapMinimap floor={floor} activePanorama={activePanorama} onSelectPanorama={onSelectPanorama} scale={miniScale} />}
         <div className="mm-ctrls">
-          <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Ẩn minimap" : "Hiện minimap"}>
+          <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Hide minimap" : "Show minimap"}>
             {showMinimap ? "«" : "»"}
           </button>
           <button
             className="mm-ctrl-btn"
             onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
-            title="Phóng to minimap (1x → 1.75x → 2.6x)"
+            title="Zoom in on minimap"
           >
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
               <circle cx="11" cy="11" r="7" />

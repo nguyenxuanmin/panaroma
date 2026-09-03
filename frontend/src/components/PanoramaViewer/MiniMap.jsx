@@ -31,7 +31,7 @@ export default function MiniMap({
       className="pano-minimap-box"
       style={{ width: `${mapSize}px` }}
       onWheel={handleWheel}
-      title="Bản đồ thu nhỏ (Cuộn chuột hoặc dùng +/- để phóng to)"
+      title="Mini-map (Scroll or use +/- to zoom in)"
     >
       <div
         className="pano-minimap-img-wrap"

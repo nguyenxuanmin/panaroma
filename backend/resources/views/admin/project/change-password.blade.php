@@ -1,18 +1,19 @@
 @extends('admin.layouts.master-page')
 
 @section('title')
-    Change Password Admin
+    Change Password
 @endsection
 
 @section('content')
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6"><h3 class="mb-0">Change Password Admin</h3></div>
+                <div class="col-sm-6"><h3 class="mb-0">Change Password</h3></div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="{{route('admin')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Change Password Admin</li>
+                        <li class="breadcrumb-item"><a href="{{route('list_project')}}">User</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{$titlePage}}</li>
                     </ol>
                 </div>
             </div>
@@ -21,18 +22,13 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card card-primary card-outline mb-4">
-                <form id="submitForm" data-url-submit="{{route('save_change_password')}}" data-url-complete="{{route('admin')}}">
+                <form id="submitForm" data-url-submit="{{route('save_project')}}" data-url-complete="{{route('list_project')}}">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <button class="btn btn-primary">Save</button>
                             </div>
                             <div class="col-12 col-md-4">
-                                <div class="mb-3 position-relative">
-                                    <label for="old" class="form-label">Old Password</label>
-                                    <input type="password" class="form-control" name="old" value="">
-                                    <i class="bi bi-eye icon-eye" onclick="togglePassword('old')"></i>
-                                </div>
                                 <div class="mb-3 position-relative">
                                     <label for="new" class="form-label">New Password</label>
                                     <input type="password" class="form-control" name="new" value="">
@@ -46,6 +42,8 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="action" value="{{$action}}">
+                    <input type="hidden" name="id" value="@if (isset($project)){{$project->id}}@endif">
                 </form>
             </div>
         </div>

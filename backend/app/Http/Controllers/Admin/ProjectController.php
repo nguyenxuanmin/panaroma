@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Services\AdminService;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Project;
 
 class ProjectController extends Controller
@@ -23,7 +24,7 @@ class ProjectController extends Controller
     }
 
     public function add(){
-        $titlePage = "Thêm dự án";
+        $titlePage = "Add Project";
         $action = "add";
         return view('admin.project.main',[
             'titlePage' => $titlePage,
@@ -32,7 +33,7 @@ class ProjectController extends Controller
     }
 
     public function edit($id){
-        $titlePage = "Sửa dự án";
+        $titlePage = "Update Project";
         $action = "edit";
         $project = Project::find($id);
         return view('admin.project.main',[
@@ -42,28 +43,62 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function changePassword($id){
+        $titlePage = "Change Password";
+        $action = "change_password";
+        $project = Project::find($id);
+        return view('admin.project.change-password',[
+            'titlePage' => $titlePage,
+            'action' => $action,
+            'project' => $project
+        ]);
+    }
+
     public function save(Request $request){
-        $title = $request->title;
-        $slug = Str::slug($title);
         $action = $request->action;
+        if($action == "change_password"){
+            $passwordNew = $request->input('new');
+            $passwordConfirm = $request->input('confirm');
 
-        if (empty($title)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tiêu đề không được để trống.'
-            ]);
-        }
+            if (empty($passwordNew) || empty($passwordConfirm)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please fill in all password information.'
+                ]);
+            }
 
-        if($action == "edit"){
+            if ($passwordNew != $passwordConfirm) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The new password and confirmation password do not match.'
+                ]);
+            }
+
             $project = Project::find($request->id);
+            $project->password = Hash::make($passwordNew);
+            
         }else{
-            $project = new Project();
-        }
-        
-        $project->name = $title;
-        $project->slug = $slug;
-        $project->save();
+            $title = $request->title;
+            $slug = Str::slug($title);
 
+            if (empty($title)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The title cannot be left blank.'
+                ]);
+            }
+
+            if($action == "edit"){
+                $project = Project::find($request->id);
+            }else{
+                $project = new Project();
+            }
+            
+            $project->name = $title;
+            $project->slug = $slug;
+        }
+
+        $project->save();
         return response()->json([
             'success' => true,
             'message' => ""

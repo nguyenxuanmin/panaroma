@@ -36,7 +36,8 @@ export default function MapMinimap({ floor, activePanorama, onSelectPanorama, sc
                     height: `${coneSize}px`,
                     top: `-${coneSize}px`,
                     left: `-${coneSize / 2}px`,
-                    transform: `rotate(${currentYaw}deg)`,
+                    // backend map_angle 0°=Đông (sang phải), 90°=Nam, 180°=Tây - cone fan gốc chỉ Bắc, nên +90° để khớp Ảnh 1
+                    transform: `rotate(${(currentYaw + 90) % 360}deg)`,
                     transformOrigin: `${coneSize / 2}px ${coneSize}px`,
                   }}
                 >

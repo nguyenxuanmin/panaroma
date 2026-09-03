@@ -12,7 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Enable CORS + session for API (need session for /api/auth/me)
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        ]);
+        // Ensure CORS for web too
+        $middleware->web(append: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

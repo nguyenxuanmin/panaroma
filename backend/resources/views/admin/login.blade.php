@@ -23,10 +23,10 @@
             </div>
             <div class="card">
                 <div class="card-body login-card-body">
-                    <p class="login-box-msg">Đăng nhập để bắt đầu phiên làm việc</p>
+                    <p class="login-box-msg">Log in to start the session.</p>
                     <form id="formLogIn">
                         <div class="input-group mb-3">
-                            <input type="text" name="user_name" class="form-control" placeholder="Tên đăng nhập" />
+                            <input type="text" name="user_name" class="form-control" placeholder="Username" />
                             <div class="input-group-text"><span class="bi bi-envelope"></span></div>
                         </div>
                         <div class="input-group mb-3">
@@ -34,7 +34,7 @@
                             <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
                         </div>
                         <div class="d-grid gap-2 mb-2">
-                            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                            <button type="submit" class="btn btn-primary">Log In</button>
                         </div>
                     </form>
                     <p id="response" class="mb-1"></p>
