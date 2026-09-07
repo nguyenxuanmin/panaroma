@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hotspot extends Model
 {
-    public function panorama()
+    public function panaroma()
     {
-        return $this->belongsTo(Panorama::class, 'panorama_id');
+        return $this->belongsTo(Panaroma::class, 'panaroma_id');
     }
 
-    public function targetPanorama()
+    public function targetPanaroma()
     {
-        return $this->belongsTo(Panorama::class, 'target_panorama_id');
+        return $this->belongsTo(Panaroma::class, 'target_panaroma_id');
     }
 }

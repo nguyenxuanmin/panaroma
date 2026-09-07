@@ -7,7 +7,7 @@ import LoginScreen from "./components/LoginScreen/LoginScreen";
 import BuildingSidebar from "./components/BuildingSidebar/BuildingSidebar";
 import FloorMap from "./components/FloorMap/FloorMap";
 import FooterCarousel from "./components/FooterCarousel/FooterCarousel";
-import PanoramaViewer from "./components/PanoramaViewer/PanoramaViewer";
+import PanaromaViewer from "./components/PanaromaViewer/PanaromaViewer";
 import TopHeader from "./components/TopHeader/TopHeader";
 import SettingsPanel from "./components/SettingsPanel";
 import GoogleMapModal from "./components/GoogleMapModal/GoogleMapModal";
@@ -38,7 +38,7 @@ function App() {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", flexDirection: "column", gap: 12, background: "#0f172a", color: "#fff" }}>
         <div style={{ width: 36, height: 36, border: "3px solid #334155", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <span style={{ fontSize: 13, opacity: 0.8 }}>Đang tải dữ liệu panorama...</span>
+        <span style={{ fontSize: 13, opacity: 0.8 }}>Đang tải dữ liệu panaroma...</span>
         <style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style>
       </div>
     );
@@ -85,16 +85,16 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     return getActiveFloorHelper(b, fid);
   };
   const activeFloor = getActiveFloor(activeBuilding, activeFloorId);
-  const [activePanorama, setActivePanorama] = useState(activeFloor?.panoramas?.[0] ?? null);
+  const [activePanaroma, setActivePanaroma] = useState(activeFloor?.panaromas?.[0] ?? null);
 
   useEffect(() => {
-    if (activeFloor?.panoramas?.length && !activeFloor.panoramas.find((p) => p.id === activePanorama?.id)) {
-      setActivePanorama(activeFloor.panoramas[0]);
+    if (activeFloor?.panaromas?.length && !activeFloor.panaromas.find((p) => p.id === activePanaroma?.id)) {
+      setActivePanaroma(activeFloor.panaromas[0]);
     }
-    if (!activeFloor && activePanorama) {
-      setActivePanorama(null);
+    if (!activeFloor && activePanaroma) {
+      setActivePanaroma(null);
     }
-  }, [activeFloor, activePanorama]);
+  }, [activeFloor, activePanaroma]);
   const [viewMode, setViewMode] = useState("map");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showGmap, setShowGmap] = useState(false);
@@ -106,36 +106,36 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     setActiveBuilding(building);
     if (building.type === "single") {
       setActiveFloorId(null);
-      if (building.panoramas?.length) setActivePanorama(building.panoramas[0]);
-      else setActivePanorama(null);
+      if (building.panaromas?.length) setActivePanaroma(building.panaromas[0]);
+      else setActivePanaroma(null);
     } else {
       const first = building.floors?.[0];
       if (first) {
         setActiveFloorId(first.id);
-        if (first.panoramas?.length) setActivePanorama(first.panoramas[0]);
-        else setActivePanorama(null);
+        if (first.panaromas?.length) setActivePanaroma(first.panaromas[0]);
+        else setActivePanaroma(null);
       } else {
         setActiveFloorId(null);
-        setActivePanorama(null);
+        setActivePanaroma(null);
       }
     }
   };
 
   const handleSelectFloor = (floor) => {
     setActiveFloorId(floor.id);
-    if (floor.panoramas?.length) setActivePanorama(floor.panoramas[0]);
-    else setActivePanorama(null);
+    if (floor.panaromas?.length) setActivePanaroma(floor.panaromas[0]);
+    else setActivePanaroma(null);
   };
 
-  const findPanoramaById = (pid) => {
+  const findPanaromaById = (pid) => {
     for (const b of buildings) {
       if (b.type === "single") {
-        const pano = b.panoramas?.find((p) => p.id === pid);
-        if (pano) return { building: b, floor: b, panorama: pano };
+        const pano = b.panaromas?.find((p) => p.id === pid);
+        if (pano) return { building: b, floor: b, panaroma: pano };
       } else {
         for (const f of b.floors || []) {
-          const pano = f.panoramas?.find((p) => p.id === pid);
-          if (pano) return { building: b, floor: f, panorama: pano };
+          const pano = f.panaromas?.find((p) => p.id === pid);
+          if (pano) return { building: b, floor: f, panaroma: pano };
         }
       }
     }
@@ -150,7 +150,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     if (!bs.length) {
       setActiveBuilding(null);
       setActiveFloorId(null);
-      setActivePanorama(null);
+      setActivePanaroma(null);
       setViewMode("map");
       return;
     }
@@ -159,29 +159,29 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     const fid = nb.type === "group" ? nb.floors?.[0]?.id ?? null : null;
     setActiveFloorId(fid);
     const nf = fid ? nb.floors[0] : nb;
-    setActivePanorama(nf?.panoramas?.[0] ?? null);
+    setActivePanaroma(nf?.panaromas?.[0] ?? null);
     setViewMode("map");
   };
 
-  const handleHotspot3DClick = (targetPanoramaId) => {
-    const found = findPanoramaById(targetPanoramaId);
+  const handleHotspot3DClick = (targetPanaromaId) => {
+    const found = findPanaromaById(targetPanaromaId);
     if (found) {
       setActiveBuilding(found.building);
       if (found.building.type === "group") setActiveFloorId(found.floor.id);
       else setActiveFloorId(null);
-      setActivePanorama(found.panorama);
+      setActivePanaroma(found.panaroma);
     }
   };
 
-  const handleMapPanoramaClick = (pano) => {
-    const found = findPanoramaById(pano.id);
+  const handleMapPanaromaClick = (pano) => {
+    const found = findPanaromaById(pano.id);
     if (found) {
       setActiveBuilding(found.building);
       if (found.building.type === "group") setActiveFloorId(found.floor.id);
       else setActiveFloorId(null);
     }
-    setActivePanorama(pano);
-    setViewMode("panorama");
+    setActivePanaroma(pano);
+    setViewMode("panaroma");
   };
 
   // Footer chỉ show thumbnail của tầng hiện tại, tối đa 6
@@ -201,7 +201,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
         <TopHeader
           activeBuilding={null}
           activeFloor={null}
-          activePanorama={null}
+          activePanaroma={null}
           viewMode={viewMode}
           onToggleViewMode={(mode) => setViewMode(mode)}
           onOpenGoogleMap={() => setShowGmap(true)}
@@ -219,7 +219,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
           <div style={{ fontSize: 48, opacity: 0.2 }}>🏢</div>
           <div style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>Dự án "{selectedProject.name}" chưa có Building</div>
           <div style={{ fontSize: 12, color: "#64748b", maxWidth: 360, textAlign: "center" }}>
-            Admin có thể thêm Building trong Filament, hoặc thêm Panorama trực tiếp cho Project.<br />
+            Admin có thể thêm Building trong Filament, hoặc thêm Panaroma trực tiếp cho Project.<br />
             Dự án vẫn hoạt động bình thường — không bị lỗi.
           </div>
         </main>
@@ -235,9 +235,9 @@ function AppContent({ projects, isFallback, user, onLogout }) {
   if (!activeFloor) {
     return (
       <div className="app-layout">
-        <TopHeader activeBuilding={activeBuilding} activeFloor={null} activePanorama={null} viewMode={viewMode} onToggleViewMode={(mode) => setViewMode(mode)} onOpenGoogleMap={() => setShowGmap(true)} onOpenVideo={() => setShowVideo(true)} onToggleFullscreen={handleToggleFullscreen} onToggleSidebar={() => setShowSidebar((v) => !v)} projects={projects} selectedProjectId={selectedProjectId} onSelectProject={handleSelectProject} user={user} onLogout={onLogout} showTopButtons={showSidebar} />
+        <TopHeader activeBuilding={activeBuilding} activeFloor={null} activePanaroma={null} viewMode={viewMode} onToggleViewMode={(mode) => setViewMode(mode)} onOpenGoogleMap={() => setShowGmap(true)} onOpenVideo={() => setShowVideo(true)} onToggleFullscreen={handleToggleFullscreen} onToggleSidebar={() => setShowSidebar((v) => !v)} projects={projects} selectedProjectId={selectedProjectId} onSelectProject={handleSelectProject} user={user} onLogout={onLogout} showTopButtons={showSidebar} />
         <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8 }}>
-          <span style={{ fontSize: 13, color: "#64748b" }}>Building "{activeBuilding.name}" chưa có Floor/Panorama</span>
+          <span style={{ fontSize: 13, color: "#64748b" }}>Building "{activeBuilding.name}" chưa có Floor/Panaroma</span>
         </main>
       </div>
     );
@@ -253,7 +253,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
       <TopHeader
         activeBuilding={activeBuilding}
         activeFloor={activeFloor}
-        activePanorama={activePanorama}
+        activePanaroma={activePanaroma}
         viewMode={viewMode}
         onToggleViewMode={(mode) => setViewMode(mode)}
         onOpenGoogleMap={() => setShowGmap(true)}
@@ -270,19 +270,19 @@ function AppContent({ projects, isFallback, user, onLogout }) {
 
       <main className="main-viewport">
         {viewMode === "map" ? (
-          activePanorama ? <FloorMap floor={activeFloor} building={activeBuilding} activePanorama={activePanorama} onSelectPanorama={handleMapPanoramaClick} /> : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: 13 }}>Chưa có Panorama</div>
+          activePanaroma ? <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} /> : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: 13 }}>Chưa có Panaroma</div>
         ) : (
-          activePanorama ? (
-            <PanoramaViewer
-              panorama={activePanorama}
+          activePanaroma ? (
+            <PanaromaViewer
+              panaroma={activePanaroma}
               floor={activeFloor}
               building={activeBuilding}
               onHotspotClick={handleHotspot3DClick}
-              onSelectPanorama={(pano) => setActivePanorama(pano)}
+              onSelectPanaroma={(pano) => setActivePanaroma(pano)}
               onReturnToMap={() => setViewMode("map")}
               showLeftToolbar={showSidebar}
             />
-          ) : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>Chưa có Panorama</div>
+          ) : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>Chưa có Panaroma</div>
         )}
         {showSidebar && hasBuildings && (
           <BuildingSidebar
@@ -293,7 +293,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
             onSelectFloor={handleSelectFloor}
           />
         )}
-        <FooterCarousel panoramas={activeFloor?.panoramas || []} activePanorama={activePanorama} onSelectPanorama={handleMapPanoramaClick} floorId={activeFloor?.id} />
+        <FooterCarousel panaromas={activeFloor?.panaromas || []} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} floorId={activeFloor?.id} />
       </main>
 
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />

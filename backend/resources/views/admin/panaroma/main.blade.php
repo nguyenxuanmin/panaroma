@@ -12,7 +12,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="{{route('admin')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('list_panorama')}}">Panorama</a></li>
+                        <li class="breadcrumb-item"><a href="{{route('list_panaroma')}}">Panaroma</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{$titlePage}}</li>
                     </ol>
                 </div>
@@ -22,7 +22,7 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card card-primary card-outline mb-4">
-                <form id="submitForm" enctype="multipart/form-data" data-url-submit="{{route('save_panorama')}}" data-url-complete="{{route('list_panorama')}}">
+                <form id="submitForm" enctype="multipart/form-data" data-url-submit="{{route('save_panaroma')}}" data-url-complete="{{route('list_panaroma')}}">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 mb-3">
@@ -31,35 +31,35 @@
                                 @else
                                     <button class="btn btn-info">Update</button>
                                 @endif
-                                <a href="{{route('list_panorama')}}" class="btn btn-dark">Back</a>
+                                <a href="{{route('list_panaroma')}}" class="btn btn-dark">Back</a>
                             </div>
                             <div class="col-12 col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Title</label>
-                                    <input type="text" class="form-control" name="title" value="@if (isset($panorama)){{$panorama->name}}@endif">
+                                    <input type="text" class="form-control" name="title" value="@if (isset($panaroma)){{$panaroma->name}}@endif">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Panorama Category</label>
+                                    <label class="form-label">Panaroma Category</label>
                                     <select class="form-select" name="floor" id="floorSelect">
                                         @if (isset($floors))
-                                            @if (!isset($panorama) || (isset($panorama) && empty($panorama->floor_id)))
-                                                <option selected disabled value="">Select Panorama Category</option>
+                                            @if (!isset($panaroma) || (isset($panaroma) && empty($panaroma->floor_id)))
+                                                <option selected disabled value="">Select Panaroma Category</option>
                                             @endif
                                             @foreach ($floors as $item)
-                                                <option @if (isset($panorama) && $item->id == $panorama->floor_id) selected @endif value="{{$item->id}}" data-image="{{ $item->plan_image ? asset($item->plan_image) : '' }}">{{$item->name}}</option>
+                                                <option @if (isset($panaroma) && $item->id == $panaroma->floor_id) selected @endif value="{{$item->id}}" data-image="{{ $item->plan_image ? asset($item->plan_image) : '' }}">{{$item->name}}</option>
                                             @endforeach
                                         @else
-                                            <option selected disabled value="">Select Panorama Category</option>
+                                            <option selected disabled value="">Select Panaroma Category</option>
                                         @endif
                                     </select>
                                 </div>
                                 <div class="mb-3" id="floorPlanContainer" style="display: none;">
-                                    <label class="form-label">Position on the panorama category map</label>
+                                    <label class="form-label">Position on the panaroma category map</label>
                                     <div id="floorPlan" style="position: relative; cursor: crosshair; line-height: 0;">
                                         <img id="floorPlanImage" src="" alt="Sơ đồ floor" style="display: block; max-width: 100%; height: auto;">
                                         <span id="floorPlanMarker" aria-hidden="true" style="display: none; position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%; background: #dc3545; box-shadow: 0 0 0 1px #000;"></span>
                                     </div>
-                                    <small class="text-muted">Click on the diagram to select a panorama location.</small>
+                                    <small class="text-muted">Click on the diagram to select a panaroma location.</small>
                                 </div>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
@@ -67,19 +67,19 @@
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
                                     <div class="imageContent">
-                                        <img id="imageContent" src="@if (isset($panorama) && !empty($panorama->thumbnail)){{ asset($panorama->thumbnail) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
+                                        <img id="imageContent" src="@if (isset($panaroma) && !empty($panaroma->thumbnail)){{ asset($panaroma->thumbnail) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <input type="hidden" name="action" value="{{$action}}">
-                    <input type="hidden" name="id" value="@if (isset($panorama)){{$panorama->id}}@endif">
-                    <input type="hidden" class="form-control" name="map_x" value="@if (isset($panorama)){{$panorama->map_x}}@endif">
-                    <input type="hidden" class="form-control" name="map_y" value="@if (isset($panorama)){{$panorama->map_y}}@endif">
-                    <input type="hidden" class="form-control" name="map_angle" value="@if (isset($panorama)){{$panorama->map_angle}}@endif">
-                    <input type="hidden" class="form-control" name="yaw" value="@if (isset($panorama)){{$panorama->default_yaw}}@endif">
-                    <input type="hidden" class="form-control" name="pitch" value="@if (isset($panorama)){{$panorama->default_pitch}}@endif">
+                    <input type="hidden" name="id" value="@if (isset($panaroma)){{$panaroma->id}}@endif">
+                    <input type="hidden" class="form-control" name="map_x" value="@if (isset($panaroma)){{$panaroma->map_x}}@endif">
+                    <input type="hidden" class="form-control" name="map_y" value="@if (isset($panaroma)){{$panaroma->map_y}}@endif">
+                    <input type="hidden" class="form-control" name="map_angle" value="@if (isset($panaroma)){{$panaroma->map_angle}}@endif">
+                    <input type="hidden" class="form-control" name="yaw" value="@if (isset($panaroma)){{$panaroma->default_yaw}}@endif">
+                    <input type="hidden" class="form-control" name="pitch" value="@if (isset($panaroma)){{$panaroma->default_pitch}}@endif">
                 </form>
             </div>
         </div>

@@ -1,15 +1,15 @@
 import React from "react";
 
-export default function MapHotspot({ panorama, isActive, onClick, onHover }) {
-  const { mapPosition, name, label } = panorama;
+export default function MapHotspot({ panaroma, isActive, onClick, onHover }) {
+  const { mapPosition, name, label } = panaroma;
   const displayLabel = label || name;
 
   return (
     <div
       className={`map-hotspot ${isActive ? "active" : ""}`}
       style={{ left: `${mapPosition.x}%`, top: `${mapPosition.y}%` }}
-      onClick={(e) => { e.stopPropagation(); onClick(panorama); }}
-      onMouseEnter={() => onHover && onHover(panorama)}
+      onClick={(e) => { e.stopPropagation(); onClick(panaroma); }}
+      onMouseEnter={() => onHover && onHover(panaroma)}
       onMouseLeave={() => onHover && onHover(null)}
       title={`${displayLabel} (Click to view 360°)`}
     >

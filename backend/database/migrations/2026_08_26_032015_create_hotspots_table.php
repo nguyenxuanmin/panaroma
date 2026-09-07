@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('hotspots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('panorama_id')->constrained('panoramas')->cascadeOnDelete();
+            $table->foreignId('panaroma_id')->constrained('panaromas')->cascadeOnDelete();
             $table->decimal('yaw', 7, 2)->default(0);
             $table->decimal('pitch', 7, 2)->default(0);
             $table->string('title')->nullable();
-            $table->foreignId('target_panorama_id')->constrained('panoramas')->cascadeOnDelete();
+            $table->foreignId('target_panaroma_id')->constrained('panaromas')->cascadeOnDelete();
             $table->timestamps();
         });
     }

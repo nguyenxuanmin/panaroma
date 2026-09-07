@@ -3,33 +3,33 @@ import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import MapMinimap from "../MapMinimap/MapMinimap";
-import "./PanoramaViewer.css";
+import "./PanaromaViewer.css";
 
-export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSelectPanorama, showLeftToolbar = true }) {
+export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true }) {
   const viewerRef = useRef(null);
-  // map_angle chính là hướng default khi nhảy vào panorama (theo yêu cầu) -> ưu tiên mapPosition.angle
+  // map_angle chính là hướng default khi nhảy vào panaroma (theo yêu cầu) -> ưu tiên mapPosition.angle
   const getInitialAngle = (p) => {
     if (typeof p?.mapPosition?.angle === "number") return p.mapPosition.angle;
     return p?.defaultView?.yaw ?? 0;
   };
-  const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panorama));
+  const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panaroma));
   const [showMinimap, setShowMinimap] = useState(true);
   const [miniScale, setMiniScale] = useState(1);
   const [transitionPhase, setTransitionPhase] = useState("idle");
-  const [visiblePanorama, setVisiblePanorama] = useState(panorama);
+  const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";
 
-  // Preload panorama đích rồi switch ngay với kích thước thật, không hiệu ứng nhảy
+  // Preload panaroma đích rồi switch ngay với kích thước thật, không hiệu ứng nhảy
   useEffect(() => {
-    if (!panorama || panorama.id === visiblePanorama?.id) return;
+    if (!panaroma || panaroma.id === visiblePanaroma?.id) return;
     let cancelled = false;
-    const url = panorama.url || defaultImage;
+    const url = panaroma.url || defaultImage;
     const img = new window.Image();
     img.src = url;
     const done = () => {
       if (cancelled) return;
-      setVisiblePanorama(panorama);
-      setCurrentYaw(getInitialAngle(panorama));
+      setVisiblePanaroma(panaroma);
+      setCurrentYaw(getInitialAngle(panaroma));
       setTransitionPhase("idle");
     };
     if (img.complete) {
@@ -39,10 +39,10 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
       img.onerror = done;
     }
     return () => { cancelled = true; };
-  }, [panorama, visiblePanorama?.id]);
+  }, [panaroma, visiblePanaroma?.id]);
 
   const withFadeTransition = useCallback((cb) => {
-    // Hotspot click: preload target trước khi fade (cb sẽ đổi panorama -> useEffect trên sẽ lo preload)
+    // Hotspot click: preload target trước khi fade (cb sẽ đổi panaroma -> useEffect trên sẽ lo preload)
     // Giữ fade cũ để tương thích, nhưng giờ chuyển cảnh chính do useEffect preload
     setTransitionPhase("out");
     setTimeout(() => {
@@ -50,14 +50,14 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
     }, 150);
   }, []);
 
-  const displayPanorama = visiblePanorama || panorama;
+  const displayPanaroma = visiblePanaroma || panaroma;
   const markers =
-    displayPanorama?.hotspots?.map((hotspot) => ({
+    displayPanaroma?.hotspots?.map((hotspot) => ({
       id: hotspot.id,
       position: { yaw: `${hotspot.yaw}deg`, pitch: `${hotspot.pitch}deg` },
       html: `
         <div class="scene-hotspot-pin">
-          <div class="scene-hotspot-badge">${hotspot.tooltip || hotspot.targetPanorama || "Đi tiếp"}</div>
+          <div class="scene-hotspot-badge">${hotspot.tooltip || hotspot.targetPanaroma || "Đi tiếp"}</div>
           <div class="scene-hotspot-pointer">▼</div>
           <div class="scene-hotspot-ring-wrap">
             <div class="scene-hotspot-ring"></div>
@@ -67,7 +67,7 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
         </div>
       `,
       anchor: "bottom center",
-      data: { targetPanorama: hotspot.targetPanorama },
+      data: { targetPanaroma: hotspot.targetPanaroma },
     })) || [];
 
   const handleReady = (instance) => {
@@ -78,11 +78,11 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
     const markersPlugin = instance.getPlugin(MarkersPlugin);
     if (markersPlugin) {
       markersPlugin.addEventListener("select-marker", (e) => {
-        const targetId = e.marker.data?.targetPanorama;
+        const targetId = e.marker.data?.targetPanaroma;
         if (!targetId || !onHotspotClick) return;
         // Lấy hotspot để zoom đúng điểm click
         const markerId = e.marker.id;
-        const hotspot = displayPanorama?.hotspots?.find((h) => h.id === markerId || h.targetPanorama === targetId);
+        const hotspot = displayPanaroma?.hotspots?.find((h) => h.id === markerId || h.targetPanaroma === targetId);
         if (hotspot && viewerRef.current) {
           try {
             // Zoom vào đúng điểm hotspot trong 2s như trang T-TOKAI
@@ -93,7 +93,7 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
               speed: 2000,
             });
           } catch {}
-          // Sau 2s mới chuyển sang panorama đích với kích thước thật
+          // Sau 2s mới chuyển sang panaroma đích với kích thước thật
           setTimeout(() => {
             onHotspotClick(targetId);
           }, 2000);
@@ -111,12 +111,12 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
   const plugins = [[MarkersPlugin, { markers }]];
 
   return (
-    <div className="panorama-viewer-container">
+    <div className="panaroma-viewer-container">
       {/* Backdrop mờ để không bao giờ hiện màn hình đen khi chuyển cảnh */}
       <div
         className="pano-backdrop"
         style={{
-          backgroundImage: `url(${displayPanorama?.thumbnail || displayPanorama?.url || ""})`,
+          backgroundImage: `url(${displayPanaroma?.thumbnail || displayPanaroma?.url || ""})`,
         }}
       />
       {/* Unified minimap - ẩn hiện theo th-menu-btn */}
@@ -125,8 +125,8 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
         {showMinimap && (
           <MapMinimap
             floor={floor}
-            activePanorama={panorama}
-            onSelectPanorama={onSelectPanorama}
+            activePanaroma={panaroma}
+            onSelectPanaroma={onSelectPanaroma}
             scale={miniScale}
             currentYaw={currentYaw}
           />
@@ -153,16 +153,16 @@ export default function PanoramaViewer({ panorama, floor, onHotspotClick, onSele
 
       <div className={`pano-scene-wrapper pano-scene-${transitionPhase}`}>
         <ReactPhotoSphereViewer
-          key={displayPanorama?.id}
-          src={displayPanorama?.url || defaultImage}
+          key={displayPanaroma?.id}
+          src={displayPanaroma?.url || defaultImage}
           height={"100vh"}
           width={"100%"}
           container={""}
           navbar={false}
           plugins={plugins}
           onReady={handleReady}
-          defaultYaw={`${getInitialAngle(displayPanorama)}deg`}
-          defaultPitch={`${displayPanorama?.defaultView?.pitch || 0}deg`}
+          defaultYaw={`${getInitialAngle(displayPanaroma)}deg`}
+          defaultPitch={`${displayPanaroma?.defaultView?.pitch || 0}deg`}
         />
         </div>
 

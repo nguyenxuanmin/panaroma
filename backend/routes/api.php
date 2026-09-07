@@ -25,37 +25,37 @@ if (!function_exists('normalizeStorageUrl')) {
     }
 }
 
-function mapPanoramaForApi($panorama) {
+function mapPanaromaForApi($panaroma) {
     return [
-        'id' => (string) $panorama->id,
-        'name' => $panorama->name,
-        'code' => $panorama->code,
-        'number' => (int) $panorama->number,
-        'thumbnail' => normalizeStorageUrl($panorama->thumbnail),
-        'url' => normalizeStorageUrl($panorama->url ?? $panorama->thumbnail),
+        'id' => (string) $panaroma->id,
+        'name' => $panaroma->name,
+        'code' => $panaroma->code,
+        'number' => (int) $panaroma->number,
+        'thumbnail' => normalizeStorageUrl($panaroma->thumbnail),
+        'url' => normalizeStorageUrl($panaroma->url ?? $panaroma->thumbnail),
         'mapPosition' => [
-            'x' => (float) ($panorama->map_x ?? 0),
-            'y' => (float) ($panorama->map_y ?? 0),
-            'angle' => (float) ($panorama->map_angle ?? 0),
+            'x' => (float) ($panaroma->map_x ?? 0),
+            'y' => (float) ($panaroma->map_y ?? 0),
+            'angle' => (float) ($panaroma->map_angle ?? 0),
         ],
         'defaultView' => [
-            'yaw' => (float) ($panorama->default_yaw ?? 0),
-            'pitch' => (float) ($panorama->default_pitch ?? 0),
+            'yaw' => (float) ($panaroma->default_yaw ?? 0),
+            'pitch' => (float) ($panaroma->default_pitch ?? 0),
         ],
-        'hotspots' => $panorama->hotspots->map(function ($hotspot) {
+        'hotspots' => $panaroma->hotspots->map(function ($hotspot) {
             return [
                 'id' => (string) $hotspot->id,
                 'yaw' => (float) $hotspot->yaw,
                 'pitch' => (float) $hotspot->pitch,
                 'tooltip' => $hotspot->title,
-                'targetPanorama' => (string) $hotspot->target_panorama_id,
+                'targetPanaroma' => (string) $hotspot->target_panaroma_id,
             ];
         })->values(),
     ];
 }
 
 function mapProjectToFrontend($project) {
-    $floors = $project->floors()->with('panoramas.hotspots')->orderBy('id')->get();
+    $floors = $project->floors()->with('panaromas.hotspots')->orderBy('id')->get();
 
     // Each floor becomes a building of type "single" for frontend
     // This keeps sidebar rendering working without needing a buildings table
@@ -67,9 +67,9 @@ function mapProjectToFrontend($project) {
             'shortLabel' => $floor->short_label,
             'description' => $floor->description,
             'planImage' => normalizeStorageUrl($floor->plan_image),
-            'defaultPanoramaId' => $floor->panoramas->first()?->id ? (string) $floor->panoramas->first()->id : null,
+            'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
             'videos' => [],
-            'panoramas' => $floor->panoramas->map(fn($p) => mapPanoramaForApi($p))->values(),
+            'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
         ];
     })->values();
 
@@ -169,7 +169,7 @@ Route::post('/auth/logout', function () {
 
 // Projects - main endpoint for frontend useProjects hook
 Route::get('/projects', function () {
-    $projects = Project::with('floors.panoramas.hotspots')->orderBy('id')->get();
+    $projects = Project::with('floors.panaromas.hotspots')->orderBy('id')->get();
 
     if ($projects->isEmpty()) {
         return response()->json(['data' => []]);
@@ -181,7 +181,7 @@ Route::get('/projects', function () {
 });
 
 Route::get('/projects/{slug}', function (string $slug) {
-    $project = Project::with('floors.panoramas.hotspots')
+    $project = Project::with('floors.panaromas.hotspots')
         ->where('slug', $slug)
         ->orWhere('id', $slug)
         ->first();
@@ -196,7 +196,7 @@ Route::get('/projects/{slug}', function (string $slug) {
 
 // Keep original floors endpoint for backward compat + better shape
 Route::get('/floors', function () {
-    $floors = Floor::with(['panoramas.hotspots'])->orderBy('id')->get();
+    $floors = Floor::with(['panaromas.hotspots'])->orderBy('id')->get();
 
     $data = $floors->map(function ($floor) {
         return [
@@ -205,9 +205,9 @@ Route::get('/floors', function () {
             'shortLabel' => $floor->short_label,
             'description' => $floor->description,
             'planImage' => normalizeStorageUrl($floor->plan_image),
-            'defaultPanoramaId' => $floor->panoramas->first()?->id ? (string) $floor->panoramas->first()->id : null,
+            'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
             'videos' => [],
-            'panoramas' => $floor->panoramas->map(fn($p) => mapPanoramaForApi($p))->values(),
+            'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
         ];
     });
 

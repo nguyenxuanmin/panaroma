@@ -11,8 +11,8 @@ class Floor extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function panoramas()
+    public function panaromas()
     {
-        return $this->hasMany(Panorama::class);
+        return $this->hasMany(Panaroma::class);
     }
 }

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "./FooterCarousel.css";
 
-export default function FooterCarousel({ panoramas, activePanorama, onSelectPanorama, floorId }) {
+export default function FooterCarousel({ panaromas, activePanaroma, onSelectPanaroma, floorId }) {
   const scrollRef = useRef(null);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -19,10 +19,10 @@ export default function FooterCarousel({ panoramas, activePanorama, onSelectPano
   };
 
   // Giữ thứ tự cố định, tối đa 6, chỉ highlight - không nhảy lung tung
-  const visiblePanoramas = React.useMemo(() => {
-    const list = panoramas || [];
+  const visiblePanaromas = React.useMemo(() => {
+    const list = panaromas || [];
     return list.slice(0, 6);
-  }, [panoramas]);
+  }, [panaromas]);
 
   // Chọn tầng mới thì chạy về đầu
   React.useEffect(() => {
@@ -38,10 +38,10 @@ export default function FooterCarousel({ panoramas, activePanorama, onSelectPano
             <svg viewBox="0 0 24 24" width="16" height="16" stroke="#4a4a4a" strokeWidth="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
           <div className="carousel-track" ref={scrollRef}>
-            {visiblePanoramas.map((pano) => {
-              const isActive = activePanorama?.id === pano.id;
+            {visiblePanaromas.map((pano) => {
+              const isActive = activePanaroma?.id === pano.id;
               return (
-                <div key={pano.id} className={`carousel-card ${isActive ? "active" : ""}`} onClick={() => onSelectPanorama(pano)} title={`${pano.name}`}>
+                <div key={pano.id} className={`carousel-card ${isActive ? "active" : ""}`} onClick={() => onSelectPanaroma(pano)} title={`${pano.name}`}>
                   <div className="card-thumb-wrapper">
                     <img src={pano.thumbnail || pano.url} alt={pano.name} className="card-thumb-img" loading="lazy" />
                   </div>
@@ -55,7 +55,7 @@ export default function FooterCarousel({ panoramas, activePanorama, onSelectPano
           </button>
         </footer>
       )}
-      <button className="footer-collapse-bar" onClick={() => setCollapsed((v) => !v)} title={collapsed ? "Mở panorama list" : "Đóng panorama list"}>
+      <button className="footer-collapse-bar" onClick={() => setCollapsed((v) => !v)} title={collapsed ? "Mở panaroma list" : "Đóng panaroma list"}>
         <span className={`collapse-icon ${collapsed ? "up" : "down"}`}>{collapsed ? "︿" : "﹀"}</span>
       </button>
     </div>

@@ -13,12 +13,12 @@
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                 <li class="nav-item">
                     <a href="{{route('list_floor')}}" class="nav-link @if (request()->is('floor*')) active @endif">
-                        <p>Panorama Category</p>
+                        <p>Panaroma Category</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_panorama')}}" class="nav-link @if (request()->is('panorama*')) active @endif">
-                        <p>Panorama</p>
+                    <a href="{{route('list_panaroma')}}" class="nav-link @if (request()->is('panaroma*')) active @endif">
+                        <p>Panaroma</p>
                     </a>
                 </li>
                 <li class="nav-item">

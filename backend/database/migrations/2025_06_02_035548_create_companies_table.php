@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -22,6 +23,18 @@ return new class extends Migration
             $table->string('map')->nullable();
             $table->timestamps();
         });
+
+        DB::table('companies')->insert([
+            'name' => 'LINX B',
+            'address' => '',
+            'hotline' => '',
+            'email' => '',
+            'logo' => null,
+            'favicon' => null,
+            'map' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

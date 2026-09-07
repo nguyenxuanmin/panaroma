@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Panorama extends Model
+class Panaroma extends Model
 {
     public function floor()
     {
@@ -13,11 +13,11 @@ class Panorama extends Model
 
     public function hotspots()
     {
-        return $this->hasMany(Hotspot::class, 'panorama_id');
+        return $this->hasMany(Hotspot::class, 'panaroma_id');
     }
 
     public function incomingHotspots()
     {
-        return $this->hasMany(Hotspot::class, 'target_panorama_id');
+        return $this->hasMany(Hotspot::class, 'target_panaroma_id');
     }
 }

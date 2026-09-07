@@ -52,7 +52,7 @@ export const api = {
     if (/^https?:\/\//.test(path) || path.startsWith("//")) return path;
     // /storage/... hoặc /images/... => same-origin
     if (path.startsWith("/")) return buildUrl(path);
-    // storage relative e.g. panoramas/xxx.jpg => /storage/xxx.jpg
+    // storage relative e.g. panaromas/xxx.jpg => /storage/xxx.jpg
     return buildUrl(`/storage/${path}`);
   },
 };

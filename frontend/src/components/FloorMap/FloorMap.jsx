@@ -3,7 +3,7 @@ import MapHotspot from "./MapHotspot";
 import MapMinimap from "../MapMinimap/MapMinimap";
 import "./FloorMap.css";
 
-export default function FloorMap({ floor, building, activePanorama, onSelectPanorama }) {
+export default function FloorMap({ floor, building, activePanaroma, onSelectPanaroma }) {
   const [showMinimap, setShowMinimap] = useState(true);
   const [miniScale, setMiniScale] = useState(1);
 
@@ -11,7 +11,7 @@ export default function FloorMap({ floor, building, activePanorama, onSelectPano
     <div className="floor-map-container">
       {/* Minimap top-right - Ảnh 2/3 đỏ */}
       <div className="map-minimap-wrap">
-        {showMinimap && <MapMinimap floor={floor} activePanorama={activePanorama} onSelectPanorama={onSelectPanorama} scale={miniScale} />}
+        {showMinimap && <MapMinimap floor={floor} activePanaroma={activePanaroma} onSelectPanaroma={onSelectPanaroma} scale={miniScale} />}
         <div className="mm-ctrls">
           <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Hide minimap" : "Show minimap"}>
             {showMinimap ? "«" : "»"}
@@ -35,8 +35,8 @@ export default function FloorMap({ floor, building, activePanorama, onSelectPano
         <div className="map-image-wrapper">
           <img src={floor.planImage} alt={floor.name} className="floor-plan-img" draggable={false} />
           <div className="hotspots-layer">
-            {floor.panoramas.map((pano) => (
-              <MapHotspot key={pano.id} panorama={pano} isActive={activePanorama?.id === pano.id} onClick={(s) => onSelectPanorama(s)} />
+            {floor.panaromas.map((pano) => (
+              <MapHotspot key={pano.id} panaroma={pano} isActive={activePanaroma?.id === pano.id} onClick={(s) => onSelectPanaroma(s)} />
             ))}
           </div>
         </div>

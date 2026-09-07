@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
 use App\Models\Floor;
-use App\Models\Panorama;
+use App\Models\Panaroma;
 
-class PanoramaController extends Controller
+class PanaromaController extends Controller
 {
     public function __construct()
     {
@@ -16,17 +16,17 @@ class PanoramaController extends Controller
     }
 
     public function show(){
-        $panoramas = Panorama::orderBy('name','asc')->paginate(20);
-        return view('admin.panorama.list',[
-            'panoramas' => $panoramas
+        $panaromas = Panaroma::orderBy('name','asc')->paginate(20);
+        return view('admin.panaroma.list',[
+            'panaromas' => $panaromas
         ]);
     }
 
     public function add(){
-        $titlePage = "Create New Panorama";
+        $titlePage = "Create New Panaroma";
         $action = "add";
         $floors = Floor::orderBy('name','asc')->get();
-        return view('admin.panorama.main',[
+        return view('admin.panaroma.main',[
             'titlePage' => $titlePage,
             'floors' => $floors,
             'action' => $action
@@ -34,15 +34,15 @@ class PanoramaController extends Controller
     }
 
     public function edit($id){
-        $titlePage = "Update Panorama";
+        $titlePage = "Update Panaroma";
         $action = "edit";
-        $panorama = Panorama::find($id);
+        $panaroma = Panaroma::find($id);
         $floors = Floor::orderBy('name','asc')->get();
-        return view('admin.panorama.main',[
+        return view('admin.panaroma.main',[
             'titlePage' => $titlePage,
             'action' => $action,
             'floors' => $floors,
-            'panorama' => $panorama
+            'panaroma' => $panaroma
         ]);
     }
 
@@ -68,7 +68,7 @@ class PanoramaController extends Controller
         if (empty($floorId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a panorama category.'
+                'message' => 'Please select a panaroma category.'
             ]);
         }
 
@@ -82,33 +82,33 @@ class PanoramaController extends Controller
         if ($map_x === null || $map_x === '') {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a panorama location.'
+                'message' => 'Please select a panaroma location.'
             ]);
         }
 
         if ($action === 'add') {
-            $panorama = new Panorama();
-            $imageUrl = 'storage/panoramas/' . $imageName;
+            $panaroma = new Panaroma();
+            $imageUrl = 'storage/panaromas/' . $imageName;
         } else {
-            $panorama = Panorama::find($request->id);
+            $panaroma = Panaroma::find($request->id);
             
             if (!empty($imageName)) {
                 if (app()->environment('local')) {
-                    $imagePath = public_path($panorama->thumbnail);
+                    $imagePath = public_path($panaroma->thumbnail);
                 } else {
-                    $imagePath = base_path('../public_html/' . $panorama->thumbnail);
+                    $imagePath = base_path('../public_html/' . $panaroma->thumbnail);
                 }
                 if (file_exists($imagePath) && is_file($imagePath)) {
                     unlink($imagePath);
                 }
-                $imageUrl = 'storage/panoramas/' . $imageName;
+                $imageUrl = 'storage/panaromas/' . $imageName;
             } else {
-                $imageUrl = $panorama->thumbnail;
+                $imageUrl = $panaroma->thumbnail;
             }
         }
 
         if (!empty($imageName)) {
-            $messageError = $this->adminService->generateImage($_FILES["image"],'panoramas');
+            $messageError = $this->adminService->generateImage($_FILES["image"],'panaromas');
             if($messageError != ""){
                 return response()->json([
                     'success' => false,
@@ -117,20 +117,20 @@ class PanoramaController extends Controller
             }
         }
 
-        $number = Panorama::where('floor_id',$floorId)->count() + 1;
+        $number = Panaroma::where('floor_id',$floorId)->count() + 1;
         
-        $panorama->floor_id = $floorId;
-        $panorama->name = $title;
-        $panorama->code = $title;
-        $panorama->thumbnail = $imageUrl;
-        $panorama->url = $imageUrl;
-        $panorama->number = $number;
-        $panorama->map_x = $map_x;
-        $panorama->map_y = $map_y;
-        $panorama->map_angle = $map_angle;
-        $panorama->default_yaw = $yaw;
-        $panorama->default_pitch = $pitch;
-        $panorama->save();
+        $panaroma->floor_id = $floorId;
+        $panaroma->name = $title;
+        $panaroma->code = $title;
+        $panaroma->thumbnail = $imageUrl;
+        $panaroma->url = $imageUrl;
+        $panaroma->number = $number;
+        $panaroma->map_x = $map_x;
+        $panaroma->map_y = $map_y;
+        $panaroma->map_angle = $map_angle;
+        $panaroma->default_yaw = $yaw;
+        $panaroma->default_pitch = $pitch;
+        $panaroma->save();
 
         return response()->json([
             'success' => true,
@@ -139,16 +139,16 @@ class PanoramaController extends Controller
     }
 
     public function delete(Request $request){
-        $panorama = Panorama::find($request->id);
+        $panaroma = Panaroma::find($request->id);
         if (app()->environment('local')) {
-            $imagePath = public_path($panorama->thumbnail);
+            $imagePath = public_path($panaroma->thumbnail);
         } else {
-            $imagePath = base_path('../public_html/' . $panorama->thumbnail);
+            $imagePath = base_path('../public_html/' . $panaroma->thumbnail);
         }
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
-        $panorama->delete();
+        $panaroma->delete();
         return response()->json([
             'success' => true
         ]);

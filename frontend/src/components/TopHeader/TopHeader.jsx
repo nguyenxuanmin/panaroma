@@ -4,7 +4,7 @@ import "./TopHeader.css";
 export default function TopHeader({
   activeBuilding,
   activeFloor,
-  activePanorama,
+  activePanaroma,
   viewMode,
   onToggleViewMode,
   onOpenGoogleMap,
@@ -19,7 +19,7 @@ export default function TopHeader({
   showTopButtons = true,
 }) {
   const handleImageClick = () => {
-    onToggleViewMode(viewMode === "map" ? "panorama" : "map");
+    onToggleViewMode(viewMode === "map" ? "panaroma" : "map");
   };
 
   return (
@@ -37,8 +37,8 @@ export default function TopHeader({
             ))}
           </select>
         )}
-        {viewMode === "panorama" && (
-          <span className="th-breadcrumb">{activeBuilding?.name} / {activeFloor?.name} / {activePanorama?.name}</span>
+        {viewMode === "panaroma" && (
+          <span className="th-breadcrumb">{activeBuilding?.name} / {activeFloor?.name} / {activePanaroma?.name}</span>
         )}
       </div>
 

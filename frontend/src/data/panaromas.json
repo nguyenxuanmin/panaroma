@@ -3,7 +3,7 @@
     {
       "id": "top-view",
       "name": "Top View",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana1",
           "name": "Đường 30m",
@@ -15,7 +15,7 @@
               "yaw": 45,
               "pitch": 0,
               "tooltip": "Đi đến Phố Vân Lam",
-              "targetPanorama": "pana2"
+              "targetPanaroma": "pana2"
             }
           ]
         },
@@ -31,7 +31,7 @@
     {
       "id": "bird-view",
       "name": "Bird View",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana3",
           "name": "Đường Dương Phổ",
@@ -51,7 +51,7 @@
     {
       "id": "tien-ich",
       "name": "Tiện Ích",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana5",
           "name": "Đường Vĩnh Giang",
@@ -71,7 +71,7 @@
     {
       "id": "kien-truc",
       "name": "Kiến Trúc",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana7",
           "name": "Biệt thự Tân Đông Dương",
@@ -91,7 +91,7 @@
     {
       "id": "noi-that",
       "name": "Nội Thất",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana9",
           "name": "Ban công Thượng Uyển",
@@ -104,7 +104,7 @@
     {
       "id": "lien-ket-vung",
       "name": "Liên Kết Vùng",
-      "panoramas": [
+      "panaromas": [
         {
           "id": "pana10",
           "name": "Kết nối giao thông",

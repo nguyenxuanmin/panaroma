@@ -27,7 +27,7 @@ export default function HelpModal({ isOpen, onClose }) {
           <div className="help-item">
             <span className="help-icon">🖼</span>
             <div>
-              <strong>Đổi chế độ xem:</strong> Chuyển đổi qua lại giữa Mặt bằng 2D và Panorama 360°.
+              <strong>Đổi chế độ xem:</strong> Chuyển đổi qua lại giữa Mặt bằng 2D và Panaroma 360°.
             </div>
           </div>
           <div className="help-item">

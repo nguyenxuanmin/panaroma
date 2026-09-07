@@ -6,7 +6,7 @@ const medicalDeck = {
   type: "single",
   planImage: "/maps/floor1.jpg",
   videos: sampleVideos,
-  panoramas: [
+  panaromas: [
     { id: "med-1", name: "新1号館外観(南西面)", code: "南西面", number: 1, thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg", mapPosition: { x: 35, y: 22, angle: 90 }, defaultView: { yaw: 0, pitch: 0 }, label: "新1号館外観(南西面)", hotspots: [] },
     { id: "med-2", name: "メディカルデッキ外観(東面)", code: "東面", number: 2, thumbnail: "/images/pana2.jpg", url: "/images/pana2.jpg", mapPosition: { x: 52, y: 28, angle: 0 }, defaultView: { yaw: 45, pitch: 0 }, label: "メディカルデッキ外観(東面)", hotspots: [] },
     { id: "med-3", name: "新1号館外観(南面)", code: "南面", number: 3, thumbnail: "/images/pana3.jpg", url: "/images/pana3.jpg", mapPosition: { x: 50, y: 38, angle: -90 }, defaultView: { yaw: 90, pitch: 0 }, label: "新1号館外観(南面)", hotspots: [] },

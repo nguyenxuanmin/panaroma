@@ -1,6 +1,6 @@
 # Pano Frontend - React + Vite + Photo Sphere Viewer
 
-> Frontend panorama 360° cho hệ thống `pano-admin` (Laravel). Build ra `dist/` rồi copy vào `pano-admin/public/pano` để chạy same-origin, không CORS.
+> Frontend panaroma 360° cho hệ thống `pano-admin` (Laravel). Build ra `dist/` rồi copy vào `pano-admin/public/pano` để chạy same-origin, không CORS.
 
 ---
 
@@ -55,7 +55,7 @@ src/
   App.jsx                 # useSiteSettings (đổi title/favicon theo /api/site-settings)
   components/
     TopHeader/            # th-menu-btn ẩn/hiện toàn bộ UI, Admin button theo role
-    PanoramaViewer/       # preload + backdrop blur, zoom 2s vào hotspot rồi sang pano đích
+    PanaromaViewer/       # preload + backdrop blur, zoom 2s vào hotspot rồi sang pano đích
     BuildingSidebar/      # scrollable, responsive
     FloorMap/ FloorSidebar/ FooterCarousel/ LoginScreen/
   hooks/
@@ -99,7 +99,7 @@ If you move `pano-admin` folder, update `deploy.ps1:8` `$LaravelPublicPano` then
 
 ### 5. Features
 - TopHeader with role-based Admin link, fullscreen, help modal
-- PanoramaViewer with 2s zoom-to-hotspot, preloaded, blurred backdrop (no black flash)
+- PanaromaViewer with 2s zoom-to-hotspot, preloaded, blurred backdrop (no black flash)
 - Responsive (iPhone 13 fixed, BuildingSidebar scrollable)
 
 ---

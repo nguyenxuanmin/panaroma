@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Panorama;
+use App\Models\Panaroma;
 use App\Models\Hotspot;
 
 class HotspotController extends Controller
@@ -19,13 +19,13 @@ class HotspotController extends Controller
     public function add(){
         $titlePage = "Create New Hotspot";
         $action = "add";
-        $panoramas = Panorama::orderBy('name','asc')->get();
-        $targetPanoramas = Panorama::orderBy('name','asc')->get();
+        $panaromas = Panaroma::orderBy('name','asc')->get();
+        $targetPanaromas = Panaroma::orderBy('name','asc')->get();
         return view('admin.hotspot.main',[
             'titlePage' => $titlePage,
-            'panoramas' => $panoramas,
+            'panaromas' => $panaromas,
             'action' => $action,
-            'targetPanoramas' => $targetPanoramas
+            'targetPanaromas' => $targetPanaromas
         ]);
     }
 
@@ -33,21 +33,21 @@ class HotspotController extends Controller
         $titlePage = "Update Hotspot";
         $action = "edit";
         $hotspot = Hotspot::find($id);
-        $panoramas = Panorama::orderBy('name','asc')->get();
-        $targetPanoramas = Panorama::orderBy('name','asc')->get();
+        $panaromas = Panaroma::orderBy('name','asc')->get();
+        $targetPanaromas = Panaroma::orderBy('name','asc')->get();
         return view('admin.hotspot.main',[
             'titlePage' => $titlePage,
             'action' => $action,
-            'panoramas' => $panoramas,
-            'targetPanoramas' => $targetPanoramas,
+            'panaromas' => $panaromas,
+            'targetPanaromas' => $targetPanaromas,
             'hotspot' => $hotspot
         ]);
     }
 
     public function save(Request $request){
         $title = $request->title;
-        $panoramaId = $request->panorama;
-        $targetPanoramaId = $request->targetPanorama;
+        $panaromaId = $request->panaroma;
+        $targetPanaromaId = $request->targetPanaroma;
         $yaw = $request->yaw;
         $pitch = $request->pitch;
         $action = $request->action;
@@ -59,17 +59,17 @@ class HotspotController extends Controller
             ]);
         }
 
-        if (empty($panoramaId)) {
+        if (empty($panaromaId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a panorama.'
+                'message' => 'Please select a panaroma.'
             ]);
         }
 
-        if (empty($targetPanoramaId)) {
+        if (empty($targetPanaromaId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a target panorama.'
+                'message' => 'Please select a target panaroma.'
             ]);
         }
 
@@ -86,8 +86,8 @@ class HotspotController extends Controller
             $hotspot = hotspot::find($request->id);
         }
         
-        $hotspot->panorama_id = $panoramaId;
-        $hotspot->target_panorama_id = $targetPanoramaId;
+        $hotspot->panaroma_id = $panaromaId;
+        $hotspot->target_panaroma_id = $targetPanaromaId;
         $hotspot->title = $title;
         $hotspot->yaw = $yaw;
         $hotspot->pitch = $pitch;

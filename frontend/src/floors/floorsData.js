@@ -8,10 +8,10 @@
  *
  * Mỗi floor gồm:
  *   - id, name, shortLabel, description, planImage: metadata tầng
- *   - defaultPanoramaId: panorama mặc định khi chọn tầng
+ *   - defaultPanaromaId: panaroma mặc định khi chọn tầng
  *   - videos[]: danh sách video giới thiệu của tầng / dự án (dễ dàng đổ data từ Database sau này)
  *     └─ { id, title, label, description, thumbnail, videoUrl }
- *   - panoramas[]: danh sách điểm panorama trong tầng
+ *   - panaromas[]: danh sách điểm panaroma trong tầng
  */
 
 // Video mẫu cho dự án (Dễ dàng thay đổi hoặc lấy trực tiếp từ Database)
@@ -57,16 +57,16 @@ const floorsData = [
     shortLabel: "外観",
     description: "Tổng thể ngoại cảnh và khuôn viên dự án",
     planImage: "/maps/exterior.jpg",
-    defaultPanoramaId: "exterior-1",
+    defaultPanaromaId: "exterior-1",
     videos: sampleVideos,
-    panoramas: [
+    panaromas: [
       {
         id: "exterior-1", name: "外観1", code: "外観1", number: 1,
         thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 42.5, y: 76.5, angle: 0 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          { id: "hs-ext1-2", yaw: 35, pitch: -2, tooltip: "Đến 外観2", targetPanorama: "exterior-2" }
+          { id: "hs-ext1-2", yaw: 35, pitch: -2, tooltip: "Đến 外観2", targetPanaroma: "exterior-2" }
         ]
       },
       {
@@ -75,8 +75,8 @@ const floorsData = [
         mapPosition: { x: 49.0, y: 52.0, angle: -20 },
         defaultView: { yaw: 30, pitch: 0 },
         hotspots: [
-          { id: "hs-ext2-1", yaw: 215, pitch: -2, tooltip: "Về 外観1", targetPanorama: "exterior-1" },
-          { id: "hs-ext2-3", yaw: 75, pitch: 0, tooltip: "Đến 外観3", targetPanorama: "exterior-3" }
+          { id: "hs-ext2-1", yaw: 215, pitch: -2, tooltip: "Về 外観1", targetPanaroma: "exterior-1" },
+          { id: "hs-ext2-3", yaw: 75, pitch: 0, tooltip: "Đến 外観3", targetPanaroma: "exterior-3" }
         ]
       },
       {
@@ -85,8 +85,8 @@ const floorsData = [
         mapPosition: { x: 38.0, y: 38.5, angle: 45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          { id: "hs-ext3-2", yaw: 250, pitch: -2, tooltip: "Về 外観2", targetPanorama: "exterior-2" },
-          { id: "hs-ext3-4", yaw: 40, pitch: 0, tooltip: "Đến 外観4", targetPanorama: "exterior-4" }
+          { id: "hs-ext3-2", yaw: 250, pitch: -2, tooltip: "Về 外観2", targetPanaroma: "exterior-2" },
+          { id: "hs-ext3-4", yaw: 40, pitch: 0, tooltip: "Đến 外観4", targetPanaroma: "exterior-4" }
         ]
       },
       {
@@ -95,7 +95,7 @@ const floorsData = [
         mapPosition: { x: 58.5, y: 24.0, angle: 135 },
         defaultView: { yaw: 180, pitch: 0 },
         hotspots: [
-          { id: "hs-ext4-3", yaw: 220, pitch: -2, tooltip: "Về 外観3", targetPanorama: "exterior-3" }
+          { id: "hs-ext4-3", yaw: 220, pitch: -2, tooltip: "Về 外観3", targetPanaroma: "exterior-3" }
         ]
       },
       {
@@ -121,16 +121,16 @@ const floorsData = [
     shortLabel: "1Fl",
     description: "Mặt bằng Tầng 1 - Khu tiếp nhận hàng & Kho chính",
     planImage: "/maps/floor1.jpg",
-    defaultPanoramaId: "1fl-1",
+    defaultPanaromaId: "1fl-1",
     videos: sampleVideos,
-    panoramas: [
+    panaromas: [
       {
         id: "1fl-1", name: "1Fl-1", code: "1Fl-1", number: 1,
         thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 26.0, y: 55.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          { id: "hs-1fl1-2", yaw: 45, pitch: 0, tooltip: "Đến Khu Kệ Hàng 2", targetPanorama: "1fl-2" }
+          { id: "hs-1fl1-2", yaw: 45, pitch: 0, tooltip: "Đến Khu Kệ Hàng 2", targetPanaroma: "1fl-2" }
         ]
       },
       {
@@ -139,8 +139,8 @@ const floorsData = [
         mapPosition: { x: 50.0, y: 55.0, angle: 0 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          { id: "hs-1fl2-1", yaw: 180, pitch: 0, tooltip: "Về Điểm 1", targetPanorama: "1fl-1" },
-          { id: "hs-1fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Cửa Xuất Hàng", targetPanorama: "1fl-3" }
+          { id: "hs-1fl2-1", yaw: 180, pitch: 0, tooltip: "Về Điểm 1", targetPanaroma: "1fl-1" },
+          { id: "hs-1fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Cửa Xuất Hàng", targetPanaroma: "1fl-3" }
         ]
       },
       {
@@ -149,7 +149,7 @@ const floorsData = [
         mapPosition: { x: 45.0, y: 28.0, angle: -90 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          { id: "hs-1fl3-4", yaw: 90, pitch: 0, tooltip: "Sang Khu Văn Phòng", targetPanorama: "1fl-4" }
+          { id: "hs-1fl3-4", yaw: 90, pitch: 0, tooltip: "Sang Khu Văn Phòng", targetPanaroma: "1fl-4" }
         ]
       },
       {
@@ -168,16 +168,16 @@ const floorsData = [
     shortLabel: "2Fl",
     description: "Mặt bằng Tầng 2 - Kho lưu trữ tải trọng & Văn phòng làm việc",
     planImage: "/maps/floor2.jpg",
-    defaultPanoramaId: "2fl-1",
+    defaultPanaromaId: "2fl-1",
     videos: sampleVideos,
-    panoramas: [
+    panaromas: [
       {
         id: "2fl-1", name: "2Fl-1", code: "2Fl-1", number: 1,
         thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 30.0, y: 35.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          { id: "hs-2fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Khu Kệ B", targetPanorama: "2fl-2" }
+          { id: "hs-2fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Khu Kệ B", targetPanaroma: "2fl-2" }
         ]
       },
       {
@@ -186,7 +186,7 @@ const floorsData = [
         mapPosition: { x: 30.0, y: 70.0, angle: 180 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          { id: "hs-2fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Sảnh Thang Bộ", targetPanorama: "2fl-3" }
+          { id: "hs-2fl2-3", yaw: 0, pitch: 0, tooltip: "Đến Sảnh Thang Bộ", targetPanaroma: "2fl-3" }
         ]
       },
       {
@@ -195,7 +195,7 @@ const floorsData = [
         mapPosition: { x: 62.0, y: 65.0, angle: -45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          { id: "hs-2fl3-4", yaw: -45, pitch: 0, tooltip: "Đến Phòng Họp", targetPanorama: "2fl-4" }
+          { id: "hs-2fl3-4", yaw: -45, pitch: 0, tooltip: "Đến Phòng Họp", targetPanaroma: "2fl-4" }
         ]
       },
       {
@@ -214,16 +214,16 @@ const floorsData = [
     shortLabel: "3Fl",
     description: "Mặt bằng Tầng 3 - Sân thượng Rooftop & Khu điều hành",
     planImage: "/maps/floor3.jpg",
-    defaultPanoramaId: "3fl-1",
+    defaultPanaromaId: "3fl-1",
     videos: sampleVideos,
-    panoramas: [
+    panaromas: [
       {
         id: "3fl-1", name: "3Fl-1", code: "3Fl-1", number: 1,
         thumbnail: "/images/pana1.jpg", url: "/images/pana1.jpg",
         mapPosition: { x: 26.0, y: 48.0, angle: 90 },
         defaultView: { yaw: 0, pitch: 0 },
         hotspots: [
-          { id: "hs-3fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Sân Vườn Rooftop", targetPanorama: "3fl-2" }
+          { id: "hs-3fl1-2", yaw: 90, pitch: 0, tooltip: "Đến Sân Vườn Rooftop", targetPanaroma: "3fl-2" }
         ]
       },
       {
@@ -232,7 +232,7 @@ const floorsData = [
         mapPosition: { x: 30.0, y: 75.0, angle: 0 },
         defaultView: { yaw: 45, pitch: 0 },
         hotspots: [
-          { id: "hs-3fl2-3", yaw: 0, pitch: 0, tooltip: "Vào Sảnh Lễ Tân", targetPanorama: "3fl-3" }
+          { id: "hs-3fl2-3", yaw: 0, pitch: 0, tooltip: "Vào Sảnh Lễ Tân", targetPanaroma: "3fl-3" }
         ]
       },
       {
@@ -241,7 +241,7 @@ const floorsData = [
         mapPosition: { x: 62.0, y: 52.0, angle: -45 },
         defaultView: { yaw: 90, pitch: 0 },
         hotspots: [
-          { id: "hs-3fl3-4", yaw: 0, pitch: 0, tooltip: "Đến Phòng Hội Nghị", targetPanorama: "3fl-4" }
+          { id: "hs-3fl3-4", yaw: 0, pitch: 0, tooltip: "Đến Phòng Hội Nghị", targetPanaroma: "3fl-4" }
         ]
       },
       {

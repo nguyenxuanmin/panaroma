@@ -22,16 +22,16 @@ export function getFloorById(floorId) {
   return buildings[0];
 }
 
-// Tìm panorama trong toàn bộ buildings
-export function findPanoramaById(panoramaId) {
+// Tìm panaroma trong toàn bộ buildings
+export function findPanaromaById(panaromaId) {
   for (const b of buildings) {
     if (b.type === "single") {
-      const pano = b.panoramas.find((p) => p.id === panoramaId);
-      if (pano) return { building: b, floor: b, panorama: pano };
+      const pano = b.panaromas.find((p) => p.id === panaromaId);
+      if (pano) return { building: b, floor: b, panaroma: pano };
     } else {
       for (const f of b.floors) {
-        const pano = f.panoramas.find((p) => p.id === panoramaId);
-        if (pano) return { building: b, floor: f, panorama: pano };
+        const pano = f.panaromas.find((p) => p.id === panaromaId);
+        if (pano) return { building: b, floor: f, panaroma: pano };
       }
     }
   }

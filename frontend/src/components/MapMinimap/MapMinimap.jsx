@@ -1,7 +1,7 @@
 import React from "react";
 import "./MapMinimap.css";
 
-export default function MapMinimap({ floor, activePanorama, onSelectPanorama, scale = 1, currentYaw }) {
+export default function MapMinimap({ floor, activePanaroma, onSelectPanaroma, scale = 1, currentYaw }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const baseW = isMobile ? 140 : 190;
   const baseH = isMobile ? 100 : 140;
@@ -12,8 +12,8 @@ export default function MapMinimap({ floor, activePanorama, onSelectPanorama, sc
     <div className="map-minimap-box" style={{ width: `${Math.round(baseW * scale)}px`, height: `${Math.round(baseH * scale)}px` }}>
       <div className="map-minimap-inner">
         <img src={floor?.planImage} alt={floor?.name} className="map-minimap-img" draggable={false} />
-        {floor?.panoramas?.map((p) => {
-          const isActive = activePanorama?.id === p.id;
+        {floor?.panaromas?.map((p) => {
+          const isActive = activePanaroma?.id === p.id;
           return (
             <div
               key={p.id}
@@ -25,7 +25,7 @@ export default function MapMinimap({ floor, activePanorama, onSelectPanorama, sc
                 height: 0,
                 zIndex: isActive ? 20 : 10,
               }}
-              onClick={(e) => { e.stopPropagation(); onSelectPanorama(p); }}
+              onClick={(e) => { e.stopPropagation(); onSelectPanaroma(p); }}
               title={p.label || p.name}
             >
               {isActive && hasYaw && (

@@ -22,7 +22,7 @@ class FloorController extends Controller
     }
 
     public function add(){
-        $titlePage = "Create New Panorama Category";
+        $titlePage = "Create New Panaroma Category";
         $action = "add";
         return view('admin.floor.main',[
             'titlePage' => $titlePage,
@@ -31,7 +31,7 @@ class FloorController extends Controller
     }
 
     public function edit($id){
-        $titlePage = "Update Panorama Category";
+        $titlePage = "Update Panaroma Category";
         $action = "edit";
         $floor = Floor::find($id);
         return view('admin.floor.main',[
@@ -103,7 +103,7 @@ class FloorController extends Controller
     }
 
     public function delete(Request $request){
-        $floor = Floor::with('panoramas')->find($request->id);
+        $floor = Floor::with('panaromas')->find($request->id);
         if (app()->environment('local')) {
             $imagePath = public_path($floor->plan_image);
         } else {
@@ -112,14 +112,14 @@ class FloorController extends Controller
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
-        foreach ($floor->panoramas as $key => $panorama) {
+        foreach ($floor->panaromas as $key => $panaroma) {
             if (app()->environment('local')) {
-                $imagePathPanorama = public_path($panorama->thumbnail);
+                $imagePathpanaroma = public_path($panaroma->thumbnail);
             } else {
-                $imagePathPanorama = base_path('../public_html/' . $panorama->thumbnail);
+                $imagePathpanaroma = base_path('../public_html/' . $panaroma->thumbnail);
             }
-            if (file_exists($imagePathPanorama) && is_file($imagePathPanorama)) {
-                unlink($imagePathPanorama);
+            if (file_exists($imagePathpanaroma) && is_file($imagePathpanaroma)) {
+                unlink($imagePathpanaroma);
             }
         }
         $floor->delete();
