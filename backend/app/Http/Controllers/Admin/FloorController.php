@@ -43,8 +43,8 @@ class FloorController extends Controller
 
     public function save(Request $request){
         $title = $request->title;
-        $image = $_FILES['image'] ?? null;
-        $imageName = $image['name'] ?? '';
+        $image = $request->file('image');
+        $imageName = $image ? $image->getClientOriginalName() : '';
         $action = $request->action;
 
         if (empty($title)) {
@@ -63,7 +63,7 @@ class FloorController extends Controller
 
         if ($action === 'add') {
             $floor = new Floor();
-            $imageUrl = 'storage/floors/' . $imageName;
+            $imageUrl = 'storage/floors/' . time() . '_' . $imageName;
         } else {
             $floor = Floor::find($request->id);
             if (!empty($imageName)) {
@@ -75,14 +75,14 @@ class FloorController extends Controller
                 if (file_exists($imagePath) && is_file($imagePath)) {
                     unlink($imagePath);
                 }
-                $imageUrl = 'storage/floors/' . $imageName;
+                $imageUrl = 'storage/floors/' . time() . '_' . $imageName;
             } else {
                 $imageUrl = $floor->plan_image;
             }
         }
 
         if (isset($image)) {
-            $messageError = $this->adminService->generateImage($_FILES["image"],'floors');
+            $messageError = $this->adminService->generateImage($image,'floors');
             if($messageError != ""){
                 return response()->json([
                     'success' => false,

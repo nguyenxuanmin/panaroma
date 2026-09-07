@@ -27,8 +27,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
-                        <p>User</p>
+                    <a href="{{route('change_password_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
+                        <p>Change Password</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('map_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
+                        <p>Google Maps</p>
                     </a>
                 </li>
             </ul>

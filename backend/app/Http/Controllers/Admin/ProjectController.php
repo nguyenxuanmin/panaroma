@@ -11,11 +11,6 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function __construct()
-    {
-        $this->adminService = new AdminService;
-    }
-
     public function show(){
         $projects = Project::orderBy('name','asc')->paginate(20);
         return view('admin.project.list',[
@@ -43,11 +38,22 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function changePassword($id){
+    public function changePassword(){
         $titlePage = "Change Password";
         $action = "change_password";
-        $project = Project::find($id);
+        $project = Project::first();
         return view('admin.project.change-password',[
+            'titlePage' => $titlePage,
+            'action' => $action,
+            'project' => $project
+        ]);
+    }
+
+    public function map(){
+        $titlePage = "Map";
+        $action = "map";
+        $project = Project::first();
+        return view('admin.project.map',[
             'titlePage' => $titlePage,
             'action' => $action,
             'project' => $project
@@ -67,6 +73,13 @@ class ProjectController extends Controller
                 ]);
             }
 
+            if (strlen($passwordNew) < 8) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The new password must be at least 8 characters long.'
+                ]);
+            }
+
             if ($passwordNew != $passwordConfirm) {
                 return response()->json([
                     'success' => false,
@@ -76,7 +89,10 @@ class ProjectController extends Controller
 
             $project = Project::find($request->id);
             $project->password = Hash::make($passwordNew);
-            
+        } elseif($action == "map"){
+            $mapLink = $request->input('map');
+            $project = Project::find($request->id);
+            $project->map = $mapLink;
         }else{
             $title = $request->title;
             $slug = Str::slug($title);

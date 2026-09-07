@@ -30,13 +30,15 @@ Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::post('/project/save', [ProjectController::class, 'save'])->name('save_project');
     //Route::post('/project/delete', [ProjectController::class, 'delete'])->name('delete_project');
     Route::get('/project/edit/{id}', [ProjectController::class, 'edit'])->name('edit_project');
-    Route::get('/project/change-password/{id}', [ProjectController::class, 'changePassword'])->name('change_password_project');
+    Route::get('/project/change-password', [ProjectController::class, 'changePassword'])->name('change_password_project');
+    Route::get('/project/map', [ProjectController::class, 'map'])->name('map_project');
     // Panaroma
     Route::get('/panaroma', [PanaromaController::class, 'show'])->name('list_panaroma');
     Route::get('/panaroma/add', [PanaromaController::class, 'add'])->name('add_panaroma');
     Route::post('/panaroma/save', [PanaromaController::class, 'save'])->name('save_panaroma');
     Route::post('/panaroma/delete', [PanaromaController::class, 'delete'])->name('delete_panaroma');
     Route::get('/panaroma/edit/{id}', [PanaromaController::class, 'edit'])->name('edit_panaroma');
+     Route::post('/panaroma/delete-panaroma-image', [PanaromaController::class, 'deletePanaromaImage'])->name('delete_panaroma_image');
     // Hotspot
     Route::get('/hotspot', [HotspotController::class, 'show'])->name('list_hotspot');
     Route::get('/hotspot/add', [HotspotController::class, 'add'])->name('add_hotspot');

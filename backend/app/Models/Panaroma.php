@@ -20,4 +20,9 @@ class Panaroma extends Model
     {
         return $this->hasMany(Hotspot::class, 'target_panaroma_id');
     }
+
+    public function panaromaImages()
+    {
+        return $this->hasMany(PanaromaImage::class, 'panaroma_id');
+    }
 }

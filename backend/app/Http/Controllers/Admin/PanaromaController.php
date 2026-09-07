@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\AdminService;
 use App\Models\Floor;
 use App\Models\Panaroma;
+use App\Models\PanaromaImage;
 
 class PanaromaController extends Controller
 {
@@ -36,7 +37,7 @@ class PanaromaController extends Controller
     public function edit($id){
         $titlePage = "Update Panaroma";
         $action = "edit";
-        $panaroma = Panaroma::find($id);
+        $panaroma = Panaroma::with('panaromaImages')->find($id);
         $floors = Floor::orderBy('name','asc')->get();
         return view('admin.panaroma.main',[
             'titlePage' => $titlePage,
@@ -54,8 +55,9 @@ class PanaromaController extends Controller
         $map_angle = $request->map_angle;
         $yaw = $request->yaw;
         $pitch = $request->pitch;
-        $image = $_FILES['image'] ?? null;
-        $imageName = $image['name'] ?? '';
+        $image = $request->file('image');
+        $imageName = $image ? $image->getClientOriginalName() : '';
+        $panaromaImages = $request->file('panaromaImages');
         $action = $request->action;
 
         if (empty($title)) {
@@ -88,10 +90,10 @@ class PanaromaController extends Controller
 
         if ($action === 'add') {
             $panaroma = new Panaroma();
-            $imageUrl = 'storage/panaromas/' . $imageName;
+            $imageUrl = 'storage/panaromas/' . time() . '_' . $imageName;
+            $number = Panaroma::where('floor_id',$floorId)->count() + 1;
         } else {
             $panaroma = Panaroma::find($request->id);
-            
             if (!empty($imageName)) {
                 if (app()->environment('local')) {
                     $imagePath = public_path($panaroma->thumbnail);
@@ -101,14 +103,15 @@ class PanaromaController extends Controller
                 if (file_exists($imagePath) && is_file($imagePath)) {
                     unlink($imagePath);
                 }
-                $imageUrl = 'storage/panaromas/' . $imageName;
+                $imageUrl = 'storage/panaromas/' . time() . '_' . $imageName;
             } else {
                 $imageUrl = $panaroma->thumbnail;
             }
+            $number = $panaroma->number;
         }
 
-        if (!empty($imageName)) {
-            $messageError = $this->adminService->generateImage($_FILES["image"],'panaromas');
+        if (isset($image)) {
+            $messageError = $this->adminService->generateImage($image,'panaromas');
             if($messageError != ""){
                 return response()->json([
                     'success' => false,
@@ -117,8 +120,18 @@ class PanaromaController extends Controller
             }
         }
 
-        $number = Panaroma::where('floor_id',$floorId)->count() + 1;
-        
+        if (isset($panaromaImages)) {
+            foreach ($panaromaImages as $panaromaImage) {
+                $messageError = $this->adminService->generateImage($panaromaImage,'panaroma-images');
+                if($messageError != ""){
+                    return response()->json([
+                        'success' => false,
+                        'message' => $messageError
+                    ]);
+                }
+            }
+        }
+
         $panaroma->floor_id = $floorId;
         $panaroma->name = $title;
         $panaroma->code = $title;
@@ -132,6 +145,18 @@ class PanaromaController extends Controller
         $panaroma->default_pitch = $pitch;
         $panaroma->save();
 
+        if (isset($panaromaImages)) {
+            foreach ($panaromaImages as $panaromaImage) {
+                $panaromaImageName = time() . '_' . $panaromaImage->getClientOriginalName();
+                $panaromaImageUrl = 'storage/panaroma-images/' . $panaromaImageName;
+                $filepanaromaImage = new PanaromaImage();
+                $filepanaromaImage->title = $panaromaImageName;
+                $filepanaromaImage->thumbnail = $panaromaImageUrl;
+                $filepanaromaImage->panaroma_id = $panaroma->id;
+                $filepanaromaImage->save();
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => ""
@@ -139,7 +164,7 @@ class PanaromaController extends Controller
     }
 
     public function delete(Request $request){
-        $panaroma = Panaroma::find($request->id);
+        $panaroma = Panaroma::with('panaromaImages')->find($request->id);
         if (app()->environment('local')) {
             $imagePath = public_path($panaroma->thumbnail);
         } else {
@@ -148,7 +173,33 @@ class PanaromaController extends Controller
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
+        foreach ($panaroma->panaromaImages as $panaromaImage) {
+            if (app()->environment('local')) {
+                $imagePathpanaroma = public_path($panaromaImage->thumbnail);
+            } else {
+                $imagePathpanaroma = base_path('../public_html/' . $panaromaImage->thumbnail);
+            }
+            if (file_exists($imagePathpanaroma) && is_file($imagePathpanaroma)) {
+                unlink($imagePathpanaroma);
+            }
+        }
         $panaroma->delete();
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function deletePanaromaImage(Request $request){
+        $panaromaImage = PanaromaImage::find($request->id);
+        if (app()->environment('local')) {
+            $imagePath = public_path($panaromaImage->thumbnail);
+        } else {
+            $imagePath = base_path('../public_html/' . $panaromaImage->thumbnail);
+        }
+        if (file_exists($imagePath) && is_file($imagePath)) {
+            unlink($imagePath);
+        }
+        $panaromaImage->delete();
         return response()->json([
             'success' => true
         ]);

@@ -12,7 +12,6 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="{{route('admin')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('list_project')}}">User</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{$titlePage}}</li>
                     </ol>
                 </div>
@@ -22,7 +21,7 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card card-primary card-outline mb-4">
-                <form id="submitForm" data-url-submit="{{route('save_project')}}" data-url-complete="{{route('list_project')}}">
+                <form id="submitForm" data-url-submit="{{route('save_project')}}" data-url-complete="">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 mb-3">
@@ -43,7 +42,7 @@
                         </div>
                     </div>
                     <input type="hidden" name="action" value="{{$action}}">
-                    <input type="hidden" name="id" value="@if (isset($project)){{$project->id}}@endif">
+                    <input type="hidden" name="id" value="{{$project->id}}">
                 </form>
             </div>
         </div>

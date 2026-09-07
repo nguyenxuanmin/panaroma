@@ -19,17 +19,19 @@ return new class extends Migration
             $table->string('slug')->nullable();
             $table->string('user_name')->nullable();
             $table->string('password')->nullable();
+            $table->text('map')->nullable();
             $table->timestamps();
-
-            DB::table('projects')->insert([
-                'name' => 'Project 1',
-                'slug' => 'project-1',
-                'user_name' => 'demo',
-                'password' => Hash::make('12345678'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
         });
+
+        DB::table('projects')->insert([
+            'name' => 'Project 1',
+            'slug' => 'project-1',
+            'user_name' => 'demo',
+            'password' => Hash::make('12345678'),
+            'map' => '',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

@@ -77,6 +77,7 @@ function mapProjectToFrontend($project) {
         'id' => $project->slug ?: (string) $project->id,
         'name' => $project->name ?? ('Project ' . $project->id),
         'slug' => $project->slug,
+        'map' => $project->map,
         'buildings' => $buildings,
     ];
 }

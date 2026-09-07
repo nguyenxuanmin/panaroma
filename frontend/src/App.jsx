@@ -224,7 +224,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
           </div>
         </main>
         <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-        <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} />
+        <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} mapUrl={selectedProject?.map} />
         <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={[]} floorName={null} />
         <RotatePrompt />
       </div>
@@ -270,7 +270,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
 
       <main className="main-viewport">
         {viewMode === "map" ? (
-          activePanaroma ? <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} /> : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: 13 }}>Chưa có Panaroma</div>
+          activePanaroma ? <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} /> : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: 13 }}>No panaroma available yet.</div>
         ) : (
           activePanaroma ? (
             <PanaromaViewer
@@ -282,7 +282,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
               onReturnToMap={() => setViewMode("map")}
               showLeftToolbar={showSidebar}
             />
-          ) : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>Chưa có Panaroma</div>
+          ) : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>No panaroma available yet.</div>
         )}
         {showSidebar && hasBuildings && (
           <BuildingSidebar
@@ -297,7 +297,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
       </main>
 
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} />
+      <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} mapUrl={selectedProject?.map} />
       <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={activeFloor?.videos || []} floorName={activeFloor?.name} />
       <RotatePrompt />
     </div>

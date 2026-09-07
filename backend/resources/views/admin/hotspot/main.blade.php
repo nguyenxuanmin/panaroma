@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Target Panaroma</label>
-                                    <select class="form-select" name="targetPanaroma">
+                                    <select class="form-select" name="targetPanaroma" id="targetPanaromaSelect">
                                         @if (isset($targetPanaromas))
                                             @if (!isset($hotspot) || (isset($hotspot) && empty($hotspot->target_panaroma_id)))
                                                 <option selected disabled value="">Select Target Panaroma</option>
@@ -95,12 +95,30 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const panaromaSelect = document.getElementById('panaromaSelect');
+            const targetPanaromaSelect = document.getElementById('targetPanaromaSelect');
             const panaromaPlanContainer = document.getElementById('panaromaPlanContainer');
             const panaromaPlan = document.getElementById('panaromaPlan');
             const panaromaPlanImage = document.getElementById('panaromaPlanImage');
             const panaromaPlanMarker = document.getElementById('panaromaPlanMarker');
             const yaw = document.querySelector('[name="yaw"]');
             const pitch = document.querySelector('[name="pitch"]');
+
+            function syncPanaromaOptions() {
+                const sourceVal = panaromaSelect.value;
+                const targetVal = targetPanaromaSelect.value;
+                Array.from(targetPanaromaSelect.options).forEach(function (opt) {
+                    if (!opt.value) return;
+                    const shouldHide = opt.value === sourceVal && opt.value !== targetVal;
+                    opt.hidden = shouldHide;
+                    opt.disabled = shouldHide;
+                });
+                Array.from(panaromaSelect.options).forEach(function (opt) {
+                    if (!opt.value) return;
+                    const shouldHide = opt.value === targetVal && opt.value !== sourceVal;
+                    opt.hidden = shouldHide;
+                    opt.disabled = shouldHide;
+                });
+            }
 
             function updatePanaromaPreview() {
                 const imageUrl = panaromaSelect.options[panaromaSelect.selectedIndex]?.dataset.image || '';
@@ -127,7 +145,11 @@
                     field.value = '';
                 });
                 panaromaPlanMarker.style.display = 'none';
+                syncPanaromaOptions();
                 updatePanaromaPreview();
+            });
+            targetPanaromaSelect.addEventListener('change', function () {
+                syncPanaromaOptions();
             });
             panaromaPlan.addEventListener('click', function (event) {
                 const bounds = panaromaPlanImage.getBoundingClientRect();
@@ -142,6 +164,7 @@
             });
 
             panaromaPlanImage.addEventListener('load', restoreMarker);
+            syncPanaromaOptions();
             updatePanaromaPreview();
             restoreMarker();
         });

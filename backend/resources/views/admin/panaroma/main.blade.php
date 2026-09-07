@@ -33,7 +33,7 @@
                                 @endif
                                 <a href="{{route('list_panaroma')}}" class="btn btn-dark">Back</a>
                             </div>
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-7">
                                 <div class="mb-3">
                                     <label class="form-label">Title</label>
                                     <input type="text" class="form-control" name="title" value="@if (isset($panaroma)){{$panaroma->name}}@endif">
@@ -62,13 +62,29 @@
                                     <small class="text-muted">Click on the diagram to select a panaroma location.</small>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-12 col-md-5">
                                 <div class="mb-3">
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
                                     <div class="imageContent">
                                         <img id="imageContent" src="@if (isset($panaroma) && !empty($panaroma->thumbnail)){{ asset($panaroma->thumbnail) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
                                     </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Other Images</label>
+                                    <input type="file" name="panaromaImages[]" id="imageUploads" class="form-control mb-3" multiple accept="image/*">
+                                    <div id="previewImageUploads"></div>
+                                    @if (isset($panaroma))
+                                        <p><label class="form-label">List of other images</label></p>
+                                        <div class="d-flex flex-wrap justify-content-start align-items-start gap-2">
+                                            @foreach ($panaroma->panaromaImages as $item)
+                                                <div class="list-image">
+                                                    <img src="{{ asset($item->thumbnail) }}" alt="{{$item->title}}">
+                                                    <i class="fa-solid fa-xmark" onclick="deletePhoto({{$item->id}},'{{route('delete_panaroma_image')}}')"></i>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -146,5 +162,62 @@
             updateFloorPlan();
             restoreMarker();
         });
+
+        $('#imageUploads').on('change', function (event) {
+            const preview = $('#previewImageUploads');
+            preview.empty();
+            const files = event.target.files;
+            $.each(files, function (i, file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = $('<img>')
+                    .attr('src', e.target.result)
+                    .css({
+                        width: '200px',
+                        height: 'auto',
+                        margin: '5px',
+                        border: '1px solid #ccc',
+                        'object-fit': 'cover',
+                        'border-radius': '5px'
+                    });
+                    preview.append(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function deletePhoto(id,url) {
+                Swal.fire({
+                    text: 'Do you want to delete this image?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            type: 'POST',
+                            data: {id: id},
+                            success: function(response) {
+                                Swal.fire({
+                                    text: "Image deleted successfully!",
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                console.log(xhr);
+                            }
+                        });
+                    }
+                });
+            }
     </script>
 @endsection

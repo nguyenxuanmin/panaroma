@@ -37,9 +37,6 @@ export default function TopHeader({
             ))}
           </select>
         )}
-        {viewMode === "panaroma" && (
-          <span className="th-breadcrumb">{activeBuilding?.name} / {activeFloor?.name} / {activePanaroma?.name}</span>
-        )}
       </div>
 
       <div className="th-right">
@@ -54,9 +51,9 @@ export default function TopHeader({
             <button className={`th-icon-btn ${viewMode !== "map" ? "active" : ""}`} onClick={handleImageClick} title="Image">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M21 19V5c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v14c0 .55.45 1 1 1h16c.55 0 1-.45 1-1zM18 7l-4 5-3-3-4 6h12z"/></svg>
             </button>
-            {/* <button className="th-icon-btn" onClick={onOpenGoogleMap} title="Location">
+            <button className="th-icon-btn" onClick={onOpenGoogleMap} title="Location">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            </button> */}
+            </button>
             {/* <button className="th-icon-btn" title="Help" onClick={() => alert("Help: Home=Map, Video=ムービー, Image=Toggle 2D/360, Pin=Google Map, ⛶=Fullscreen, ☰=Show/hide sidebar")}>?</button> */}
             {user?.role === 'admin' && (
               <a className="th-icon-btn" href="/admin" title="Admin - Quản trị" style={{ textDecoration: 'none' }}>

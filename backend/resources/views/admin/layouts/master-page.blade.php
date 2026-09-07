@@ -28,6 +28,31 @@
                 cursor: pointer;
                 z-index: 2;
             }
+            .list-image{
+                position: relative;
+                width: 250px;
+            }
+            .list-image img{
+                width: 100%;
+                height: auto;
+                border: 1px solid #ccc;
+                object-fit: cover;
+                border-radius: 5px;
+            }
+            .list-image i{
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                font-size: 18px;
+                color: #fff;
+                background: red;
+                border-radius: 50%;
+                cursor: pointer;
+                width: 25px;
+                height: 25px;
+                line-height: 25px;
+                text-align: center;
+            }
         </style>
     </head>
     <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
