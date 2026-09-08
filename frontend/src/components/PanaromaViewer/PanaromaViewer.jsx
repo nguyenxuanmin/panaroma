@@ -57,7 +57,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
       position: { yaw: `${hotspot.yaw}deg`, pitch: `${hotspot.pitch}deg` },
       html: `
         <div class="scene-hotspot-pin">
-          <div class="scene-hotspot-badge">${hotspot.tooltip || hotspot.targetPanaroma || "Đi tiếp"}</div>
+          <div class="scene-hotspot-badge">${hotspot.tooltip || hotspot.targetPanaroma || "Go to next"}</div>
           <div class="scene-hotspot-pointer">▼</div>
           <div class="scene-hotspot-ring-wrap">
             <div class="scene-hotspot-ring"></div>
@@ -132,7 +132,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
           />
         )}
         <div className="mm-ctrls">
-          <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Ẩn minimap" : "Hiện minimap"}>
+          <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Hide minimap" : "Show minimap"}>
             {showMinimap ? "«" : "»"}
           </button>
           <button

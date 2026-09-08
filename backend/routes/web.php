@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PanaromaController;
 use App\Http\Controllers\Admin\HotspotController;
+use App\Http\Controllers\Admin\VideoController;
 
 Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
@@ -38,13 +39,19 @@ Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::post('/panaroma/save', [PanaromaController::class, 'save'])->name('save_panaroma');
     Route::post('/panaroma/delete', [PanaromaController::class, 'delete'])->name('delete_panaroma');
     Route::get('/panaroma/edit/{id}', [PanaromaController::class, 'edit'])->name('edit_panaroma');
-     Route::post('/panaroma/delete-panaroma-image', [PanaromaController::class, 'deletePanaromaImage'])->name('delete_panaroma_image');
+    Route::post('/panaroma/delete-panaroma-image', [PanaromaController::class, 'deletePanaromaImage'])->name('delete_panaroma_image');
     // Hotspot
     Route::get('/hotspot', [HotspotController::class, 'show'])->name('list_hotspot');
     Route::get('/hotspot/add', [HotspotController::class, 'add'])->name('add_hotspot');
     Route::post('/hotspot/save', [HotspotController::class, 'save'])->name('save_hotspot');
     Route::post('/hotspot/delete', [HotspotController::class, 'delete'])->name('delete_hotspot');
     Route::get('/hotspot/edit/{id}', [HotspotController::class, 'edit'])->name('edit_hotspot');
+    // Video
+    Route::get('/video', [VideoController::class, 'show'])->name('list_video');
+    Route::get('/video/add', [VideoController::class, 'add'])->name('add_video');
+    Route::post('/video/save', [VideoController::class, 'save'])->name('save_video');
+    Route::post('/video/delete', [VideoController::class, 'delete'])->name('delete_video');
+    Route::get('/video/edit/{id}', [VideoController::class, 'edit'])->name('edit_video');
 });
 Route::group(['middleware' => [LoginAuth::class]], function () {
     Route::get('/admin/login', function () {return view('admin.login');})->name('login');

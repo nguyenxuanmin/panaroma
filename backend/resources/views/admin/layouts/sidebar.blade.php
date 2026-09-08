@@ -27,6 +27,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{route('list_video')}}" class="nav-link @if (request()->is('video*')) active @endif">
+                        <p>Video</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{route('change_password_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
                         <p>Change Password</p>
                     </a>

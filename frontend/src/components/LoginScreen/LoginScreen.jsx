@@ -11,7 +11,7 @@ export default function LoginScreen({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!id.trim() || !password) {
-      setError("Vui lòng nhập ID và Password");
+      setError("Please enter your ID and password.");
       return;
     }
     setError("");
@@ -24,7 +24,7 @@ export default function LoginScreen({ onLogin }) {
         body: JSON.stringify({ id: id.trim(), password }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || "Đăng nhập thất bại");
+      if (!res.ok) throw new Error(data.message || "Login failed");
       onLogin(data.user);
     } catch (err) {
       setError(err.message);

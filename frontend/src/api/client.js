@@ -1,15 +1,7 @@
-/**
- * API Client - Pano Frontend <-> Laravel Backend
- * - Dev: VITE_API_BASE_URL="" => fetch("/api/...") đi qua Vite proxy -> http://pano-admin.test (không CORS)
- * - Prod same-origin: cũng fetch("/api/...") vì React được serve từ Laravel public
- * - Prod tách domain: set VITE_API_BASE_URL=https://api.domain.com thì fetch cross-origin (đã có CORS config)
- */
-
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
 function buildUrl(path) {
   if (!path.startsWith("/")) path = "/" + path;
-  // nếu API_BASE rỗng => same-origin
   return API_BASE ? `${API_BASE}${path}` : path;
 }
 
@@ -39,20 +31,26 @@ export const api = {
   health: () => request("/api/health"),
   getProjects: async () => {
     const json = await request("/api/projects");
-    // backend trả { data: [...] }
     return json.data || json;
   },
   getProject: async (slug) => {
     const json = await request(`/api/projects/${encodeURIComponent(slug)}`);
     return json.data || json;
   },
-  // helper resolve image url: nếu trả về /storage/... thì cũng đi qua proxy / cùng origin
+  getVideos: async (projectId = null) => {
+    const qs = projectId ? `?project_id=${encodeURIComponent(projectId)}` : "";
+    const json = await request(`/api/videos${qs}`);
+    return json.data || json;
+  },
+  getProjectVideos: async (slug) => {
+    const json = await request(`/api/projects/${encodeURIComponent(slug)}/videos`);
+    return json.data || json;
+  },
+  
   resolveImageUrl: (path) => {
     if (!path) return null;
     if (/^https?:\/\//.test(path) || path.startsWith("//")) return path;
-    // /storage/... hoặc /images/... => same-origin
     if (path.startsWith("/")) return buildUrl(path);
-    // storage relative e.g. panaromas/xxx.jpg => /storage/xxx.jpg
     return buildUrl(`/storage/${path}`);
   },
 };

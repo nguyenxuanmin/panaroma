@@ -56,7 +56,7 @@ export default function TopHeader({
             </button>
             {/* <button className="th-icon-btn" title="Help" onClick={() => alert("Help: Home=Map, Video=ムービー, Image=Toggle 2D/360, Pin=Google Map, ⛶=Fullscreen, ☰=Show/hide sidebar")}>?</button> */}
             {user?.role === 'admin' && (
-              <a className="th-icon-btn" href="/admin" title="Admin - Quản trị" style={{ textDecoration: 'none' }}>
+              <a className="th-icon-btn" href="/admin" title="Admin" style={{ textDecoration: 'none' }}>
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4a3 3 0 110 6 3 3 0 010-6zm-4 8c0 1.5 1.5 3 4 3s4-1.5 4-3v-1H8v1z"/></svg>
               </a>
             )}

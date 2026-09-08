@@ -55,7 +55,7 @@ export default function FooterCarousel({ panaromas, activePanaroma, onSelectPana
           </button>
         </footer>
       )}
-      <button className="footer-collapse-bar" onClick={() => setCollapsed((v) => !v)} title={collapsed ? "Mở panaroma list" : "Đóng panaroma list"}>
+      <button className="footer-collapse-bar" onClick={() => setCollapsed((v) => !v)} title={collapsed ? "Open panaroma list" : "Close panaroma list"}>
         <span className={`collapse-icon ${collapsed ? "up" : "down"}`}>{collapsed ? "︿" : "﹀"}</span>
       </button>
     </div>

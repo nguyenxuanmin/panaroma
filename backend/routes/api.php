@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Floor;
 use App\Models\Project;
 use App\Models\Company;
+use App\Models\Video;
 
 // Helper: normalize storage path to /storage/...
 if (!function_exists('normalizeStorageUrl')) {
@@ -22,6 +23,45 @@ if (!function_exists('normalizeStorageUrl')) {
         // if path already starts with /storage, keep
         // if path like /images/... keep as is (public assets fallback)
         return $path;
+    }
+}
+
+if (!function_exists('getYoutubeId')) {
+    function getYoutubeId(?string $url): ?string {
+        if (!$url) return null;
+        // embed
+        if (preg_match('/youtube\.com\/embed\/([\w-]{11})/', $url, $m)) return $m[1];
+        if (preg_match('/youtube\.com\/shorts\/([\w-]{11})/', $url, $m)) return $m[1];
+        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/', $url, $m)) return $m[1];
+        // fallback parse ?v=
+        $parts = parse_url($url);
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $qs);
+            if (!empty($qs['v']) && preg_match('/^[\w-]{11}$/', $qs['v'])) return $qs['v'];
+        }
+        return null;
+    }
+}
+
+if (!function_exists('mapVideoForApi')) {
+    function mapVideoForApi($video): array {
+        $link = $video->link ?? '';
+        $ytId = getYoutubeId($link);
+        $thumbnail = null;
+        if ($ytId) {
+            $thumbnail = "https://img.youtube.com/vi/{$ytId}/hqdefault.jpg";
+        }
+        return [
+            'id' => (string) $video->id,
+            'title' => $video->title ?? 'Video',
+            'label' => $video->title ?? 'Video',
+            'description' => $video->title ?? '',
+            'thumbnail' => $thumbnail,
+            'videoUrl' => $link,
+            // keep original field for backward compat
+            'link' => $link,
+            'project_id' => $video->project_id,
+        ];
     }
 }
 
@@ -57,9 +97,13 @@ function mapPanaromaForApi($panaroma) {
 function mapProjectToFrontend($project) {
     $floors = $project->floors()->with('panaromas.hotspots')->orderBy('id')->get();
 
+    // Load videos for this project
+    $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
+
     // Each floor becomes a building of type "single" for frontend
     // This keeps sidebar rendering working without needing a buildings table
-    $buildings = $floors->map(function ($floor) {
+    // Inject project videos into each building's videos for backward compat (activeFloor?.videos)
+    $buildings = $floors->map(function ($floor) use ($videos) {
         return [
             'id' => (string) $floor->id,
             'name' => $floor->name ?? ('Floor ' . $floor->id),
@@ -68,7 +112,7 @@ function mapProjectToFrontend($project) {
             'description' => $floor->description,
             'planImage' => normalizeStorageUrl($floor->plan_image),
             'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
-            'videos' => [],
+            'videos' => $videos->values(),
             'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
         ];
     })->values();
@@ -79,6 +123,8 @@ function mapProjectToFrontend($project) {
         'slug' => $project->slug,
         'map' => $project->map,
         'buildings' => $buildings,
+        // expose at project level as primary source
+        'videos' => $videos->values(),
     ];
 }
 
@@ -193,6 +239,26 @@ Route::get('/projects/{slug}', function (string $slug) {
 
     $data = mapProjectToFrontend($project);
     return response()->json(['data' => $data]);
+});
+
+// Videos - frontend VideoModal
+Route::get('/videos', function (Request $request) {
+    $projectId = $request->query('project_id');
+    $query = Video::orderBy('title', 'asc');
+    if ($projectId) {
+        // allow slug or id
+        $project = Project::where('id', $projectId)->orWhere('slug', $projectId)->first();
+        if ($project) $query->where('project_id', $project->id);
+    }
+    $videos = $query->get()->map(fn($v) => mapVideoForApi($v))->values();
+    return response()->json(['data' => $videos]);
+});
+
+Route::get('/projects/{slug}/videos', function (string $slug) {
+    $project = Project::where('slug', $slug)->orWhere('id', $slug)->first();
+    if (!$project) return response()->json(['message' => 'Project not found'], 404);
+    $videos = Video::where('project_id', $project->id)->orderBy('title','asc')->get()->map(fn($v) => mapVideoForApi($v))->values();
+    return response()->json(['data' => $videos]);
 });
 
 // Keep original floors endpoint for backward compat + better shape

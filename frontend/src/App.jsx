@@ -38,7 +38,7 @@ function App() {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", flexDirection: "column", gap: 12, background: "#0f172a", color: "#fff" }}>
         <div style={{ width: 36, height: 36, border: "3px solid #334155", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <span style={{ fontSize: 13, opacity: 0.8 }}>Đang tải dữ liệu panaroma...</span>
+        <span style={{ fontSize: 13, opacity: 0.8 }}>Loading panaroma data...</span>
         <style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style>
       </div>
     );
@@ -86,6 +86,10 @@ function AppContent({ projects, isFallback, user, onLogout }) {
   };
   const activeFloor = getActiveFloor(activeBuilding, activeFloorId);
   const [activePanaroma, setActivePanaroma] = useState(activeFloor?.panaromas?.[0] ?? null);
+
+  // Videos come from Project (DB) — backend injects into buildings as well for backward compat
+  const projectVideos = selectedProject?.videos || [];
+  const availableVideos = projectVideos.length > 0 ? projectVideos : (activeFloor?.videos || []);
 
   useEffect(() => {
     if (activeFloor?.panaromas?.length && !activeFloor.panaromas.find((p) => p.id === activePanaroma?.id)) {
@@ -217,15 +221,15 @@ function AppContent({ projects, isFallback, user, onLogout }) {
         />
         <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12, background: "#f8fafc" }}>
           <div style={{ fontSize: 48, opacity: 0.2 }}>🏢</div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>Dự án "{selectedProject.name}" chưa có Building</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>Project "{selectedProject.name}" has no Buildings</div>
           <div style={{ fontSize: 12, color: "#64748b", maxWidth: 360, textAlign: "center" }}>
-            Admin có thể thêm Building trong Filament, hoặc thêm Panaroma trực tiếp cho Project.<br />
-            Dự án vẫn hoạt động bình thường — không bị lỗi.
+            Admin can add Buildings in Filament, or add Panaromas directly to the Project.<br />
+            The project will continue to function normally — no errors.
           </div>
         </main>
         <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} mapUrl={selectedProject?.map} />
-        <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={[]} floorName={null} />
+        <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={projectVideos} floorName={null} />
         <RotatePrompt />
       </div>
     );
@@ -237,7 +241,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
       <div className="app-layout">
         <TopHeader activeBuilding={activeBuilding} activeFloor={null} activePanaroma={null} viewMode={viewMode} onToggleViewMode={(mode) => setViewMode(mode)} onOpenGoogleMap={() => setShowGmap(true)} onOpenVideo={() => setShowVideo(true)} onToggleFullscreen={handleToggleFullscreen} onToggleSidebar={() => setShowSidebar((v) => !v)} projects={projects} selectedProjectId={selectedProjectId} onSelectProject={handleSelectProject} user={user} onLogout={onLogout} showTopButtons={showSidebar} />
         <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8 }}>
-          <span style={{ fontSize: 13, color: "#64748b" }}>Building "{activeBuilding.name}" chưa có Floor/Panaroma</span>
+          <span style={{ fontSize: 13, color: "#64748b" }}>Building "{activeBuilding.name}" has no Floor/Panaroma</span>
         </main>
       </div>
     );
@@ -247,7 +251,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     <div className="app-layout">
       {isFallback && (
         <div style={{ position: "fixed", bottom: 8, left: "50%", transform: "translateX(-50%)", background: "#f59e0b", color: "#000", padding: "4px 12px", borderRadius: 20, fontSize: 11, zIndex: 9999, opacity: 0.9 }}>
-          Đang dùng dữ liệu mẫu (API chưa có data) — hãy thêm dữ liệu trong Filament Admin
+          Loading sample data (API has no data) — please add data in Filament Admin
         </div>
       )}
       <TopHeader
@@ -298,7 +302,7 @@ function AppContent({ projects, isFallback, user, onLogout }) {
 
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} mapUrl={selectedProject?.map} />
-      <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={activeFloor?.videos || []} floorName={activeFloor?.name} />
+      <VideoModal isOpen={showVideo} onClose={() => setShowVideo(false)} videos={availableVideos} floorName={activeFloor?.name} />
       <RotatePrompt />
     </div>
   );

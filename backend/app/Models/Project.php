@@ -10,4 +10,9 @@ class Project extends Model
     {
         return $this->hasMany(Floor::class);
     }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
 }

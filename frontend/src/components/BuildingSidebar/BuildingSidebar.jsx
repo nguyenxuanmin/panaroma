@@ -5,7 +5,7 @@ export default function BuildingSidebar({ buildings, activeBuilding, activeFloor
   if (!buildings || buildings.length === 0) {
     return (
       <aside className="building-sidebar" aria-label="Building selector">
-        <div style={{ padding: 12, fontSize: 12, color: "#64748b", textAlign: "center" }}>Chưa có Building</div>
+        <div style={{ padding: 12, fontSize: 12, color: "#64748b", textAlign: "center" }}>No building yet.</div>
       </aside>
     );
   }
