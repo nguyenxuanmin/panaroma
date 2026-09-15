@@ -77,12 +77,12 @@ class PanaromaController extends Controller
         if (empty($buildingId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a Building.'
+                'message' => 'Please select a Panaroma Category.'
             ]);
         }
         $targetBuilding = Building::with('floors')->find($buildingId);
         if (!$targetBuilding) {
-            return response()->json(['success'=>false,'message'=>'Building not found.']);
+            return response()->json(['success'=>false,'message'=>'Panaroma Category not found.']);
         }
         $isSingle = $targetBuilding->type === 'single';
         if ($isSingle) {
@@ -93,12 +93,12 @@ class PanaromaController extends Controller
             if (empty($floorId)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Group building requires a Floor. Please select a floor.'
+                    'message' => 'Group Panaroma Category requires a Panaroma Sub-Category. Please select a Panaroma Sub-Category.'
                 ]);
             }
             $targetFloor = Floor::where('id',$floorId)->where('building_id',$targetBuilding->id)->first();
             if (!$targetFloor) {
-                return response()->json(['success'=>false,'message'=>'Floor does not belong to selected Building.']);
+                return response()->json(['success'=>false,'message'=>'Panaroma Sub-Category does not belong to selected Panaroma Category.']);
             }
         }
 

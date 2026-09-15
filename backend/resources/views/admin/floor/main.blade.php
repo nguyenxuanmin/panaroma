@@ -39,20 +39,15 @@
                                     <input type="text" class="form-control" name="title" value="@if (isset($floor)){{$floor->name}}@endif">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Building (Group only)</label>
+                                    <label class="form-label">Panaroma Category (Group only)</label>
                                     <select class="form-select" name="building_id" id="buildingSelect">
-                                        <option value="" disabled @if (!isset($floor) || empty($floor->building_id)) selected @endif>-- Select Group Building --</option>
+                                        <option value="" disabled @if (!isset($floor) || empty($floor->building_id)) selected @endif>Select Group Panaroma Category</option>
                                         @if (isset($buildings) && $buildings->count() > 0)
                                             @foreach ($buildings as $b)
                                                 <option value="{{$b->id}}" @if (isset($floor) && $floor->building_id == $b->id) selected @endif>{{$b->name}} ({{$b->type}})</option>
                                             @endforeach
                                         @endif
                                     </select>
-                                    @if (!isset($buildings) || $buildings->count() === 0)
-                                        <small class="text-danger">Chưa có Building type=group. Vui lòng tạo Building group trước.</small>
-                                    @else
-                                        <small class="text-muted">Chỉ building type=group mới chứa floors (khớp frontend buildingsData type=group).</small>
-                                    @endif
                                 </div>
                             </div>
                             <div class="col-12 col-md-6 mb-3">

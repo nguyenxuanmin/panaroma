@@ -8,11 +8,11 @@
     <div class="app-content-header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6"><h3 class="mb-0">Paronama Category</h3></div>
+                <div class="col-sm-6"><h3 class="mb-0">Paronama Sub-Category</h3></div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                       <li class="breadcrumb-item"><a href="{{route('admin')}}">Dashboard</a></li>
-                      <li class="breadcrumb-item active" aria-current="page">Paronama Category</li>
+                      <li class="breadcrumb-item active" aria-current="page">Paronama Sub-Category</li>
                     </ol>
                   </div>
             </div>
@@ -29,8 +29,8 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
                         <th scope="col">Title</th>
-                        <th scope="col" width="200px">Panaroma Category</th>
-                        <th scope="col" width="150px">Create Date</th>
+                        <th scope="col" width="200px" class="text-center">Panaroma Category</th>
+                        <th scope="col" width="150px" class="text-center">Create Date</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -51,8 +51,8 @@
                                 @endif
                             </td>
                             <td valign="middle">{{$floor->name}}</td>
-                            <td valign="middle">{{$floor->building->name ?? ''}}</td>
-                            <td valign="middle">{{$floor->created_at->format('d/m/Y')}}</td>
+                            <td valign="middle" class="text-center">{{$floor->building->name ?? ''}}</td>
+                            <td valign="middle" class="text-center">{{$floor->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_floor',[$floor->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$floor->id}},'floor','{{route('delete_floor')}}');"><i class="fa-solid fa-trash"></i></button>

@@ -39,9 +39,9 @@
                                     <input type="text" class="form-control" name="title" value="@if (isset($panaroma)){{$panaroma->name}}@endif">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Building</label>
+                                    <label class="form-label">Panaroma Category </label>
                                     <select class="form-select" name="building_id" id="buildingSelect">
-                                        <option value="" disabled @if (!isset($panaroma)) selected @endif>-- Select Building --</option>
+                                        <option value="" disabled @if (!isset($panaroma)) selected @endif>-- Select Panaroma Category --</option>
                                         @if (isset($buildings))
                                             @foreach ($buildings as $b)
                                                 @php
@@ -55,12 +55,12 @@
                                             @endforeach
                                         @endif
                                     </select>
-                                    <small class="text-muted">Single: panaroma gắn trực tiếp building. Group: phải chọn thêm Floor.</small>
+                                    <small class="text-muted">Single: Panorama attached directly to the Panaroma Category. Group: Must also select a Panaroma Sub-Category.</small>
                                 </div>
                                 <div class="mb-3" id="floorWrapper" style="display:none;">
-                                    <label class="form-label">Floor (chỉ khi Building = group)</label>
+                                    <label class="form-label">Panaroma Sub-Category (only when Panaroma Category = group)</label>
                                     <select class="form-select" name="floor_id" id="floorSelect">
-                                        <option value="" disabled selected>-- Select Floor --</option>
+                                        <option value="" disabled selected>-- Select Sub-Category --</option>
                                     </select>
                                 </div>
                                 <div class="mb-3" id="floorPlanContainer" style="display: none;">
@@ -137,7 +137,7 @@
             const initialFloorId = "{{ isset($panaroma) ? ($panaroma->floor_id ?? '') : '' }}";
 
             function populateFloors(buildingId, selectedFloorId = null) {
-                floorSelect.innerHTML = '<option value="" disabled selected>-- Select Floor --</option>';
+                floorSelect.innerHTML = '<option value="" disabled selected>-- Select Panaroma Sub-Category --</option>';
                 const floors = floorsByBuilding[buildingId] || [];
                 floors.forEach(f => {
                     const opt = document.createElement('option');

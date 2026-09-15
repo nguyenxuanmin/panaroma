@@ -23,7 +23,7 @@ class FloorController extends Controller
     }
 
     public function add(){
-        $titlePage = "Create New Panaroma Subcategory";
+        $titlePage = "Create New Panaroma Sub-Category";
         $action = "add";
         $buildings = Building::where('type','group')->orderBy('name','asc')->get();
         return view('admin.floor.main',[
@@ -34,7 +34,7 @@ class FloorController extends Controller
     }
 
     public function edit($id){
-        $titlePage = "Update Panaroma Subcategory";
+        $titlePage = "Update Panaroma Sub-Category";
         $action = "edit";
         $floor = Floor::find($id);
         $buildings = Building::where('type','group')->orderBy('name','asc')->get();
@@ -63,14 +63,14 @@ class FloorController extends Controller
         if (empty($buildingId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a group Building.'
+                'message' => 'Please select a group Panaroma Category.'
             ]);
         }
         $building = Building::where('id',$buildingId)->where('type','group')->first();
         if (!$building) {
             return response()->json([
                 'success' => false,
-                'message' => 'Selected Building must be type group.'
+                'message' => 'Selected Panaroma Category must be type group.'
             ]);
         }
 

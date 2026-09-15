@@ -41,10 +41,10 @@
                                 <div class="mb-3">
                                     <label class="form-label">Type</label>
                                     <select class="form-select" name="type" id="buildingType">
-                                        <option value="single" @if (isset($building) && $building->type === 'group') @else selected @endif>Single — có ảnh, panaroma trực tiếp</option>
-                                        <option value="group" @if (isset($building) && $building->type === 'group') selected @endif>Group — chứa floors, không có ảnh</option>
+                                        <option value="single" @if (isset($building) && $building->type === 'group') @else selected @endif>Single — has image, direct panaroma</option>
+                                        <option value="group" @if (isset($building) && $building->type === 'group') selected @endif>Group — contains floors, no image</option>
                                     </select>
-                                    <small class="text-muted">Group thì không cần plan image, Single thì bắt buộc.</small>
+                                    <small class="text-muted">Image planning is not required for groups, but it is mandatory for individuals.</small>
                                 </div>
                             </div>
                             <div class="col-12 col-md-6 mb-3" id="buildingImageWrapper">
