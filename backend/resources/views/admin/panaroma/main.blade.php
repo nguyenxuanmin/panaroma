@@ -39,24 +39,34 @@
                                     <input type="text" class="form-control" name="title" value="@if (isset($panaroma)){{$panaroma->name}}@endif">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Panaroma Category</label>
-                                    <select class="form-select" name="floor" id="floorSelect">
-                                        @if (isset($floors))
-                                            @if (!isset($panaroma) || (isset($panaroma) && empty($panaroma->floor_id)))
-                                                <option selected disabled value="">Select Panaroma Category</option>
-                                            @endif
-                                            @foreach ($floors as $item)
-                                                <option @if (isset($panaroma) && $item->id == $panaroma->floor_id) selected @endif value="{{$item->id}}" data-image="{{ $item->plan_image ? asset($item->plan_image) : '' }}">{{$item->name}}</option>
+                                    <label class="form-label">Building</label>
+                                    <select class="form-select" name="building_id" id="buildingSelect">
+                                        <option value="" disabled @if (!isset($panaroma)) selected @endif>-- Select Building --</option>
+                                        @if (isset($buildings))
+                                            @foreach ($buildings as $b)
+                                                @php
+                                                    $isSelected = false;
+                                                    if (isset($panaroma)) {
+                                                        if (!empty($panaroma->building_id) && $panaroma->building_id == $b->id) $isSelected = true;
+                                                        if (!empty($panaroma->floor_id) && $panaroma->floor && $panaroma->floor->building_id == $b->id) $isSelected = true;
+                                                    }
+                                                @endphp
+                                                <option value="{{$b->id}}" data-type="{{$b->type}}" data-image="{{ $b->plan_image ? asset($b->plan_image) : '' }}" @if ($isSelected) selected @endif>{{$b->name}} — {{$b->type}}</option>
                                             @endforeach
-                                        @else
-                                            <option selected disabled value="">Select Panaroma Category</option>
                                         @endif
+                                    </select>
+                                    <small class="text-muted">Single: panaroma gắn trực tiếp building. Group: phải chọn thêm Floor.</small>
+                                </div>
+                                <div class="mb-3" id="floorWrapper" style="display:none;">
+                                    <label class="form-label">Floor (chỉ khi Building = group)</label>
+                                    <select class="form-select" name="floor_id" id="floorSelect">
+                                        <option value="" disabled selected>-- Select Floor --</option>
                                     </select>
                                 </div>
                                 <div class="mb-3" id="floorPlanContainer" style="display: none;">
-                                    <label class="form-label">Position on the panaroma category map</label>
+                                    <label class="form-label" id="mapLabel">Position on map</label>
                                     <div id="floorPlan" style="position: relative; cursor: crosshair; line-height: 0;">
-                                        <img id="floorPlanImage" src="" alt="Sơ đồ floor" style="display: block; max-width: 100%; height: auto;">
+                                        <img id="floorPlanImage" src="" alt="Sơ đồ map" style="display: block; max-width: 100%; height: auto;">
                                         <span id="floorPlanMarker" aria-hidden="true" style="display: none; position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%; background: #dc3545; box-shadow: 0 0 0 1px #000;"></span>
                                     </div>
                                     <small class="text-muted">Click on the diagram to select a panaroma location.</small>
@@ -104,25 +114,73 @@
 
 @section('script')
     <script>
+        const buildingsData = @json($buildings ?? []);
+        // map buildingId -> floors
+        const floorsByBuilding = {};
+        buildingsData.forEach(b => { floorsByBuilding[b.id] = b.floors || []; });
+
         document.addEventListener('DOMContentLoaded', function () {
+            const buildingSelect = document.getElementById('buildingSelect');
             const floorSelect = document.getElementById('floorSelect');
+            const floorWrapper = document.getElementById('floorWrapper');
             const floorPlanContainer = document.getElementById('floorPlanContainer');
             const floorPlan = document.getElementById('floorPlan');
             const floorPlanImage = document.getElementById('floorPlanImage');
             const floorPlanMarker = document.getElementById('floorPlanMarker');
+            const mapLabel = document.getElementById('mapLabel');
             const mapX = document.querySelector('[name="map_x"]');
             const mapY = document.querySelector('[name="map_y"]');
             const mapAngle = document.querySelector('[name="map_angle"]');
             const yaw = document.querySelector('[name="yaw"]');
             const pitch = document.querySelector('[name="pitch"]');
 
-            function updateFloorPlan() {
-                const imageUrl = floorSelect.options[floorSelect.selectedIndex]?.dataset.image || '';
+            const initialFloorId = "{{ isset($panaroma) ? ($panaroma->floor_id ?? '') : '' }}";
+
+            function populateFloors(buildingId, selectedFloorId = null) {
+                floorSelect.innerHTML = '<option value="" disabled selected>-- Select Floor --</option>';
+                const floors = floorsByBuilding[buildingId] || [];
+                floors.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f.id;
+                    opt.textContent = f.name;
+                    opt.dataset.image = f.plan_image ? ('/' + f.plan_image.replace(/^\//,'')) : '';
+                    // normalize to asset URL if needed
+                    if (f.plan_image && !f.plan_image.startsWith('http')) {
+                        // buildingsData plan_image is storage/... -> use same origin
+                        opt.dataset.image = '/' + f.plan_image.replace(/^\//,'');
+                        // also try asset prefix
+                        if (buildingsData.find(b=>b.id==buildingId)?.plan_image) { /* keep */ }
+                    }
+                    // use original asset url from select building's floors if available via data-image on building options fallback
+                    if (f.plan_image) {
+                        // attempt to reuse asset helper: floors' plan_image may need asset()
+                        opt.dataset.image = "{{ asset('') }}".replace(/\/$/,'') + '/' + f.plan_image;
+                    }
+                    if (String(f.id) === String(selectedFloorId)) opt.selected = true;
+                    floorSelect.appendChild(opt);
+                });
+            }
+
+            function updateMapImage() {
+                const bOpt = buildingSelect.options[buildingSelect.selectedIndex];
+                if (!bOpt || !bOpt.value) {
+                    floorPlanContainer.style.display = 'none';
+                    floorPlanMarker.style.display = 'none';
+                    return;
+                }
+                const type = bOpt.dataset.type;
+                let imageUrl = '';
+                if (type === 'single') {
+                    imageUrl = bOpt.dataset.image || '';
+                    mapLabel.textContent = 'Position on building map (single)';
+                } else {
+                    const fOpt = floorSelect.options[floorSelect.selectedIndex];
+                    imageUrl = fOpt?.dataset.image || '';
+                    mapLabel.textContent = 'Position on floor map (group)';
+                }
                 floorPlanImage.src = imageUrl;
                 floorPlanContainer.style.display = imageUrl ? '' : 'none';
-                if (!imageUrl) {
-                    floorPlanMarker.style.display = 'none';
-                }
+                if (!imageUrl) floorPlanMarker.style.display = 'none';
             }
 
             function restoreMarker() {
@@ -134,12 +192,42 @@
                 floorPlanMarker.style.display = 'block';
             }
 
+            function handleBuildingChange(resetCoords = true) {
+                const bOpt = buildingSelect.options[buildingSelect.selectedIndex];
+                if (!bOpt || !bOpt.value) {
+                    floorWrapper.style.display = 'none';
+                    floorPlanContainer.style.display = 'none';
+                    return;
+                }
+                const type = bOpt.dataset.type;
+                if (type === 'group') {
+                    floorWrapper.style.display = '';
+                    // populate if empty or building changed
+                    const currentBuildingId = bOpt.value;
+                    const alreadyPopulated = floorSelect.options.length > 1 && floorSelect.dataset.buildingId === currentBuildingId;
+                    if (!alreadyPopulated) {
+                        populateFloors(currentBuildingId, initialFloorId);
+                        floorSelect.dataset.buildingId = currentBuildingId;
+                    }
+                } else {
+                    floorWrapper.style.display = 'none';
+                    floorSelect.innerHTML = '<option value="" disabled selected>-- Select Floor --</option>';
+                    floorSelect.dataset.buildingId = '';
+                }
+                if (resetCoords) {
+                    [mapX, mapY, mapAngle, yaw, pitch].forEach(f => f.value = '');
+                    floorPlanMarker.style.display = 'none';
+                }
+                updateMapImage();
+            }
+
+            buildingSelect.addEventListener('change', function(){ handleBuildingChange(true); });
             floorSelect.addEventListener('change', function () {
                 [mapX, mapY, mapAngle, yaw, pitch].forEach(function (field) {
                     field.value = '';
                 });
                 floorPlanMarker.style.display = 'none';
-                updateFloorPlan();
+                updateMapImage();
             });
             floorPlan.addEventListener('click', function (event) {
                 const bounds = floorPlanImage.getBoundingClientRect();
@@ -159,7 +247,11 @@
             });
 
             floorPlanImage.addEventListener('load', restoreMarker);
-            updateFloorPlan();
+            // init: if editing, restore building/floor state
+            if (buildingSelect.value) {
+                handleBuildingChange(false);
+            }
+            updateMapImage();
             restoreMarker();
         });
 

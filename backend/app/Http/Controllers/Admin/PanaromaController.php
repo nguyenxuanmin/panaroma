@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
 use App\Models\Floor;
+use App\Models\Building;
 use App\Models\Panaroma;
 use App\Models\PanaromaImage;
 
@@ -17,7 +18,7 @@ class PanaromaController extends Controller
     }
 
     public function show(){
-        $panaromas = Panaroma::orderBy('name','asc')->paginate(20);
+        $panaromas = Panaroma::with(['building','floor.building'])->orderBy('name','asc')->paginate(20);
         return view('admin.panaroma.list',[
             'panaromas' => $panaromas
         ]);
@@ -26,10 +27,10 @@ class PanaromaController extends Controller
     public function add(){
         $titlePage = "Create New Panaroma";
         $action = "add";
-        $floors = Floor::orderBy('name','asc')->get();
+        $buildings = Building::with('floors')->orderBy('name','asc')->get();
         return view('admin.panaroma.main',[
             'titlePage' => $titlePage,
-            'floors' => $floors,
+            'buildings' => $buildings,
             'action' => $action
         ]);
     }
@@ -38,18 +39,19 @@ class PanaromaController extends Controller
         $titlePage = "Update Panaroma";
         $action = "edit";
         $panaroma = Panaroma::with('panaromaImages')->find($id);
-        $floors = Floor::orderBy('name','asc')->get();
+        $buildings = Building::with('floors')->orderBy('name','asc')->get();
         return view('admin.panaroma.main',[
             'titlePage' => $titlePage,
             'action' => $action,
-            'floors' => $floors,
+            'buildings' => $buildings,
             'panaroma' => $panaroma
         ]);
     }
 
     public function save(Request $request){
         $title = $request->title;
-        $floorId = $request->floor;
+        $buildingId = $request->building_id;
+        $floorId = $request->floor_id;
         $map_x = $request->map_x;
         $map_y = $request->map_y;
         $map_angle = $request->map_angle;
@@ -67,11 +69,37 @@ class PanaromaController extends Controller
             ]);
         }
 
-        if (empty($floorId)) {
+        // Validate building -> single: need building_id, group: need floor_id
+        $targetBuilding = null;
+        $targetFloor = null;
+        $isSingle = false;
+
+        if (empty($buildingId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please select a panaroma category.'
+                'message' => 'Please select a Building.'
             ]);
+        }
+        $targetBuilding = Building::with('floors')->find($buildingId);
+        if (!$targetBuilding) {
+            return response()->json(['success'=>false,'message'=>'Building not found.']);
+        }
+        $isSingle = $targetBuilding->type === 'single';
+        if ($isSingle) {
+            // single => floor_id must be null
+            $floorId = null;
+        } else {
+            // group => phải chọn floor thuộc building đó
+            if (empty($floorId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Group building requires a Floor. Please select a floor.'
+                ]);
+            }
+            $targetFloor = Floor::where('id',$floorId)->where('building_id',$targetBuilding->id)->first();
+            if (!$targetFloor) {
+                return response()->json(['success'=>false,'message'=>'Floor does not belong to selected Building.']);
+            }
         }
 
         if ($action == 'add' && empty($imageName)) {
@@ -91,7 +119,11 @@ class PanaromaController extends Controller
         if ($action === 'add') {
             $panaroma = new Panaroma();
             $imageUrl = 'storage/panaromas/' . time() . '_' . $imageName;
-            $number = Panaroma::where('floor_id',$floorId)->count() + 1;
+            if ($isSingle) {
+                $number = Panaroma::where('building_id',$targetBuilding->id)->count() + 1;
+            } else {
+                $number = Panaroma::where('floor_id',$targetFloor->id)->count() + 1;
+            }
         } else {
             $panaroma = Panaroma::find($request->id);
             if (!empty($imageName)) {
@@ -132,7 +164,13 @@ class PanaromaController extends Controller
             }
         }
 
-        $panaroma->floor_id = $floorId;
+        if ($isSingle) {
+            $panaroma->building_id = $targetBuilding->id;
+            $panaroma->floor_id = null;
+        } else {
+            $panaroma->building_id = null;
+            $panaroma->floor_id = $targetFloor->id;
+        }
         $panaroma->name = $title;
         $panaroma->code = $title;
         $panaroma->thumbnail = $imageUrl;

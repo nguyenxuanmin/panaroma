@@ -29,7 +29,8 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="300px"></th>
                         <th scope="col">Title</th>
-                        <th scope="col" width="300px">Panaroma Category</th>
+                        <th scope="col" width="250px">Building</th>
+                        <th scope="col" width="250px">Floor</th>
                         <th scope="col" width="150px">Create Date</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
@@ -51,7 +52,22 @@
                                 @endif
                             </td>
                             <td valign="middle">{{$panaroma->name}}</td>
-                            <td valign="middle">{{$panaroma->floor->name}}</td>
+                            <td valign="middle">
+                                @if (!empty($panaroma->building_id))
+                                    {{ $panaroma->building->name ?? '—' }} <small class="badge bg-info">single</small>
+                                @elseif (!empty($panaroma->floor_id) && $panaroma->floor)
+                                    {{ $panaroma->floor->building->name ?? '—' }} <small class="badge bg-secondary">group</small>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                            <td valign="middle">
+                                @if (!empty($panaroma->floor_id))
+                                    {{ $panaroma->floor->name ?? '—' }}
+                                @else
+                                    <span class="text-muted">— single (trực tiếp building)</span>
+                                @endif
+                            </td>
                             <td valign="middle">{{$panaroma->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_panaroma',[$panaroma->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>

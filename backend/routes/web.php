@@ -6,6 +6,7 @@ use App\Http\Middleware\LoginAuth;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PanaromaController;
@@ -19,6 +20,12 @@ Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::post('/admin/change-password', [AdminController::class, 'saveChangePassword'])->name('save_change_password');
     Route::get('/admin/company', [CompanyController::class, 'show'])->name('company');
     Route::post('/admin/company', [CompanyController::class, 'save'])->name('save_company');
+    // Building
+    Route::get('/building', [BuildingController::class, 'show'])->name('list_building');
+    Route::get('/building/add', [BuildingController::class, 'add'])->name('add_building');
+    Route::post('/building/save', [BuildingController::class, 'save'])->name('save_building');
+    Route::post('/building/delete', [BuildingController::class, 'delete'])->name('delete_building');
+    Route::get('/building/edit/{id}', [BuildingController::class, 'edit'])->name('edit_building');
     // Floor
     Route::get('/floor', [FloorController::class, 'show'])->name('list_floor');
     Route::get('/floor/add', [FloorController::class, 'add'])->name('add_floor');

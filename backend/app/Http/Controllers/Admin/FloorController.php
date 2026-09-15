@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
 use App\Models\Floor;
+use App\Models\Building;
 
 class FloorController extends Controller
 {
@@ -22,27 +23,32 @@ class FloorController extends Controller
     }
 
     public function add(){
-        $titlePage = "Create New Panaroma Category";
+        $titlePage = "Create New Panaroma Subcategory";
         $action = "add";
+        $buildings = Building::where('type','group')->orderBy('name','asc')->get();
         return view('admin.floor.main',[
             'titlePage' => $titlePage,
-            'action' => $action
+            'action' => $action,
+            'buildings' => $buildings
         ]);
     }
 
     public function edit($id){
-        $titlePage = "Update Panaroma Category";
+        $titlePage = "Update Panaroma Subcategory";
         $action = "edit";
         $floor = Floor::find($id);
+        $buildings = Building::where('type','group')->orderBy('name','asc')->get();
         return view('admin.floor.main',[
             'titlePage' => $titlePage,
             'action' => $action,
-            'floor' => $floor
+            'floor' => $floor,
+            'buildings' => $buildings
         ]);
     }
 
     public function save(Request $request){
         $title = $request->title;
+        $buildingId = $request->building_id;
         $image = $request->file('image');
         $imageName = $image ? $image->getClientOriginalName() : '';
         $action = $request->action;
@@ -51,6 +57,20 @@ class FloorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'The title cannot be left blank.'
+            ]);
+        }
+
+        if (empty($buildingId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a group Building.'
+            ]);
+        }
+        $building = Building::where('id',$buildingId)->where('type','group')->first();
+        if (!$building) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected Building must be type group.'
             ]);
         }
 
@@ -91,7 +111,7 @@ class FloorController extends Controller
             }
         }
         
-        $floor->project_id = 1;
+        $floor->building_id = $building->id;
         $floor->name = $title;
         $floor->plan_image = $imageUrl;
         $floor->save();
@@ -103,23 +123,21 @@ class FloorController extends Controller
     }
 
     public function delete(Request $request){
-        $floor = Floor::with('panaromas')->find($request->id);
-        if (app()->environment('local')) {
-            $imagePath = public_path($floor->plan_image);
-        } else {
-            $imagePath = base_path('../public_html/' . $floor->plan_image);
+        $floor = Floor::with('panaromas.panaromaImages')->find($request->id);
+        if (!$floor) {
+            return response()->json(['success'=>false,'message'=>'Floor not found.'],404);
         }
-        if (file_exists($imagePath) && is_file($imagePath)) {
-            unlink($imagePath);
-        }
-        foreach ($floor->panaromas as $key => $panaroma) {
-            if (app()->environment('local')) {
-                $imagePathpanaroma = public_path($panaroma->thumbnail);
-            } else {
-                $imagePathpanaroma = base_path('../public_html/' . $panaroma->thumbnail);
-            }
-            if (file_exists($imagePathpanaroma) && is_file($imagePathpanaroma)) {
-                unlink($imagePathpanaroma);
+        $deleteFile = function (?string $path) {
+            if (empty($path)) return;
+            $full = app()->environment('local') ? public_path($path) : base_path('../public_html/' . $path);
+            if (file_exists($full) && is_file($full)) @unlink($full);
+        };
+        $deleteFile($floor->plan_image);
+        foreach ($floor->panaromas as $panaroma) {
+            $deleteFile($panaroma->thumbnail);
+            $deleteFile($panaroma->url !== $panaroma->thumbnail ? $panaroma->url : null);
+            foreach ($panaroma->panaromaImages as $img) {
+                $deleteFile($img->thumbnail);
             }
         }
         $floor->delete();

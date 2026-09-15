@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Panaroma extends Model
 {
+    public function building(){
+        return $this->belongsTo(Building::class);
+    }
+    
     public function floor()
     {
-        return $this->belongsTo(Floor::class);
+        return $this->belongsTo(Floor::class)->withDefault();;
     }
 
     public function hotspots()

@@ -21,7 +21,7 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="mb-3">
-                <a class="btn btn-outline-primary" href="{{route('add_floor')}}" title="Create New">Create New</a>
+                <a class="btn btn-outline-primary" href="{{route('add_building')}}" title="Create New">Create New</a>
             </div>
             <table class="table">
                 <thead class="table-dark">
@@ -29,39 +29,39 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
                         <th scope="col">Title</th>
-                        <th scope="col" width="200px">Panaroma Category</th>
+                        <th scope="col" width="200px">Type</th>
                         <th scope="col" width="150px">Create Date</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (count($floors) == 0)
+                    @if (count($buildings) == 0)
                         <tr>
                             <td valign="middle" class="text-center" colspan="6">No data available</td>
                         </tr>
                     @endif
-                    @foreach ($floors as $key => $floor)
+                    @foreach ($buildings as $key => $building)
                         <tr>
                             <td valign="middle" class="text-center">{{$key+1}}</td>
                             <td valign="middle" class="text-center">
-                                @if (!empty($floor->plan_image))
-                                    <img src="{{ asset($floor->plan_image) }}" alt="{{$floor->name}}" class="object-fit-cover" style="max-width: 100%; max-height: 150px;">
+                                @if (!empty($building->plan_image))
+                                    <img src="{{ asset($building->plan_image) }}" alt="{{$building->name}}" class="object-fit-cover" style="max-width: 100%; max-height: 150px;">
                                 @else
-                                    <img src="{{asset('library/admin/default-image.png')}}" alt="{{$floor->name}}" style="max-width: 100%; max-height: 150px;">
+                                    <img src="{{asset('library/admin/default-image.png')}}" alt="{{$building->name}}" style="max-width: 100%; max-height: 150px;">
                                 @endif
                             </td>
-                            <td valign="middle">{{$floor->name}}</td>
-                            <td valign="middle">{{$floor->building->name ?? ''}}</td>
-                            <td valign="middle">{{$floor->created_at->format('d/m/Y')}}</td>
+                            <td valign="middle">{{$building->name}}</td>
+                            <td valign="middle">{{$building->type}}</td>
+                            <td valign="middle">{{$building->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
-                                <a href="{{route('edit_floor',[$floor->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$floor->id}},'floor','{{route('delete_floor')}}');"><i class="fa-solid fa-trash"></i></button>
+                                <a href="{{route('edit_building',[$building->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$building->id}},'building','{{route('delete_building')}}');"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-            {{$floors->links('admin.layouts.pagination')}}
+            {{$buildings->links('admin.layouts.pagination')}}
         </div>
     </div>
 @endsection

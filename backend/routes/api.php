@@ -94,28 +94,52 @@ function mapPanaromaForApi($panaroma) {
     ];
 }
 
-function mapProjectToFrontend($project) {
-    $floors = $project->floors()->with('panaromas.hotspots')->orderBy('id')->get();
-
-    // Load videos for this project
-    $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
-
-    // Each floor becomes a building of type "single" for frontend
-    // This keeps sidebar rendering working without needing a buildings table
-    // Inject project videos into each building's videos for backward compat (activeFloor?.videos)
-    $buildings = $floors->map(function ($floor) use ($videos) {
+function mapBuildingForApi($building, $videos) {
+    $type = $building->type ?? 'single';
+    if ($type === 'group') {
+        $floors = $building->floors()->with('panaromas.hotspots')->orderBy('id')->get();
         return [
-            'id' => (string) $floor->id,
-            'name' => $floor->name ?? ('Floor ' . $floor->id),
-            'type' => 'single',
-            'shortLabel' => $floor->short_label,
-            'description' => $floor->description,
-            'planImage' => normalizeStorageUrl($floor->plan_image),
-            'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
-            'videos' => $videos->values(),
-            'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
+            'id' => (string) $building->id,
+            'name' => $building->name ?? ('Building ' . $building->id),
+            'type' => 'group',
+            'planImage' => null,
+            'floors' => $floors->map(function ($floor) use ($videos) {
+                return [
+                    'id' => (string) $floor->id,
+                    'name' => $floor->name,
+                    'shortLabel' => $floor->short_label,
+                    'description' => $floor->description,
+                    'planImage' => normalizeStorageUrl($floor->plan_image),
+                    'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
+                    'videos' => $videos->values(),
+                    'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
+                ];
+            })->values(),
         ];
-    })->values();
+    }
+    // single: panaromas trực tiếp building
+    $panaromas = $building->panaromas()->with('hotspots')->orderBy('number')->get();
+    // fallback: nếu single nhưng chưa có panaroma trực tiếp, lấy từ floors đầu (compat data cũ)
+    if ($panaromas->isEmpty()) {
+        $firstFloor = $building->floors()->with('panaromas.hotspots')->first();
+        if ($firstFloor) $panaromas = $firstFloor->panaromas;
+    }
+    return [
+        'id' => (string) $building->id,
+        'name' => $building->name ?? ('Building ' . $building->id),
+        'type' => 'single',
+        'planImage' => normalizeStorageUrl($building->plan_image),
+        'defaultPanaromaId' => $panaromas->first()?->id ? (string) $panaromas->first()->id : null,
+        'videos' => $videos->values(),
+        'panaromas' => $panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
+    ];
+}
+
+function mapProjectToFrontend($project) {
+    // Load buildings with nested relations
+    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots', 'panaromas.hotspots'])->orderBy('id')->get();
+    $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
+    $buildings = $buildingsRel->map(fn($b) => mapBuildingForApi($b, $videos))->values();
 
     return [
         'id' => $project->slug ?: (string) $project->id,
@@ -123,7 +147,6 @@ function mapProjectToFrontend($project) {
         'slug' => $project->slug,
         'map' => $project->map,
         'buildings' => $buildings,
-        // expose at project level as primary source
         'videos' => $videos->values(),
     ];
 }
@@ -216,7 +239,7 @@ Route::post('/auth/logout', function () {
 
 // Projects - main endpoint for frontend useProjects hook
 Route::get('/projects', function () {
-    $projects = Project::with('floors.panaromas.hotspots')->orderBy('id')->get();
+    $projects = Project::with(['buildings.floors.panaromas.hotspots','buildings.panaromas.hotspots'])->orderBy('id')->get();
 
     if ($projects->isEmpty()) {
         return response()->json(['data' => []]);
@@ -228,7 +251,7 @@ Route::get('/projects', function () {
 });
 
 Route::get('/projects/{slug}', function (string $slug) {
-    $project = Project::with('floors.panaromas.hotspots')
+    $project = Project::with(['buildings.floors.panaromas.hotspots','buildings.panaromas.hotspots'])
         ->where('slug', $slug)
         ->orWhere('id', $slug)
         ->first();

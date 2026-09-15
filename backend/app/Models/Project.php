@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    public function floors()
+    public function buildings()
     {
-        return $this->hasMany(Floor::class);
+        return $this->hasMany(Building::class);
     }
 
     public function videos()

@@ -81,9 +81,12 @@ class HotspotController extends Controller
         }
 
         if ($action === 'add') {
-            $hotspot = new hotspot();
+            $hotspot = new Hotspot();
         } else {
-            $hotspot = hotspot::find($request->id);
+            $hotspot = Hotspot::find($request->id);
+            if (!$hotspot) {
+                return response()->json(['success'=>false,'message'=>'Hotspot not found.'],404);
+            }
         }
         
         $hotspot->panaroma_id = $panaromaId;
@@ -100,7 +103,10 @@ class HotspotController extends Controller
     }
 
     public function delete(Request $request){
-        $hotspot = hotspot::find($request->id);
+        $hotspot = Hotspot::find($request->id);
+        if (!$hotspot) {
+            return response()->json(['success'=>false,'message'=>'Hotspot not found.'],404);
+        }
         $hotspot->delete();
         return response()->json([
             'success' => true

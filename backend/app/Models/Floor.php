@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Floor extends Model
 {
-    public function project()
+    public function building()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Building::class);
     }
 
     public function panaromas()
