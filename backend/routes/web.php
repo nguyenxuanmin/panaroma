@@ -64,8 +64,3 @@ Route::group(['middleware' => [LoginAuth::class]], function () {
     Route::get('/admin/login', function () {return view('admin.login');})->name('login');
     Route::post('/admin/login', [AdminController::class, 'login'])->name('login');
 });
-APP_URL=https://yourdomain.com
-SESSION_DOMAIN=.yourdomain.com
-SESSION_SECURE_COOKIE=true
-SESSION_SAME_SITE=lax
-SANCTUM_STATEFUL_DOMAINS=panaroma.tozu.vn,www.panaroma.tozu.vn

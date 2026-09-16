@@ -31,11 +31,14 @@ export default function LoginScreen({ onLogin }) {
         credentials: "include",
         body: JSON.stringify({ id: id.trim(), password }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      const raw = await res.text();
+      let data = {};
+      try { data = JSON.parse(raw); } catch { data = { message: raw.slice(0, 500) }; }
+      if (!res.ok) throw new Error(data.message || `Server Error ${res.status}: ${raw.slice(0,300)}`);
       onLogin(data.user);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Server Error - check Network tab");
+      console.error("[Login] failed", err);
     } finally {
       setLoading(false);
     }
