@@ -87,11 +87,7 @@ class FloorController extends Controller
         } else {
             $floor = Floor::find($request->id);
             if (!empty($imageName)) {
-                if (app()->environment('local')) {
-                    $imagePath = public_path($floor->plan_image);
-                } else {
-                    $imagePath = base_path('../public_html/' . $floor->plan_image);
-                }
+                $imagePath = public_path($floor->plan_image);
                 if (file_exists($imagePath) && is_file($imagePath)) {
                     unlink($imagePath);
                 }
@@ -129,7 +125,7 @@ class FloorController extends Controller
         }
         $deleteFile = function (?string $path) {
             if (empty($path)) return;
-            $full = app()->environment('local') ? public_path($path) : base_path('../public_html/' . $path);
+            $full = public_path($path);
             if (file_exists($full) && is_file($full)) @unlink($full);
         };
         $deleteFile($floor->plan_image);

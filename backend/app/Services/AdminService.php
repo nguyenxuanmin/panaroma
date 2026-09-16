@@ -27,11 +27,7 @@ class AdminService
             return $message;
         }
         $imageName = time() . '_' . basename($image->getClientOriginalName());
-        if (app()->environment('local')) {
-            $uploadDir = public_path('storage/'.$folder.'/');
-        } else {
-            $uploadDir = base_path('../public_html/storage/' . $folder . '/');
-        }
+        $uploadDir = public_path('storage/'.$folder.'/');
         $targetFile = $uploadDir . $imageName;
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);

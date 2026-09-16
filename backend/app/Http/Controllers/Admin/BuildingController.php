@@ -76,14 +76,14 @@ class BuildingController extends Controller
             }
             if ($type === 'group') {
                 if (!empty($building->plan_image)) {
-                    $old = app()->environment('local') ? public_path($building->plan_image) : base_path('../public_html/' . $building->plan_image);
+                    $old = public_path($building->plan_image);
                     if (file_exists($old) && is_file($old)) @unlink($old);
                 }
                 $imageUrl = null;
             } else {
                 if (!empty($imageName)) {
                     if (!empty($building->plan_image)) {
-                        $old = app()->environment('local') ? public_path($building->plan_image) : base_path('../public_html/' . $building->plan_image);
+                        $old = public_path($building->plan_image);
                         if (file_exists($old) && is_file($old)) @unlink($old);
                     }
                     $imageUrl = 'storage/buildings/' . time() . '_' . $imageName;
@@ -123,7 +123,7 @@ class BuildingController extends Controller
 
         $deleteFile = function (?string $path) {
             if (empty($path)) return;
-            $full = app()->environment('local') ? public_path($path) : base_path('../public_html/' . $path);
+            $full = public_path($path);
             if (file_exists($full) && is_file($full)) {
                 @unlink($full);
             }

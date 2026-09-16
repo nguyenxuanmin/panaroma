@@ -127,11 +127,7 @@ class PanaromaController extends Controller
         } else {
             $panaroma = Panaroma::find($request->id);
             if (!empty($imageName)) {
-                if (app()->environment('local')) {
-                    $imagePath = public_path($panaroma->thumbnail);
-                } else {
-                    $imagePath = base_path('../public_html/' . $panaroma->thumbnail);
-                }
+                $imagePath = public_path($panaroma->thumbnail);
                 if (file_exists($imagePath) && is_file($imagePath)) {
                     unlink($imagePath);
                 }
@@ -203,20 +199,12 @@ class PanaromaController extends Controller
 
     public function delete(Request $request){
         $panaroma = Panaroma::with('panaromaImages')->find($request->id);
-        if (app()->environment('local')) {
-            $imagePath = public_path($panaroma->thumbnail);
-        } else {
-            $imagePath = base_path('../public_html/' . $panaroma->thumbnail);
-        }
+        $imagePath = public_path($panaroma->thumbnail);
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
         foreach ($panaroma->panaromaImages as $panaromaImage) {
-            if (app()->environment('local')) {
-                $imagePathpanaroma = public_path($panaromaImage->thumbnail);
-            } else {
-                $imagePathpanaroma = base_path('../public_html/' . $panaromaImage->thumbnail);
-            }
+            $imagePathpanaroma = public_path($panaromaImage->thumbnail);
             if (file_exists($imagePathpanaroma) && is_file($imagePathpanaroma)) {
                 unlink($imagePathpanaroma);
             }
@@ -229,11 +217,7 @@ class PanaromaController extends Controller
 
     public function deletePanaromaImage(Request $request){
         $panaromaImage = PanaromaImage::find($request->id);
-        if (app()->environment('local')) {
-            $imagePath = public_path($panaromaImage->thumbnail);
-        } else {
-            $imagePath = base_path('../public_html/' . $panaromaImage->thumbnail);
-        }
+        $imagePath = public_path($panaromaImage->thumbnail);
         if (file_exists($imagePath) && is_file($imagePath)) {
             unlink($imagePath);
         }
