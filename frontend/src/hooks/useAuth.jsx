@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { buildUrl, getCsrfCookie, getXsrfToken } from "../api/client";
 
 const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 phút
 
@@ -10,7 +11,14 @@ export function useAuth() {
 
   const checkMe = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me", { credentials: "include", headers: { Accept: "application/json" } });
+      const token = getXsrfToken();
+      const res = await fetch(buildUrl("/api/auth/me"), {
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { "X-XSRF-TOKEN": token } : {}),
+        },
+      });
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
@@ -37,7 +45,18 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    try { await fetch("/api/auth/logout", { method: "POST", credentials: "include", headers: { Accept: "application/json" } }); } catch {}
+    try {
+      await getCsrfCookie();
+      const token = getXsrfToken();
+      await fetch(buildUrl("/api/auth/logout"), {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { "X-XSRF-TOKEN": token } : {}),
+        },
+      });
+    } catch {}
     setUser(null);
     localStorage.removeItem("pano_user");
     localStorage.removeItem("pano_last_active");

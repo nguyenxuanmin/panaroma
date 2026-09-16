@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { buildUrl, getCsrfCookie, getXsrfToken } from "../../api/client";
 import "./LoginScreen.css";
 
 export default function LoginScreen({ onLogin }) {
@@ -17,9 +18,16 @@ export default function LoginScreen({ onLogin }) {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      // Sanctum statefulApi yêu cầu csrf-cookie trước (backend/bootstrap/app.php:25)
+      await getCsrfCookie();
+      const xsrfToken = getXsrfToken();
+      const res = await fetch(buildUrl("/api/auth/login"), {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(xsrfToken ? { "X-XSRF-TOKEN": xsrfToken } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({ id: id.trim(), password }),
       });

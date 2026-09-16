@@ -1,20 +1,36 @@
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
-function buildUrl(path) {
+export function buildUrl(path) {
   if (!path.startsWith("/")) path = "/" + path;
   return API_BASE ? `${API_BASE}${path}` : path;
 }
 
+export function getXsrfToken() {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+export async function getCsrfCookie() {
+  const url = buildUrl("/sanctum/csrf-cookie");
+  await fetch(url, {
+    credentials: "include",
+    headers: { Accept: "application/json" },
+  });
+}
+
 async function request(path, options = {}) {
+  const token = getXsrfToken();
+  const { headers: optHeaders, ...rest } = options;
   const url = buildUrl(path);
   const res = await fetch(url, {
     credentials: "include",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      ...options.headers,
+      ...(token ? { "X-XSRF-TOKEN": token } : {}),
+      ...optHeaders,
     },
-    ...options,
+    ...rest,
   });
 
   if (!res.ok) {
