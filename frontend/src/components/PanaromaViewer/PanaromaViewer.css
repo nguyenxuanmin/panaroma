@@ -2,7 +2,8 @@
 .panaroma-viewer-container {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  min-height: 100%;
   overflow: hidden;
   background: #0a0a0a;
   font-family: Arial, sans-serif;
@@ -64,6 +65,12 @@
   transform-origin: center center;
   will-change: transform, opacity;
   background: transparent;
+  height: 100%;
+}
+.pano-scene-wrapper > div,
+.pano-scene-wrapper .psv-container {
+  height: 100% !important;
+  width: 100% !important;
 }
 
 /* Phase: idle — no transform */
@@ -236,8 +243,109 @@
 .bottom-tool-btn:hover { background: #ffffff; transform: scale(1.06); box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
 .bottom-tool-btn:active { background: #f3f4f6; transform: scale(0.97); }
 
-/* Tablet trở xuống: giữ dọc mảnh nhưng nhỏ gọn hơn, tránh đè footer */
+/* ===== Đa option ảnh cho 1 vị trí — nằm trên list panaroma (footer) ===== */
+.pano-image-options {
+  position: absolute;
+  bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  max-width: min(70vw, 560px);
+  width: max-content;
+}
+.pano-image-options-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.pano-image-options-track {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 5px 6px;
+  background: rgba(18,18,18,0.72);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.08) inset;
+}
+.pano-image-options-track::-webkit-scrollbar { display: none; }
+.pano-image-opt {
+  position: relative;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 24px;
+  background: #0f0f0f;
+  border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s, opacity 0.15s;
+  opacity: 0.78;
+}
+.pano-image-opt:hover { transform: translateY(-1px); opacity: 1; border-color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.45); }
+.pano-image-opt.active { border-color: #3b82f6; opacity: 1; box-shadow: 0 0 0 2px rgba(59,130,246,0.45), 0 4px 14px rgba(0,0,0,0.45); }
+.pano-image-opt-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pano-image-opt-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  line-height: 1.2;
+  background: linear-gradient(transparent, rgba(0,0,0,0.78));
+}
+.pano-image-opt-badge {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 7px;
+  font-weight: 800;
+  color: #fff;
+  background: #2563eb;
+  padding: 1px 4px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+/* Khi footer thu gọn, kéo options xuống thấp hơn để không hở khoảng trống lớn */
+.main-viewport:has(.footer-wrap.collapsed) .pano-image-options { bottom: calc(38px + env(safe-area-inset-bottom, 0px)); }
+
+/* Fallback cho browser chưa hỗ trợ :has() */
+@supports not selector(:has(*)) {
+  .pano-image-options.is-footer-collapsed { bottom: 38px; }
+}
+
+/* Responsive: footer thấp hơn nên kéo options xuống gần footer hơn */
 @media (max-width: 1024px) {
+  .pano-image-options { bottom: calc(118px + env(safe-area-inset-bottom, 0px)); max-width: min(94vw, 520px); }
+  .main-viewport:has(.footer-wrap.collapsed) .pano-image-options { bottom: calc(34px + env(safe-area-inset-bottom, 0px)); }
   .pano-unified-minimap-wrap {
     right: auto !important;
     left: 8px !important;
@@ -248,7 +356,7 @@
   .pano-bottomleft-toolbar {
     left: 6px;
     top: auto;
-    bottom: 88px;
+    bottom: calc(112px + env(safe-area-inset-bottom, 0px));
     transform: none;
     flex-direction: column !important;
     padding: 6px 4px;
@@ -257,9 +365,12 @@
   }
 }
 @media (max-width: 768px) {
+  .pano-image-options { bottom: calc(108px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 16px); justify-content: center; width: calc(100vw - 16px); }
+  .main-viewport:has(.footer-wrap.collapsed) .pano-image-options { bottom: calc(30px + env(safe-area-inset-bottom, 0px)); }
+  .pano-image-options-track { max-width: 100%; gap: 5px; padding: 4px 5px; justify-content: flex-start; }
   .pano-unified-minimap-wrap { top: 40px; left: 4px !important; right: auto !important; }
   .pano-bottomleft-toolbar {
-    bottom: 88px;
+    bottom: calc(98px + env(safe-area-inset-bottom, 0px));
     left: 6px;
     top: auto;
     transform: none;
@@ -271,8 +382,11 @@
   .bottom-tool-btn { width: 30px; height: 30px; font-size: 14px; }
 }
 @media (max-width: 480px) {
+  .pano-image-options { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); gap: 4px; max-width: calc(100vw - 12px); width: calc(100vw - 12px); }
+  .main-viewport:has(.footer-wrap.collapsed) .pano-image-options { bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+  .pano-image-options-track { gap: 4px; padding: 3px 4px; border-radius: 8px; }
   .pano-bottomleft-toolbar {
-    bottom: 76px;
+    bottom: calc(86px + env(safe-area-inset-bottom, 0px));
     left: 4px;
     top: auto;
     transform: none;

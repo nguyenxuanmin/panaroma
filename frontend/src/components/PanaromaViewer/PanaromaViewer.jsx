@@ -1,13 +1,12 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import MapMinimap from "../MapMinimap/MapMinimap";
 import "./PanaromaViewer.css";
 
-export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true }) {
+export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap }) {
   const viewerRef = useRef(null);
-  // map_angle chính là hướng default khi nhảy vào panaroma (theo yêu cầu) -> ưu tiên mapPosition.angle
   const getInitialAngle = (p) => {
     if (typeof p?.mapPosition?.angle === "number") return p.mapPosition.angle;
     return p?.defaultView?.yaw ?? 0;
@@ -19,10 +18,44 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";
 
-  // Preload panaroma đích rồi switch ngay với kích thước thật, không hiệu ứng nhảy
+  // ---- Đa option ảnh cho 1 vị trí ----
+  const imageOptions = useMemo(() => {
+    if (!panaroma) return [];
+    const extras = panaroma.images || panaroma.panaromaImages || [];
+    const main = {
+      id: `${panaroma.id}__main`,
+      title: panaroma.name || "Ảnh chính",
+      thumbnail: panaroma.thumbnail || panaroma.url,
+      url: panaroma.url || panaroma.thumbnail,
+      isMain: true,
+    };
+    const extraOpts = (Array.isArray(extras) ? extras : []).map((img, idx) => ({
+      id: String(img.id ?? `${panaroma.id}__opt_${idx}`),
+      title: img.title || `Option ${idx + 1}`,
+      thumbnail: img.thumbnail || img.url,
+      url: img.url || img.thumbnail,
+      isMain: false,
+    }));
+    return [main, ...extraOpts];
+  }, [panaroma]);
+
+  const hasMultipleOptions = imageOptions.length > 1;
+  const [activeOptionIdx, setActiveOptionIdx] = useState(0);
+
+  // Reset option khi đổi vị trí panaroma
+  useEffect(() => {
+    setActiveOptionIdx(0);
+  }, [panaroma?.id]);
+
+  const activeOption = imageOptions[activeOptionIdx] || imageOptions[0] || null;
+  const currentUrl = activeOption?.url || panaroma?.url || defaultImage;
+  const currentThumb = activeOption?.thumbnail || panaroma?.thumbnail || panaroma?.url;
+
+  // Preload khi đổi panaroma (theo id) — giữ logic cũ nhưng dùng currentUrl khi cần
   useEffect(() => {
     if (!panaroma || panaroma.id === visiblePanaroma?.id) return;
     let cancelled = false;
+    // luôn preload ảnh main của panaroma mới; option sẽ reset về 0
     const url = panaroma.url || defaultImage;
     const img = new window.Image();
     img.src = url;
@@ -32,22 +65,31 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
       setCurrentYaw(getInitialAngle(panaroma));
       setTransitionPhase("idle");
     };
-    if (img.complete) {
-      done();
-    } else {
+    if (img.complete) done();
+    else {
       img.onload = done;
       img.onerror = done;
     }
     return () => { cancelled = true; };
   }, [panaroma, visiblePanaroma?.id]);
 
+  // Preload khi đổi option trong cùng vị trí
+  const [preloadedUrl, setPreloadedUrl] = useState(currentUrl);
+  useEffect(() => {
+    if (currentUrl === preloadedUrl) return;
+    const img = new window.Image();
+    img.src = currentUrl;
+    const done = () => setPreloadedUrl(currentUrl);
+    if (img.complete) done();
+    else {
+      img.onload = done;
+      img.onerror = done;
+    }
+  }, [currentUrl, preloadedUrl]);
+
   const withFadeTransition = useCallback((cb) => {
-    // Hotspot click: preload target trước khi fade (cb sẽ đổi panaroma -> useEffect trên sẽ lo preload)
-    // Giữ fade cũ để tương thích, nhưng giờ chuyển cảnh chính do useEffect preload
     setTransitionPhase("out");
-    setTimeout(() => {
-      cb();
-    }, 150);
+    setTimeout(() => cb(), 150);
   }, []);
 
   const displayPanaroma = visiblePanaroma || panaroma;
@@ -80,12 +122,10 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
       markersPlugin.addEventListener("select-marker", (e) => {
         const targetId = e.marker.data?.targetPanaroma;
         if (!targetId || !onHotspotClick) return;
-        // Lấy hotspot để zoom đúng điểm click
         const markerId = e.marker.id;
         const hotspot = displayPanaroma?.hotspots?.find((h) => h.id === markerId || h.targetPanaroma === targetId);
         if (hotspot && viewerRef.current) {
           try {
-            // Zoom vào đúng điểm hotspot trong 2s như trang T-TOKAI
             viewerRef.current.animate({
               yaw: `${hotspot.yaw}deg`,
               pitch: `${hotspot.pitch}deg`,
@@ -93,10 +133,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
               speed: 2000,
             });
           } catch {}
-          // Sau 2s mới chuyển sang panaroma đích với kích thước thật
-          setTimeout(() => {
-            onHotspotClick(targetId);
-          }, 2000);
+          setTimeout(() => onHotspotClick(targetId), 2000);
         } else {
           withFadeTransition(() => onHotspotClick(targetId));
         }
@@ -112,50 +149,67 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
 
   return (
     <div className="panaroma-viewer-container">
-      {/* Backdrop mờ để không bao giờ hiện màn hình đen khi chuyển cảnh */}
       <div
         className="pano-backdrop"
-        style={{
-          backgroundImage: `url(${displayPanaroma?.thumbnail || displayPanaroma?.url || ""})`,
-        }}
+        style={{ backgroundImage: `url(${currentThumb || displayPanaroma?.thumbnail || displayPanaroma?.url || ""})` }}
       />
-      {/* Unified minimap - ẩn hiện theo th-menu-btn */}
       {showLeftToolbar && (
         <div className="pano-unified-minimap-wrap">
-        {showMinimap && (
-          <MapMinimap
-            floor={floor}
-            activePanaroma={panaroma}
-            onSelectPanaroma={onSelectPanaroma}
-            scale={miniScale}
-            currentYaw={currentYaw}
-          />
-        )}
-        <div className="mm-ctrls">
-          <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Hide minimap" : "Show minimap"}>
-            {showMinimap ? "«" : "»"}
-          </button>
-          <button
-            className="mm-ctrl-btn"
-            onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
-            title="Zoom in on minimap"
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="11" y1="8" x2="11" y2="14" />
-              <line x1="8" y1="11" x2="14" y2="11" />
-              <line x1="21" y1="21" x2="16.5" y2="16.5" />
-            </svg>
-          </button>
+          {showMinimap && (
+            <MapMinimap
+              floor={floor}
+              activePanaroma={panaroma}
+              onSelectPanaroma={onSelectPanaroma}
+              scale={miniScale}
+              currentYaw={currentYaw}
+            />
+          )}
+          <div className="mm-ctrls">
+            <button className="mm-ctrl-btn" onClick={() => setShowMinimap((v) => !v)} title={showMinimap ? "Hide minimap" : "Show minimap"}>
+              {showMinimap ? "«" : "»"}
+            </button>
+            <button
+              className="mm-ctrl-btn"
+              onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
+              title="Zoom in on minimap"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="11" y1="8" x2="11" y2="14" />
+                <line x1="8" y1="11" x2="14" y2="11" />
+                <line x1="21" y1="21" x2="16.5" y2="16.5" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Đa option ảnh cho 1 vị trí - hiển thị khi có >1 ảnh */}
+      {hasMultipleOptions && (
+        <div className="pano-image-options">
+          <div className="pano-image-options-track">
+            {imageOptions.map((opt, idx) => {
+              const isActive = idx === activeOptionIdx;
+              return (
+                <button
+                  key={opt.id}
+                  className={`pano-image-opt ${isActive ? "active" : ""}`}
+                  onClick={() => setActiveOptionIdx(idx)}
+                  title={opt.title}
+                >
+                  <img src={opt.thumbnail || opt.url} alt={opt.title} className="pano-image-opt-thumb" loading="lazy" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       <div className={`pano-scene-wrapper pano-scene-${transitionPhase}`}>
         <ReactPhotoSphereViewer
-          key={displayPanaroma?.id}
-          src={displayPanaroma?.url || defaultImage}
-          height={"100vh"}
+          key={`${displayPanaroma?.id}__opt_${activeOptionIdx}__${preloadedUrl}`}
+          src={preloadedUrl || currentUrl || defaultImage}
+          height={"100%"}
           width={"100%"}
           container={""}
           navbar={false}
@@ -164,13 +218,12 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
           defaultYaw={`${getInitialAngle(displayPanaroma)}deg`}
           defaultPitch={`${displayPanaroma?.defaultView?.pitch || 0}deg`}
         />
-        </div>
+      </div>
 
       {showLeftToolbar && (
         <div className="pano-bottomleft-toolbar">
           <button className="bottom-tool-btn" onClick={handlePanoZoomIn} title="Zoom in 360">+</button>
           <button className="bottom-tool-btn" onClick={handlePanoZoomOut} title="Zoom out 360">-</button>
-          {/* <button className="bottom-tool-btn" title="Information">ℹ</button> */}
           <button className="bottom-tool-btn" onClick={handleToggleFullscreen} title="Full screen">⛶</button>
         </div>
       )}

@@ -66,6 +66,15 @@ if (!function_exists('mapVideoForApi')) {
 }
 
 function mapPanaromaForApi($panaroma) {
+    $panaromaImages = $panaroma->relationLoaded('panaromaImages') ? $panaroma->panaromaImages : ($panaroma->panaromaImages()->get());
+    $images = $panaromaImages->map(function ($img) {
+        return [
+            'id' => (string) $img->id,
+            'title' => $img->title ?? 'Option',
+            'thumbnail' => normalizeStorageUrl($img->thumbnail),
+            'url' => normalizeStorageUrl($img->thumbnail),
+        ];
+    })->values();
     return [
         'id' => (string) $panaroma->id,
         'name' => $panaroma->name,
@@ -91,13 +100,16 @@ function mapPanaromaForApi($panaroma) {
                 'targetPanaroma' => (string) $hotspot->target_panaroma_id,
             ];
         })->values(),
+        // đa option ảnh cho 1 vị trí
+        'images' => $images,
+        'panaromaImages' => $images,
     ];
 }
 
 function mapBuildingForApi($building, $videos) {
     $type = $building->type ?? 'single';
     if ($type === 'group') {
-        $floors = $building->floors()->with('panaromas.hotspots')->orderBy('id')->get();
+        $floors = $building->floors()->with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
         return [
             'id' => (string) $building->id,
             'name' => $building->name ?? ('Building ' . $building->id),
@@ -118,7 +130,7 @@ function mapBuildingForApi($building, $videos) {
         ];
     }
     // single: panaromas trực tiếp building
-    $panaromas = $building->panaromas()->with('hotspots')->orderBy('number')->get();
+    $panaromas = $building->panaromas()->with(['hotspots','panaromaImages'])->orderBy('number')->get();
     // fallback: nếu single nhưng chưa có panaroma trực tiếp, lấy từ floors đầu (compat data cũ)
     if ($panaromas->isEmpty()) {
         $firstFloor = $building->floors()->with('panaromas.hotspots')->first();
@@ -137,7 +149,7 @@ function mapBuildingForApi($building, $videos) {
 
 function mapProjectToFrontend($project) {
     // Load buildings with nested relations
-    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots', 'panaromas.hotspots'])->orderBy('id')->get();
+    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots','floors.panaromas.panaromaImages', 'panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
     $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
     $buildings = $buildingsRel->map(fn($b) => mapBuildingForApi($b, $videos))->values();
 
@@ -239,7 +251,7 @@ Route::post('/auth/logout', function () {
 
 // Projects - main endpoint for frontend useProjects hook
 Route::get('/projects', function () {
-    $projects = Project::with(['buildings.floors.panaromas.hotspots','buildings.panaromas.hotspots'])->orderBy('id')->get();
+    $projects = Project::with(['buildings.floors.panaromas.hotspots','buildings.floors.panaromas.panaromaImages','buildings.panaromas.hotspots','buildings.panaromas.panaromaImages'])->orderBy('id')->get();
 
     if ($projects->isEmpty()) {
         return response()->json(['data' => []]);
@@ -251,7 +263,7 @@ Route::get('/projects', function () {
 });
 
 Route::get('/projects/{slug}', function (string $slug) {
-    $project = Project::with(['buildings.floors.panaromas.hotspots','buildings.panaromas.hotspots'])
+    $project = Project::with(['buildings.floors.panaromas.hotspots','buildings.floors.panaromas.panaromaImages','buildings.panaromas.hotspots','buildings.panaromas.panaromaImages'])
         ->where('slug', $slug)
         ->orWhere('id', $slug)
         ->first();
@@ -286,7 +298,7 @@ Route::get('/projects/{slug}/videos', function (string $slug) {
 
 // Keep original floors endpoint for backward compat + better shape
 Route::get('/floors', function () {
-    $floors = Floor::with(['panaromas.hotspots'])->orderBy('id')->get();
+    $floors = Floor::with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
 
     $data = $floors->map(function ($floor) {
         return [
