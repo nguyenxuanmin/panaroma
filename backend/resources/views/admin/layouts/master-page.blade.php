@@ -106,7 +106,7 @@
                         var formData = new FormData(this);
                         Swal.fire({
                             title: "In progress",
-                            timer: 8000,
+                            timer: 20000,
                             timerProgressBar: true,
                             didOpen: () => {
                                 Swal.showLoading();
