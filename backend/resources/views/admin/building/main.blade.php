@@ -47,13 +47,31 @@
                                     <small class="text-muted">Image planning is not required for groups, but it is mandatory for individuals.</small>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6 mb-3" id="buildingImageWrapper">
-                                <label class="form-label">Image</label>
-                                <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
-                                <div class="imageContent">
-                                    <img id="imageContent" src="@if (isset($building) && !empty($building->plan_image)){{ asset($building->plan_image) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Project</label>
+                                    <select class="form-select" name="project">
+                                        @if (isset($projects))
+                                            @if (!isset($building) || (isset($building) && empty($building->project_id)))
+                                                <option selected disabled value="">Select project</option>
+                                            @endif
+                                            @foreach ($projects as $item)
+                                                <option @if (isset($building) && $item->id == $building->project_id) selected @endif value="{{$item->id}}">{{$item->name}}</option>
+                                            @endforeach
+                                        @else
+                                            <option selected disabled value="">Select project</option>
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="buildingImageWrapper">
+                                    <label class="form-label">Image</label>
+                                    <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
+                                    <div class="imageContent">
+                                        <img id="imageContent" src="@if (isset($building) && !empty($building->plan_image)){{ asset($building->plan_image) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
+                                    </div>
                                 </div>
                             </div>
+                           
                         </div>
                     </div>
                     <input type="hidden" name="action" value="{{$action}}">

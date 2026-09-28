@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
+use App\Models\Project;
 use App\Models\Building;
  
 class BuildingController extends Controller
@@ -24,9 +25,11 @@ class BuildingController extends Controller
     public function add(){
         $titlePage = "Create New Panaroma Category";
         $action = "add";
+        $projects = Project::orderBy('name','asc')->get();
         return view('admin.building.main',[
             'titlePage' => $titlePage,
-            'action' => $action
+            'action' => $action,
+            'projects' => $projects
         ]);
     }
 
@@ -34,10 +37,12 @@ class BuildingController extends Controller
         $titlePage = "Update Panaroma Category";
         $action = "edit";
         $building = Building::find($id);
+        $projects = Project::orderBy('name','asc')->get();
         return view('admin.building.main',[
             'titlePage' => $titlePage,
             'action' => $action,
-            'building' => $building
+            'building' => $building,
+            'projects' => $projects
         ]);
     }
 
@@ -47,12 +52,20 @@ class BuildingController extends Controller
         if (!in_array($type, ['single', 'group'])) $type = 'single';
         $image = $request->file('image');
         $imageName = $image ? $image->getClientOriginalName() : '';
+        $project = $request->project;
         $action = $request->action;
 
         if (empty($title)) {
             return response()->json([
                 'success' => false,
                 'message' => 'The title cannot be left blank.'
+            ]);
+        }
+
+        if (!isset($project)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a project.'
             ]);
         }
 
@@ -103,7 +116,7 @@ class BuildingController extends Controller
             }
         }
         
-        $building->project_id = 1;
+        $building->project_id = $project;
         $building->name = $title;
         $building->type = $type;
         $building->plan_image = $imageUrl;

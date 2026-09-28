@@ -21,11 +21,12 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="card card-primary card-outline mb-4">
-                <form id="submitForm" data-url-submit="{{route('save_project')}}" data-url-complete="">
+                <form id="submitForm" data-url-submit="{{route('save_project')}}" data-url-complete="{{route('list_project')}}">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <button class="btn btn-primary">Save</button>
+                                <a href="{{route('list_project')}}" class="btn btn-dark">Back</a>
                             </div>
                             <div class="col-12 col-md-4">
                                 <div class="mb-3 position-relative">

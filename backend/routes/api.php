@@ -212,12 +212,12 @@ Route::post('/auth/login', function (Request $request) {
     }
 
     if (!$project) {
-        return response()->json(['message' => 'ID không tồn tại'], 401);
+        return response()->json(['message' => 'ID does not exist.'], 401);
     }
 
     // If project has no password (nullable), allow any password for demo
     if ($project->password && !Hash::check($password, $project->password)) {
-        return response()->json(['message' => 'Password không đúng'], 401);
+        return response()->json(['message' => 'Incorrect password.'], 401);
     }
 
     $user = [

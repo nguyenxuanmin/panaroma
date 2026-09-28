@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PanaromaController;
 use App\Http\Controllers\Admin\HotspotController;
 use App\Http\Controllers\Admin\VideoController;
+use App\Models\Project;
 
 Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
@@ -34,12 +35,11 @@ Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::get('/admin/floor/edit/{id}', [FloorController::class, 'edit'])->name('edit_floor');
     // Project
     Route::get('/admin/project', [ProjectController::class, 'show'])->name('list_project');
-    //Route::get('/project/add', [ProjectController::class, 'add'])->name('add_project');
+    Route::get('/admin/project/add', [ProjectController::class, 'add'])->name('add_project');
     Route::post('/admin/project/save', [ProjectController::class, 'save'])->name('save_project');
-    //Route::post('/project/delete', [ProjectController::class, 'delete'])->name('delete_project');
+    Route::post('/admin/project/delete', [ProjectController::class, 'delete'])->name('delete_project');
     Route::get('/admin/project/edit/{id}', [ProjectController::class, 'edit'])->name('edit_project');
     Route::get('/admin/project/change-password', [ProjectController::class, 'changePassword'])->name('change_password_project');
-    Route::get('/admin/project/map', [ProjectController::class, 'map'])->name('map_project');
     // Panaroma
     Route::get('/admin/panaroma', [PanaromaController::class, 'show'])->name('list_panaroma');
     Route::get('/admin/panaroma/add', [PanaromaController::class, 'add'])->name('add_panaroma');
@@ -64,3 +64,31 @@ Route::group(['middleware' => [LoginAuth::class]], function () {
     Route::get('/admin/login', function () {return view('admin.login');})->name('login');
     Route::post('/admin/login', [AdminController::class, 'login'])->name('login');
 });
+
+// SPA fallback cho frontend /:slug (vanilla slug router).
+// Cho phép F5 / share link domain.com/du-an-a mà không 404:
+// trả về public/pano/index.html để React tự resolve slug sau khi login.
+// Đặt cuối file để không lấn các route /admin... ở trên.
+if (!function_exists('servePanoSpaOr404')) {
+    function servePanoSpaOr404(string $slug) {
+        $reserved = ['admin', 'api', 'storage', 'sanctum', 'pano', 'favicon.ico', 'robots.txt'];
+        if (in_array(strtolower($slug), $reserved, true) || str_contains($slug, '.')) {
+            abort(404);
+        }
+        // Chỉ serve khi slug đúng là project (slug hoặc id), tránh nuốt route lạ
+        $exists = Project::where('slug', $slug)->orWhere('id', $slug)->exists();
+        if (!$exists) {
+            abort(404);
+        }
+        $index = public_path('pano/index.html');
+        if (!is_file($index)) {
+            abort(404);
+        }
+        return response()->file($index);
+    }
+}
+
+Route::get('/pano/{slug}', fn (string $slug) => servePanoSpaOr404($slug))
+    ->where('slug', '[A-Za-z0-9\-_]+');
+Route::get('/{slug}', fn (string $slug) => servePanoSpaOr404($slug))
+    ->where('slug', '[A-Za-z0-9\-_]+');

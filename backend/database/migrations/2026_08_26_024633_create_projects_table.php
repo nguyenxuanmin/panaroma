@@ -3,8 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 return new class extends Migration
 {
@@ -22,16 +20,6 @@ return new class extends Migration
             $table->text('map')->nullable();
             $table->timestamps();
         });
-
-        DB::table('projects')->insert([
-            'name' => 'Project 1',
-            'slug' => 'project-1',
-            'user_name' => 'demo',
-            'password' => Hash::make('12345678'),
-            'map' => '',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
     }
 
     /**

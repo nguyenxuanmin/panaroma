@@ -1,8 +1,15 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { getActiveFloor as getActiveFloorHelper } from "./buildings";
 import { useProjects } from "./hooks/useProjects";
 import { useAuth } from "./hooks/useAuth";
 import { useSiteSettings } from "./hooks/useSiteSettings";
+import { useProjectSlug } from "./hooks/useProjectSlug";
+import {
+  findProjectBySlug,
+  getProjectUrlSlug,
+  getProjectSlugFromPath,
+  navigateToProjectSlug,
+} from "./utils/slugRouter";
 import LoginScreen from "./components/LoginScreen/LoginScreen";
 import BuildingSidebar from "./components/BuildingSidebar/BuildingSidebar";
 import FloorMap from "./components/FloorMap/FloorMap";
@@ -19,6 +26,8 @@ function App() {
   useSiteSettings();
   const { user, loading: authLoading, login, logout } = useAuth();
   const { projects, loading, isFallback } = useProjects();
+  // Slug trên URL: /:slug (vanilla router, giữ LoginScreen)
+  const urlSlug = useProjectSlug();
 
   if (authLoading) {
     return (
@@ -30,7 +39,7 @@ function App() {
   }
 
   if (!user) {
-    return <LoginScreen onLogin={login} />;
+    return <LoginScreen onLogin={login} initialId={urlSlug || ""} />;
   }
 
   // Loading state khi chờ API
@@ -44,16 +53,42 @@ function App() {
     );
   }
 
-  return <AppContent projects={projects} isFallback={isFallback} user={user} onLogout={logout} />;
+  return <AppContent projects={projects} isFallback={isFallback} user={user} onLogin={login} onLogout={logout} urlSlug={urlSlug} />;
 }
 
-function AppContent({ projects, isFallback, user, onLogout }) {
-  const [selectedProjectId, setSelectedProjectId] = useState(projects[0].id);
-  useEffect(() => {
-    if (!projects.find((p) => p.id === selectedProjectId)) {
-      setSelectedProjectId(projects[0].id);
-    }
-  }, [projects, selectedProjectId]);
+/** Session user có thuộc về project này không (so theo slug/id/project_id). */
+function doesUserMatchProject(user, project) {
+  if (!user || !project) return false;
+  const norm = (v) => (v == null ? null : String(v).toLowerCase());
+  const uSlug = norm(user.slug);
+  const uId = norm(user.id);
+  const uPid = norm(user.project_id);
+  const pSlug = norm(project.slug);
+  const pId = norm(project.id);
+  if (uSlug && (uSlug === pSlug || uSlug === pId)) return true;
+  if (uId && (uId === pSlug || uId === pId)) return true;
+  if (uPid && uPid === pId) return true;
+  return false;
+}
+
+function resolveInitialProjectId(projects, urlSlug, user) {
+  // Session login thắng: user đang thuộc project nào thì mở project đó.
+  // (Mở link /:slug của project khác khi đang login -> AppContent sẽ bật màn hình login lại.)
+  if (user) {
+    const byUser = projects.find((p) => doesUserMatchProject(user, p));
+    if (byUser) return byUser.id;
+  }
+  if (urlSlug) {
+    const byUrl = findProjectBySlug(projects, urlSlug);
+    if (byUrl) return byUrl.id;
+  }
+  return projects[0].id;
+}
+
+function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) {
+  const [selectedProjectId, setSelectedProjectId] = useState(() =>
+    resolveInitialProjectId(projects, urlSlug ?? getProjectSlugFromPath(), user)
+  );
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
   const buildings = selectedProject.buildings || [];
@@ -63,6 +98,106 @@ function AppContent({ projects, isFallback, user, onLogout }) {
   const [activeFloorId, setActiveFloorId] = useState(
     hasBuildings && buildings[0].type === "group" ? buildings[0].floors?.[0]?.id ?? null : null
   );
+  const [activePanaroma, setActivePanaroma] = useState(null);
+  const [viewMode, setViewMode] = useState("map");
+  // Đổi project yêu cầu login lại: project chờ xác thực + lỗi khi sai tài khoản
+  const [pendingProjectId, setPendingProjectId] = useState(null);
+  const [switchError, setSwitchError] = useState("");
+  // Guard: phân biệt lần mount đầu (đồng bộ URL) với các lần URL đổi sau đó
+  const didInitUrlRef = useRef(false);
+
+  useEffect(() => {
+    if (!projects.find((p) => p.id === selectedProjectId)) {
+      setSelectedProjectId(projects[0].id);
+    }
+  }, [projects, selectedProjectId]);
+
+  // Deep-link /:slug: khi URL đổi (gõ tay, share link, Back/Forward) -> chọn đúng project
+  const applyProjectSelection = useCallback(
+    (pid) => {
+      const proj = projects.find((p) => p.id === pid);
+      if (!proj) return;
+      setSelectedProjectId(pid);
+      const bs = proj.buildings || [];
+      if (!bs.length) {
+        setActiveBuilding(null);
+        setActiveFloorId(null);
+        setActivePanaroma(null);
+        setViewMode("map");
+        return;
+      }
+      const nb = bs[0];
+      setActiveBuilding(nb);
+      const fid = nb.type === "group" ? nb.floors?.[0]?.id ?? null : null;
+      setActiveFloorId(fid);
+      const nf = fid ? nb.floors[0] : nb;
+      setActivePanaroma(nf?.panaromas?.[0] ?? null);
+      setViewMode("map");
+    },
+    [projects]
+  );
+
+  // Deep-link /:slug + bắt buộc login lại khi đổi project:
+  // - Chế độ fallback (sample data, không có tài khoản thật): giữ hành vi cũ, tự chọn theo URL.
+  // - Ngược lại: session gắn với 1 project. URL trỏ sang project khác (gõ tay, share link,
+  //   Back/Forward) hoặc chọn ở dropdown -> bật màn hình login lại, URL hoàn về project hiện tại.
+  //   Login đúng tài khoản -> vào project mới; Cancel -> ở lại project cũ.
+  useEffect(() => {
+    if (isFallback) {
+      if (!urlSlug) return;
+      const matched = findProjectBySlug(projects, urlSlug);
+      if (matched && matched.id !== selectedProjectId) {
+        applyProjectSelection(matched.id);
+      }
+      return;
+    }
+    const current = projects.find((p) => p.id === selectedProjectId);
+    const curSlug = getProjectUrlSlug(current);
+    if (!didInitUrlRef.current) {
+      didInitUrlRef.current = true;
+      if (urlSlug) {
+        const matched = findProjectBySlug(projects, urlSlug);
+        if (matched && matched.id !== selectedProjectId) {
+          // Mở link project khác trong khi session đang thuộc project hiện tại
+          setPendingProjectId(matched.id);
+          setSwitchError("");
+        }
+      }
+      if (curSlug && getProjectSlugFromPath() !== curSlug) {
+        navigateToProjectSlug(curSlug, { replace: true });
+      }
+      return;
+    }
+    if (pendingProjectId || !urlSlug) return;
+    const matched = findProjectBySlug(projects, urlSlug);
+    if (matched && matched.id !== selectedProjectId) {
+      setPendingProjectId(matched.id);
+      setSwitchError("");
+      if (curSlug && getProjectSlugFromPath() !== curSlug) {
+        navigateToProjectSlug(curSlug, { replace: true });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlSlug, projects]);
+
+  // Đổi project (dropdown) -> đẩy slug lên URL để shareable / Back-Forward được
+  useEffect(() => {
+    const current = findProjectBySlug(projects, selectedProjectId)
+      || projects.find((p) => p.id === selectedProjectId);
+    const targetSlug = getProjectUrlSlug(current);
+    if (!targetSlug) return;
+    if (getProjectSlugFromPath() !== targetSlug) {
+      navigateToProjectSlug(targetSlug);
+    }
+  }, [selectedProjectId, projects]);
+
+  // Title theo project đang xem (giữ suffix company nếu có)
+  useEffect(() => {
+    const current = projects.find((p) => p.id === selectedProjectId);
+    if (current?.name) {
+      document.title = current.name;
+    }
+  }, [selectedProjectId, projects]);
 
   // Sync khi đổi project: reset building/floor - building tách rời nên có thể rỗng
   useEffect(() => {
@@ -85,7 +220,6 @@ function AppContent({ projects, isFallback, user, onLogout }) {
     return getActiveFloorHelper(b, fid);
   };
   const activeFloor = getActiveFloor(activeBuilding, activeFloorId);
-  const [activePanaroma, setActivePanaroma] = useState(activeFloor?.panaromas?.[0] ?? null);
 
   // Videos come from Project (DB) — backend injects into buildings as well for backward compat
   const projectVideos = selectedProject?.videos || [];
@@ -99,7 +233,6 @@ function AppContent({ projects, isFallback, user, onLogout }) {
       setActivePanaroma(null);
     }
   }, [activeFloor, activePanaroma]);
-  const [viewMode, setViewMode] = useState("map");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showGmap, setShowGmap] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -147,24 +280,37 @@ function AppContent({ projects, isFallback, user, onLogout }) {
   };
 
   const handleSelectProject = (pid) => {
-    const proj = projects.find((p) => p.id === pid);
-    if (!proj) return;
-    setSelectedProjectId(pid);
-    const bs = proj.buildings || [];
-    if (!bs.length) {
-      setActiveBuilding(null);
-      setActiveFloorId(null);
-      setActivePanaroma(null);
-      setViewMode("map");
+    if (pid === selectedProjectId) return;
+    const target = projects.find((p) => p.id === pid);
+    if (!target) return;
+    // Fallback sample data (không có tài khoản thật): đổi trực tiếp như cũ
+    if (isFallback || doesUserMatchProject(user, target)) {
+      // applyProjectSelection reset building/floor/pano + view; effect sync sẽ đẩy slug lên URL
+      applyProjectSelection(pid);
       return;
     }
-    const nb = bs[0];
-    setActiveBuilding(nb);
-    const fid = nb.type === "group" ? nb.floors?.[0]?.id ?? null : null;
-    setActiveFloorId(fid);
-    const nf = fid ? nb.floors[0] : nb;
-    setActivePanaroma(nf?.panaromas?.[0] ?? null);
-    setViewMode("map");
+    // Mỗi lần đổi project phải login lại bằng tài khoản của project đó
+    setPendingProjectId(pid);
+    setSwitchError("");
+  };
+
+  const handleSwitchLogin = (newUser) => {
+    const target = projects.find((p) => p.id === pendingProjectId);
+    if (target && doesUserMatchProject(newUser, target)) {
+      onLogin(newUser); // cập nhật session sang tài khoản project mới
+      setPendingProjectId(null);
+      setSwitchError("");
+      applyProjectSelection(target.id);
+    } else {
+      setSwitchError(
+        `Tài khoản không thuộc project "${target?.name || ""}". Vui lòng đăng nhập đúng tài khoản của project này.`
+      );
+    }
+  };
+
+  const handleCancelSwitch = () => {
+    setPendingProjectId(null);
+    setSwitchError("");
   };
 
   const handleHotspot3DClick = (targetPanaromaId) => {
@@ -197,6 +343,52 @@ function AppContent({ projects, isFallback, user, onLogout }) {
       document.exitFullscreen?.();
     }
   }, []);
+
+  // Đang chờ login lại để đổi project -> hiện LoginScreen khóa ID theo project đích
+  const pendingProject = pendingProjectId
+    ? projects.find((p) => p.id === pendingProjectId)
+    : null;
+  if (pendingProject && !isFallback) {
+    return (
+      <LoginScreen
+        key={pendingProject.id}
+        onLogin={handleSwitchLogin}
+        initialId={pendingProject.slug || String(pendingProject.id)}
+        lockId
+        projectName={pendingProject.name}
+        onCancel={handleCancelSwitch}
+        externalError={switchError}
+      />
+    );
+  }
+
+  // Slug trên URL không khớp project nào -> màn hình 404 nhẹ (đặt sau mọi hooks)
+  const urlProject = urlSlug ? findProjectBySlug(projects, urlSlug) : null;
+  if (urlSlug && !urlProject) {
+    return (
+      <div className="app-layout">
+        <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 24 }}>
+          <div style={{ fontSize: 40, opacity: 0.25 }}>🔍</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+            Project "{urlSlug}" not found
+          </div>
+          <div style={{ fontSize: 12, color: "#64748b", maxWidth: 380, textAlign: "center" }}>
+            The link may be wrong or the project was renamed. You are logged in as {user?.name || "guest"}.
+          </div>
+          <button
+            onClick={() => {
+              const fallback = projects[0];
+              setSelectedProjectId(fallback.id);
+              navigateToProjectSlug(getProjectUrlSlug(fallback), { replace: true });
+            }}
+            style={{ marginTop: 6, padding: "8px 18px", borderRadius: 8, border: "none", background: "#0f172a", color: "#fff", fontSize: 13, cursor: "pointer" }}
+          >
+            Back to {projects[0]?.name || "home"}
+          </button>
+        </main>
+      </div>
+    );
+  }
 
   // Building tách rời: nếu không có building vẫn chạy, hiện empty state đẹp
   if (!hasBuildings) {

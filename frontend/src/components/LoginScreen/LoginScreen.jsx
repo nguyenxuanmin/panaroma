@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { buildUrl, getCsrfCookie, getXsrfToken } from "../../api/client";
 import "./LoginScreen.css";
 
-export default function LoginScreen({ onLogin }) {
-  const [id, setId] = useState("");
+export default function LoginScreen({ onLogin, initialId = "", lockId = false, projectName = "", onCancel = null, externalError = "" }) {
+  const [id, setId] = useState(initialId);
+
+  // Prefill ID khi vào link /:slug trực tiếp
+  useEffect(() => {
+    if (initialId && !id) setId(initialId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialId]);
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +53,18 @@ export default function LoginScreen({ onLogin }) {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={handleSubmit} autoComplete="off">
-        <div className="login-title">WELCOME</div>
+        <div className="login-title">{projectName ? "PROJECT LOGIN" : "WELCOME"}</div>
+
+        {projectName && (
+          <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, color: "#111827", marginBottom: 4 }}>
+            {projectName}
+          </div>
+        )}
+        {onCancel && (
+          <div style={{ textAlign: "center", fontSize: 10, color: "#6b7280", marginBottom: 14 }}>
+            Please sign in again to switch to this project
+          </div>
+        )}
 
         <div className="login-field">
           <label className="login-label">ID</label>
@@ -55,7 +72,7 @@ export default function LoginScreen({ onLogin }) {
             <span className="login-input-icon">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             </span>
-            <input className="login-input" placeholder="Enter your ID" value={id} onChange={(e) => setId(e.target.value)} />
+            <input className="login-input" placeholder="Enter your ID" value={id} onChange={(e) => setId(e.target.value)} readOnly={lockId} style={lockId ? { background: "#f3f4f6", color: "#6b7280" } : undefined} />
           </div>
         </div>
 
@@ -73,10 +90,20 @@ export default function LoginScreen({ onLogin }) {
         </div>
 
         {error && <div className="login-error">{error}</div>}
+        {externalError && !error && <div className="login-error">{externalError}</div>}
 
         <button className="login-btn" type="submit" disabled={loading}>
           {loading ? "..." : "Sign In"}
         </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{ width: "100%", height: 32, marginTop: 8, background: "transparent", color: "#374151", border: "1px solid #d1d5db", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+          >
+            Cancel
+          </button>
+        )}
       </form>
     </div>
   );

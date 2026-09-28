@@ -49,17 +49,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function map(){
-        $titlePage = "Map";
-        $action = "map";
-        $project = Project::first();
-        return view('admin.project.map',[
-            'titlePage' => $titlePage,
-            'action' => $action,
-            'project' => $project
-        ]);
-    }
-
     public function save(Request $request){
         $action = $request->action;
         if($action == "change_password"){
@@ -89,29 +78,87 @@ class ProjectController extends Controller
 
             $project = Project::find($request->id);
             $project->password = Hash::make($passwordNew);
-        } elseif($action == "map"){
-            $mapLink = $request->input('map');
-            $project = Project::find($request->id);
-            $project->map = $mapLink;
+            
         }else{
-            $title = $request->title;
-            $slug = Str::slug($title);
+            $name = trim($request->name);
+            $slug = Str::slug($name);
+            $username = trim($request->user_name);
+            $password = $request->password;
+            $confirm = $request->confirm;
+            $map = $request->map;
 
-            if (empty($title)) {
+            if (empty($name)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'The title cannot be left blank.'
+                    'message' => 'The project name cannot be left blank.'
                 ]);
+            }else{
+                if($action == "edit"){
+                    $existProjectName = Project::where('name',$name)->where('id', '!=', $request->id)->first();
+                }else{
+                    $existProjectName = Project::where('name',$name)->first();
+                }
+
+                if(isset($existProjectName)){
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The project name already exists.'
+                    ]);
+                }
             }
 
-            if($action == "edit"){
-                $project = Project::find($request->id);
+            if (empty($username)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The username cannot be left blank.'
+                ]);
             }else{
+                if($action == "edit"){
+                    $existUsername = Project::where('user_name',$username)->where('id', '!=', $request->id)->first();
+                }else{
+                    $existUsername = Project::where('user_name',$username)->first();
+                }
+
+                if(isset($existUsername)){
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The username already exists.'
+                    ]);
+                }
+            }
+
+            if($action == "add"){
+                if (empty($password)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The password cannot be left blank.'
+                    ]);
+                }
+
+                if (strlen($password) < 8) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The password must be at least 8 characters long.'
+                    ]);
+                }
+
+                if ($password !== $confirm) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The confirmation of the password does not match.'
+                    ]);
+                }
+
                 $project = new Project();
+                $project->password = Hash::make($password);
+            }else{
+                $project = Project::find($request->id);
             }
             
-            $project->name = $title;
+            $project->name = $name;
             $project->slug = $slug;
+            $project->user_name = $username;
+            $project->map = $map;
         }
 
         $project->save();

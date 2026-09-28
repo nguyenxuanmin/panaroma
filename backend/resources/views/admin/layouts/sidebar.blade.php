@@ -12,38 +12,33 @@
         <nav class="mt-2">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                 <li class="nav-item">
-                    <a href="{{route('list_building')}}" class="nav-link @if (request()->is('building*')) active @endif">
+                    <a href="{{route('list_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
+                        <p>Project</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('list_building')}}" class="nav-link @if (request()->is('admin/building*')) active @endif">
                         <p>Panaroma Category</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_floor')}}" class="nav-link @if (request()->is('floor*')) active @endif">
+                    <a href="{{route('list_floor')}}" class="nav-link @if (request()->is('admin/floor*')) active @endif">
                         <p>Panaroma Sub-Category</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_panaroma')}}" class="nav-link @if (request()->is('panaroma*')) active @endif">
+                    <a href="{{route('list_panaroma')}}" class="nav-link @if (request()->is('admin/panaroma*')) active @endif">
                         <p>Panaroma</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_hotspot')}}" class="nav-link @if (request()->is('hotspot*')) active @endif">
+                    <a href="{{route('list_hotspot')}}" class="nav-link @if (request()->is('admin/hotspot*')) active @endif">
                         <p>Hotspot</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('list_video')}}" class="nav-link @if (request()->is('video*')) active @endif">
+                    <a href="{{route('list_video')}}" class="nav-link @if (request()->is('admin/video*')) active @endif">
                         <p>Video</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('change_password_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
-                        <p>Change Password</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('map_project')}}" class="nav-link @if (request()->is('admin/project*')) active @endif">
-                        <p>Google Maps</p>
                     </a>
                 </li>
             </ul>
