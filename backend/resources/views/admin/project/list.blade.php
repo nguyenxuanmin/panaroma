@@ -30,7 +30,6 @@
                         <th scope="col">Project</th>
                         <th scope="col" width="200px">Username</th>
                         <th scope="col" width="300px">Link Project</th>
-                        <th scope="col" width="150px">Create Date</th>
                         <th scope="col" width="350px" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -46,7 +45,6 @@
                             <td valign="middle">{{$project->name}}</td>
                             <td valign="middle">{{$project->user_name}}</td>
                             <td valign="middle"><a class="badge text-bg-primary" href="{{url($project->slug)}}" target="_blank">{{url($project->slug)}}</a></td>
-                            <td valign="middle">{{$project->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_project',[$project->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$project->id}},'project','{{route('delete_project')}}');"><i class="fa-solid fa-trash"></i></button>

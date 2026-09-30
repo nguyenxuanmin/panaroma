@@ -30,7 +30,7 @@
                         <th scope="col" width="200px"></th>
                         <th scope="col">Title</th>
                         <th scope="col" width="200px" class="text-center">Panaroma Category</th>
-                        <th scope="col" width="150px" class="text-center">Create Date</th>
+                        <th scope="col" width="150px" class="text-center">Project</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -52,7 +52,7 @@
                             </td>
                             <td valign="middle">{{$floor->name}}</td>
                             <td valign="middle" class="text-center">{{$floor->building->name ?? ''}}</td>
-                            <td valign="middle" class="text-center">{{$floor->created_at->format('d/m/Y')}}</td>
+                            <td valign="middle" class="text-center">{{$floor->building->project->name ?? ''}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_floor',[$floor->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$floor->id}},'floor','{{route('delete_floor')}}');"><i class="fa-solid fa-trash"></i></button>

@@ -31,7 +31,6 @@
                         <th scope="col">Title</th>
                         <th scope="col" width="200px" class="text-center">Type</th>
                         <th scope="col" width="200px" class="text-center">Project</th>
-                        <th scope="col" width="150px" class="text-center">Create Date</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -54,7 +53,6 @@
                             <td valign="middle">{{$building->name}}</td>
                             <td valign="middle" class="text-center">{{$building->type}}</td>
                             <td valign="middle" class="text-center">{{$building->project->name}}</td>
-                            <td valign="middle" class="text-center">{{$building->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_building',[$building->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$building->id}},'building','{{route('delete_building')}}');"><i class="fa-solid fa-trash"></i></button>

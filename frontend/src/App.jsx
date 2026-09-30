@@ -414,10 +414,6 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
         <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12, background: "#f8fafc" }}>
           <div style={{ fontSize: 48, opacity: 0.2 }}>🏢</div>
           <div style={{ fontSize: 14, fontWeight: 600, color: "#334155" }}>Project "{selectedProject.name}" has no Buildings</div>
-          <div style={{ fontSize: 12, color: "#64748b", maxWidth: 360, textAlign: "center" }}>
-            Admin can add Buildings in Filament, or add Panaromas directly to the Project.<br />
-            The project will continue to function normally — no errors.
-          </div>
         </main>
         <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         <GoogleMapModal isOpen={showGmap} onClose={() => setShowGmap(false)} mapUrl={selectedProject?.map} />

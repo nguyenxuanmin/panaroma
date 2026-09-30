@@ -31,14 +31,13 @@
                         <th scope="col">Title</th>
                         <th scope="col" width="250px" class="text-center">Panaroma Category</th>
                         <th scope="col" width="250px" class="text-center">Panaroma Sub-Category</th>
-                        <th scope="col" width="150px" class="text-center">Create Date</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (count($panaromas) == 0)
                         <tr>
-                            <td valign="middle" class="text-center" colspan="7">No data available</td>
+                            <td valign="middle" class="text-center" colspan="6">No data available</td>
                         </tr>
                     @endif
                     @foreach ($panaromas as $key => $panaroma)
@@ -68,7 +67,6 @@
                                     <span class="text-muted">—</span>
                                 @endif
                             </td>
-                            <td valign="middle" class="text-center">{{$panaroma->created_at->format('d/m/Y')}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_panaroma',[$panaroma->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$panaroma->id}},'panaroma','{{route('delete_panaroma')}}');"><i class="fa-solid fa-trash"></i></button>

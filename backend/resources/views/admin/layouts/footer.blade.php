@@ -1,3 +1,3 @@
 <footer class="app-footer">
-    <div class="float-end d-none d-sm-inline">Design by Nguyen Xuan Min</div>
+    <div class="float-end d-none d-sm-inline"></div>
 </footer>
