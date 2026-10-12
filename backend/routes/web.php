@@ -75,7 +75,13 @@ if (!function_exists('servePanoSpaOr404')) {
         if (!is_file($index)) {
             abort(404);
         }
-        return response()->file($index);
+        // index.html đổi theo mỗi build (hash JS mới) nên cấm cache,
+        // tránh CDN/browser giữ HTML cũ trỏ tới file JS đã xóa -> trắng trang MIME text/html
+        return response()->file($index, [
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
     }
     function servePanoSpaOr404(string $slug) {
         $reserved = ['admin', 'api', 'storage', 'sanctum', 'pano', 'favicon.ico', 'robots.txt'];
@@ -91,7 +97,11 @@ if (!function_exists('servePanoSpaOr404')) {
         if (!is_file($index)) {
             abort(404);
         }
-        return response()->file($index);
+        return response()->file($index, [
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
     }
 }
 
