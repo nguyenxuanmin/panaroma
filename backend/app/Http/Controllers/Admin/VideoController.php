@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Video;
+use App\Models\Project;
 
 class VideoController extends Controller
 {
@@ -18,9 +19,11 @@ class VideoController extends Controller
     public function add(){
         $titlePage = "Create New Video";
         $action = "add";
+        $projects = Project::orderBy('name','asc')->get();
         return view('admin.video.main',[
             'titlePage' => $titlePage,
-            'action' => $action
+            'action' => $action,
+            'projects' => $projects
         ]);
     }
 
@@ -28,10 +31,12 @@ class VideoController extends Controller
         $titlePage = "Update Video";
         $action = "edit";
         $video = Video::find($id);
+        $projects = Project::orderBy('name','asc')->get();
         return view('admin.video.main',[
             'titlePage' => $titlePage,
             'action' => $action,
-            'video' => $video
+            'video' => $video,
+            'projects' => $projects
         ]);
     }
 
@@ -39,6 +44,7 @@ class VideoController extends Controller
         $title = $request->title;
         $link = $request->link;
         $action = $request->action;
+        $project_id = $request->project;
 
         if (empty($link)) {
             return response()->json([
@@ -46,14 +52,13 @@ class VideoController extends Controller
                 'message' => 'The link cannot be left blank.'
             ]);
         }
-
         if ($action === 'add') {
             $video = new Video();
         } else {
             $video = Video::find($request->id);
         }
         
-        $video->project_id = 1;
+        $video->project_id = $project_id;
         $video->title = $title;
         $video->link = $link;
         $video->save();

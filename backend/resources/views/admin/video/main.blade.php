@@ -51,6 +51,21 @@
                                     <small id="videoPreviewError" class="text-danger mt-1" style="display:none;"></small>
                                 </div>
                             </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label class="form-label">Project</label>
+                                <select class="form-select" name="project">
+                                    @if (isset($projects))
+                                        @if (!isset($building) || (isset($building) && empty($building->project_id)))
+                                            <option selected disabled value="">Select project</option>
+                                        @endif
+                                        @foreach ($projects as $item)
+                                            <option @if (isset($building) && $item->id == $building->project_id) selected @endif value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
+                                    @else
+                                        <option selected disabled value="">Select project</option>
+                                    @endif
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <input type="hidden" name="action" value="{{$action}}">

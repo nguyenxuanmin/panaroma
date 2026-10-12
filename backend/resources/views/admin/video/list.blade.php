@@ -28,7 +28,7 @@
                     <tr>
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col">Title</th>
-                        <th scope="col" width="150px">Create Date</th>
+                        <th scope="col" width="150px">Project</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -42,7 +42,7 @@
                         <tr>
                             <td valign="middle" class="text-center">{{$key+1}}</td>
                             <td valign="middle">{{$video->title}}</td>
-                            <td valign="middle">{{$video->created_at->format('d/m/Y')}}</td>
+                            <td valign="middle">{{$video->project->name}}</td>
                             <td valign="middle" class="text-center">
                                 <a href="{{route('edit_video',[$video->id])}}" class="btn btn-outline-info" title="Update"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteItem({{$video->id}},'video','{{route('delete_video')}}');"><i class="fa-solid fa-trash"></i></button>
