@@ -70,6 +70,13 @@ Route::group(['middleware' => [LoginAuth::class]], function () {
 // trả về public/pano/index.html để React tự resolve slug sau khi login.
 // Đặt cuối file để không lấn các route /admin... ở trên.
 if (!function_exists('servePanoSpaOr404')) {
+    function servePanoSpaIndex() {
+        $index = public_path('pano/index.html');
+        if (!is_file($index)) {
+            abort(404);
+        }
+        return response()->file($index);
+    }
     function servePanoSpaOr404(string $slug) {
         $reserved = ['admin', 'api', 'storage', 'sanctum', 'pano', 'favicon.ico', 'robots.txt'];
         if (in_array(strtolower($slug), $reserved, true) || str_contains($slug, '.')) {
@@ -88,7 +95,6 @@ if (!function_exists('servePanoSpaOr404')) {
     }
 }
 
-Route::get('/pano/{slug}', fn (string $slug) => servePanoSpaOr404($slug))
-    ->where('slug', '[A-Za-z0-9\-_]+');
+Route::get('/', fn () => servePanoSpaIndex());
 Route::get('/{slug}', fn (string $slug) => servePanoSpaOr404($slug))
     ->where('slug', '[A-Za-z0-9\-_]+');

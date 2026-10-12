@@ -108,6 +108,8 @@
                             title: "In progress",
                             timer: 20000,
                             timerProgressBar: true,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
                             didOpen: () => {
                                 Swal.showLoading();
                             }
@@ -128,7 +130,9 @@
                                             text: "Success!",
                                             icon: "success",
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 1500,
+                                            allowOutsideClick: false,
+                                            allowEscapeKey: false
                                         }).then((result) => {
                                             if(urlComplete != ""){
                                                 location.href = urlComplete;
@@ -141,7 +145,9 @@
                                             text: response.message,
                                             icon: "error",
                                             showConfirmButton: false,
-                                            timer: 2000
+                                            timer: 2000,
+                                            allowOutsideClick: false,
+                                            allowEscapeKey: false
                                         });
                                     }
                                 }, 1500);
@@ -160,7 +166,9 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Delete',
-                    cancelButtonText: 'Cancel'
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -175,7 +183,9 @@
                                     text: "Successfully deleted!",
                                     icon: "success",
                                     showConfirmButton: false,
-                                    timer: 1500
+                                    timer: 1500,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
                                 }).then((result) => {
                                     location.reload();
                                 });

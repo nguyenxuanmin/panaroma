@@ -153,7 +153,9 @@
                                     text: "Thành công!",
                                     icon: "success",
                                     showConfirmButton: false,
-                                    timer: 1500
+                                    timer: 1500,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
                                 }).then((result) => {
                                     location.href = '{{route('login')}}';
                                 });
@@ -162,7 +164,9 @@
                                     text: response.message,
                                     icon: "error",
                                     showConfirmButton: false,
-                                    timer: 2000
+                                    timer: 2000,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
                                 });
                             }
                         },

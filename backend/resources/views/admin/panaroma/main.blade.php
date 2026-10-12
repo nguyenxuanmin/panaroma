@@ -284,7 +284,9 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Delete',
-                    cancelButtonText: 'Cancel'
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -299,7 +301,9 @@
                                     text: "Image deleted successfully!",
                                     icon: "success",
                                     showConfirmButton: false,
-                                    timer: 1500
+                                    timer: 1500,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
                                 }).then((result) => {
                                     location.reload();
                                 });

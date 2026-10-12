@@ -13,6 +13,7 @@ const RESERVED_SEGMENTS = new Set([
   "storage",
   "assets",
   "sanctum",
+  "pano",
   "favicon.ico",
   "robots.txt",
 ]);
@@ -48,8 +49,9 @@ export function getProjectSlugFromPath(pathname) {
   if (segments.length === 0) return null;
 
   let first = segments[0];
-  // Hỗ trợ deploy subfolder: /pano/:slug -> slug là segment thứ 2
-  if (first.toLowerCase() === BASE_PREFIX && segments.length >= 2) {
+  // /pano đơn lẻ (không slug) -> coi như "/" để React tự redirect về project đầu tiên
+  if (first.toLowerCase() === BASE_PREFIX) {
+    if (segments.length < 2) return null;
     first = segments[1];
   }
   if (!first) return null;
