@@ -52,6 +52,14 @@ class VideoController extends Controller
                 'message' => 'The link cannot be left blank.'
             ]);
         }
+
+        if (!isset($project_id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a project.'
+            ]);
+        }
+
         if ($action === 'add') {
             $video = new Video();
         } else {
