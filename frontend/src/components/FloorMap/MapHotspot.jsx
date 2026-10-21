@@ -38,8 +38,6 @@ export default function MapHotspot({ panaroma, isActive, onClick, onHover }) {
       )}
       {/* Black label bar + leader line wrapper */}
       <div className="hotspot-label-wrap">
-        <div className="hotspot-label">{displayLabel}</div>
-        <div className="hotspot-leader"></div>
       </div>
 
       {/* Pulse + Red dot */}

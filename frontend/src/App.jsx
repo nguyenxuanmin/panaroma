@@ -462,7 +462,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
 
       <main className="main-viewport">
         {viewMode === "map" ? (
-          activePanaroma ? <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} /> : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: 13 }}>No panaroma available yet.</div>
+          <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} />
         ) : (
           activePanaroma ? (
             <PanaromaViewer
@@ -474,7 +474,17 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
               onReturnToMap={() => setViewMode("map")}
               showLeftToolbar={showSidebar}
             />
-          ) : <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>No panaroma available yet.</div>
+          ) : (
+            // Chưa có panaroma -> vẫn hiện ảnh mặt bằng tổng thể của tầng
+            activeFloor?.planImage ? (
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, padding: "60px 16px", minWidth: 0 }}>
+                <img src={activeFloor.planImage} alt={activeFloor.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 8, boxShadow: "0 4px 20px rgba(0,0,0,0.25)", background: "#fff" }} draggable={false} />
+                <span style={{ fontSize: 12, color: "#64748b" }}>Panaroma for "{activeFloor.name}" coming soon.</span>
+              </div>
+            ) : (
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>No panaroma available yet.</div>
+            )
+          )
         )}
         {showSidebar && hasBuildings && (
           <BuildingSidebar

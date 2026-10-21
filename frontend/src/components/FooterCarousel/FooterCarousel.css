@@ -63,11 +63,14 @@
 }
 
 .carousel-nav-circle-btn:hover { background: #c0c0c0; }
+.carousel-nav-circle-btn:disabled { opacity: 0.45; cursor: default; }
+.carousel-nav-circle-btn:disabled:hover { background: #d0d0d0; }
 
 .carousel-track {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   overflow-x: auto;
   padding: 2px;
   scroll-behavior: smooth;

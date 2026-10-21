@@ -81,7 +81,7 @@
 
 /* Phase: out — chỉ fade (viewer đã tự zoom vào hotspot bằng animate) */
 .pano-scene-out {
-  animation: scene-zoom-out 0.35s ease-in forwards;
+  animation: scene-zoom-out 0.22s ease-in forwards;
 }
 
 @keyframes scene-zoom-out {
@@ -98,7 +98,7 @@
 
 /* Phase: in — new scene arrives với kích thước thật (chỉ fade, không scale) */
 .pano-scene-in {
-  animation: scene-zoom-in 0.45s ease-out forwards;
+  animation: scene-zoom-in 0.28s ease-out forwards;
 }
 
 @keyframes scene-zoom-in {

@@ -35,7 +35,7 @@ export default function FloorMap({ floor, building, activePanaroma, onSelectPana
         <div className="map-image-wrapper">
           <img src={floor.planImage} alt={floor.name} className="floor-plan-img" draggable={false} />
           <div className="hotspots-layer">
-            {floor.panaromas.map((pano) => (
+            {(floor.panaromas || []).map((pano) => (
               <MapHotspot key={pano.id} panaroma={pano} isActive={activePanaroma?.id === pano.id} onClick={(s) => onSelectPanaroma(s)} />
             ))}
           </div>

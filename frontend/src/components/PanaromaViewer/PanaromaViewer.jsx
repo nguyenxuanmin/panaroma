@@ -89,7 +89,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
 
   const withFadeTransition = useCallback((cb) => {
     setTransitionPhase("out");
-    setTimeout(() => cb(), 150);
+    setTimeout(() => cb(), 220);
   }, []);
 
   const displayPanaroma = visiblePanaroma || panaroma;
@@ -130,10 +130,10 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
               yaw: `${hotspot.yaw}deg`,
               pitch: `${hotspot.pitch}deg`,
               zoom: 75,
-              speed: 2000,
+              speed: 800,
             });
           } catch {}
-          setTimeout(() => onHotspotClick(targetId), 2000);
+          setTimeout(() => onHotspotClick(targetId), 800);
         } else {
           withFadeTransition(() => onHotspotClick(targetId));
         }
