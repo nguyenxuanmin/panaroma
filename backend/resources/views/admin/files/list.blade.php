@@ -79,7 +79,6 @@
 @section('script')
     <script>
         var deleteUrl = '{{ route('delete_orphan_file') }}';
-        var csrfToken = '{{ csrf_token() }}';
 
         function deleteOrphan(btn) {
             var path = $(btn).data('path');
