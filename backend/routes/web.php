@@ -16,6 +16,8 @@ use App\Models\Project;
 
 Route::group(['middleware' => [AdminAuth::class]], function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
+    Route::get('/admin/show-file', [DashboardController::class, 'showFiles'])->name('show_file');
+    Route::post('/admin/show-file/delete', [DashboardController::class, 'deleteOrphanFile'])->name('delete_orphan_file');
     Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
     Route::get('/admin/change-password', [AdminController::class, 'changePassword'])->name('change_password');
     Route::post('/admin/change-password', [AdminController::class, 'saveChangePassword'])->name('save_change_password');
