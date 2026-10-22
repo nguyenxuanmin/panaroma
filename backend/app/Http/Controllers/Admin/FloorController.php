@@ -16,7 +16,22 @@ class FloorController extends Controller
     }
 
     public function show(){
-        $floors = Floor::orderBy('name','asc')->paginate(20);
+        $allowedSorts = [
+            'title'    => 'floors.name',
+            'category' => 'buildings_name',
+            'project'  => 'projects_name',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'title';
+
+        $floors = Floor::query()
+            ->leftJoin('buildings', 'floors.building_id', '=', 'buildings.id')
+            ->leftJoin('projects', 'buildings.project_id', '=', 'projects.id')
+            ->select('floors.*', 'buildings.name as buildings_name', 'projects.name as projects_name')
+            ->with(['building.project'])
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', floors.id asc')
+            ->paginate(20);
+        $floors->appends(request()->query());
         return view('admin.floor.list',[
             'floors' => $floors
         ]);

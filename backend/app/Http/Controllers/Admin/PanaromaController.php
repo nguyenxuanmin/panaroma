@@ -18,7 +18,23 @@ class PanaromaController extends Controller
     }
 
     public function show(){
-        $panaromas = Panaroma::with(['building','floor.building'])->orderBy('name','asc')->paginate(20);
+        // Sort theo header: sort in whitelist, dir chỉ asc/desc
+        $allowedSorts = [
+            'title'       => 'panaromas.name',
+            'category'    => 'buildings_name',
+            'subcategory' => 'floors_name',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'title';
+
+        $panaromas = Panaroma::query()
+            ->leftJoin('buildings', 'panaromas.building_id', '=', 'buildings.id')
+            ->leftJoin('floors', 'panaromas.floor_id', '=', 'floors.id')
+            ->select('panaromas.*', 'buildings.name as buildings_name', 'floors.name as floors_name')
+            ->with(['building', 'floor.building'])
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', panaromas.id asc')
+            ->paginate(20);
+        $panaromas->appends(request()->query());
         return view('admin.panaroma.list',[
             'panaromas' => $panaromas
         ]);

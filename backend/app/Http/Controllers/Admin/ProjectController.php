@@ -12,7 +12,18 @@ use App\Models\Project;
 class ProjectController extends Controller
 {
     public function show(){
-        $projects = Project::orderBy('name','asc')->paginate(20);
+        $allowedSorts = [
+            'project'  => 'projects.name',
+            'username' => 'projects.user_name',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'project';
+
+        $projects = Project::query()
+            ->select('projects.*')
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', projects.id asc')
+            ->paginate(20);
+        $projects->appends(request()->query());
         return view('admin.project.list',[
             'projects' => $projects
         ]);

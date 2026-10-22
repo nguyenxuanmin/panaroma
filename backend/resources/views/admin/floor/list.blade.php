@@ -28,9 +28,9 @@
                     <tr>
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
-                        <th scope="col">Title</th>
-                        <th scope="col" width="200px" class="text-center">Panaroma Category</th>
-                        <th scope="col" width="150px" class="text-center">Project</th>
+                        <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
+                        <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'category', 'label' => 'Panaroma Category'])</th>
+                        <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'project', 'label' => 'Project'])</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>

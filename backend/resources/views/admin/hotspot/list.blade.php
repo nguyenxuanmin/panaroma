@@ -27,10 +27,10 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col" width="80px" class="text-center">No</th>
-                        <th scope="col">Title</th>
-                        <th scope="col" width="300px" class="text-center">Panaroma</th>
-                        <th scope="col" width="300px" class="text-center">Target Panaroma</th>
-                        <th scope="col" width="150px" class="text-center">Create Date</th>
+                        <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
+                        <th scope="col" width="300px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'panaroma', 'label' => 'Panaroma'])</th>
+                        <th scope="col" width="300px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'target', 'label' => 'Target Panaroma'])</th>
+                        <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'created', 'label' => 'Create Date'])</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>

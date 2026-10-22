@@ -16,7 +16,21 @@ class BuildingController extends Controller
     }
 
     public function show(){
-        $buildings = Building::orderBy('name','asc')->paginate(20);
+        $allowedSorts = [
+            'title'   => 'buildings.name',
+            'type'    => 'buildings.type',
+            'project' => 'projects_name',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'title';
+
+        $buildings = Building::query()
+            ->leftJoin('projects', 'buildings.project_id', '=', 'projects.id')
+            ->select('buildings.*', 'projects.name as projects_name')
+            ->with('project')
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', buildings.id asc')
+            ->paginate(20);
+        $buildings->appends(request()->query());
         return view('admin.building.list',[
             'buildings' => $buildings
         ]);

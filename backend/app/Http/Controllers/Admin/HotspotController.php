@@ -10,7 +10,23 @@ use App\Models\Hotspot;
 class HotspotController extends Controller
 {
     public function show(){
-        $hotspots = Hotspot::orderBy('title','asc')->paginate(20);
+        $allowedSorts = [
+            'title'    => 'hotspots.title',
+            'panaroma' => 'p1_name',
+            'target'   => 'p2_name',
+            'created'  => 'hotspots.created_at',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'title';
+
+        $hotspots = Hotspot::query()
+            ->leftJoin('panaromas as p1', 'hotspots.panaroma_id', '=', 'p1.id')
+            ->leftJoin('panaromas as p2', 'hotspots.target_panaroma_id', '=', 'p2.id')
+            ->select('hotspots.*', 'p1.name as p1_name', 'p2.name as p2_name')
+            ->with(['panaroma', 'targetPanaroma'])
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', hotspots.id asc')
+            ->paginate(20);
+        $hotspots->appends(request()->query());
         return view('admin.hotspot.list',[
             'hotspots' => $hotspots
         ]);

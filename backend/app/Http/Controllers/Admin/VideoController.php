@@ -16,7 +16,20 @@ class VideoController extends Controller
     }
     
     public function show(){
-        $videos = Video::orderBy('title','asc')->paginate(20);
+        $allowedSorts = [
+            'title'   => 'videos.title',
+            'project' => 'projects_name',
+        ];
+        $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
+        $sortKey = array_key_exists(request()->query('sort'), $allowedSorts) ? request()->query('sort') : 'title';
+
+        $videos = Video::query()
+            ->leftJoin('projects', 'videos.project_id', '=', 'projects.id')
+            ->select('videos.*', 'projects.name as projects_name')
+            ->with('project')
+            ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', videos.id asc')
+            ->paginate(20);
+        $videos->appends(request()->query());
         return view('admin.video.list',[
             'videos' => $videos
         ]);

@@ -27,8 +27,8 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col" width="80px" class="text-center">No</th>
-                        <th scope="col">Title</th>
-                        <th scope="col" width="150px">Project</th>
+                        <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
+                        <th scope="col" width="150px">@include('admin.layouts._sort-link', ['key' => 'project', 'label' => 'Project'])</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
                     </tr>
                 </thead>
