@@ -17,8 +17,8 @@ export default function LoginScreen({ onLogin, initialId = "", lockId = false, p
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!id.trim() || !password) {
-      setError("Please enter your ID and password.");
+    if (!password) {
+      setError("Please enter your password.");
       return;
     }
     setError("");

@@ -193,32 +193,60 @@ Route::get('/site-settings', function () {
 });
 
 // Auth for frontend LoginScreen (uses Project table as account)
+// Login bằng mật khẩu chính (ID + password) hoặc mật khẩu phụ (password riêng, chỉ owner dùng, không cần ID)
 Route::post('/auth/login', function (Request $request) {
-    $id = $request->input('id');
+    $id = trim($request->input('id') ?? '');
     $password = $request->input('password');
 
-    if (!$id || !$password) {
-        return response()->json(['message' => 'Vui lòng nhập ID và Password'], 422);
+    if (!$password) {
+        return response()->json(['message' => 'Please enter your password'], 422);
     }
 
-    // Try finding project by user_name or slug or name
-    $project = Project::where('user_name', $id)
-        ->orWhere('slug', $id)
-        ->orWhere('name', $id)
-        ->first();
+    $project = null;
+    $viaSecondary = false;
 
-    // fallback: if no project with password, allow any project if password matches hashed?
-    // If still null, try by id
-    if (!$project && is_numeric($id)) {
-        $project = Project::find($id);
-    }
+    if ($id !== '') {
+        // Try finding project by user_name or slug or name
+        $project = Project::where('user_name', $id)
+            ->orWhere('slug', $id)
+            ->orWhere('name', $id)
+            ->first();
 
-    if (!$project) {
-        return response()->json(['message' => 'ID does not exist.'], 401);
+        // fallback: if no project with password, allow any project if password matches hashed?
+        // If still null, try by id
+        if (!$project && is_numeric($id)) {
+            $project = Project::find($id);
+        }
+
+        if (!$project) {
+            return response()->json(['message' => 'ID does not exist.'], 401);
+        }
+
+        // Wrong main password -> thử mật khẩu phụ của chính project này
+        if ($project->password && !Hash::check($password, $project->password)) {
+            if ($project->secondary_password && Hash::check($password, $project->secondary_password)) {
+                $viaSecondary = true;
+            } else {
+                return response()->json(['message' => 'Incorrect password.'], 401);
+            }
+        }
+    } else {
+        // Không nhập ID: đăng nhập bằng mật khẩu phụ (quét các project có secondary password)
+        $projects = Project::whereNotNull('secondary_password')->get();
+        foreach ($projects as $candidate) {
+            if (Hash::check($password, $candidate->secondary_password)) {
+                $project = $candidate;
+                $viaSecondary = true;
+                break;
+            }
+        }
+        if (!$project) {
+            return response()->json(['message' => 'Incorrect secondary password.'], 401);
+        }
     }
 
     // If project has no password (nullable), allow any password for demo
-    if ($project->password && !Hash::check($password, $project->password)) {
+    if (!$viaSecondary && $project->password && !Hash::check($password, $project->password)) {
         return response()->json(['message' => 'Incorrect password.'], 401);
     }
 

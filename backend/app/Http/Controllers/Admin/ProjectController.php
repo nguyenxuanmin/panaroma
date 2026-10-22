@@ -162,6 +162,8 @@ class ProjectController extends Controller
 
                 $project = new Project();
                 $project->password = Hash::make($password);
+                // tự seed mật khẩu phụ mặc định (owner-only), ẩn khỏi form admin
+                $project->secondary_password = Hash::make(Project::SECONDARY_DEFAULT);
             }else{
                 $project = Project::find($request->id);
             }
