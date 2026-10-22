@@ -67,7 +67,7 @@
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
                                     <div class="imageContent">
-                                        <img id="imageContent" src="@if (isset($building) && !empty($building->plan_image)){{ asset($building->plan_image) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
+                                        <img id="imageContent" src="@if (isset($building) && !empty($building->plan_image)){{ asset($building->plan_image) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;" loading="lazy" decoding="async">
                                     </div>
                                 </div>
                             </div>

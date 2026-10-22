@@ -77,7 +77,7 @@
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
                                     <div class="imageContent">
-                                        <img id="imageContent" src="@if (isset($panaroma) && !empty($panaroma->thumbnail)){{ asset($panaroma->thumbnail) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;">
+                                        <img id="imageContent" src="@if (isset($panaroma) && !empty($panaroma->thumbnail)){{ asset($panaroma->thumbnail) }}@else{{asset('library/admin/default-image.png')}}@endif" alt="Image preview" style="max-width: 100%; max-height: 200px;" loading="lazy" decoding="async">
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -89,7 +89,7 @@
                                         <div class="d-flex flex-wrap justify-content-start align-items-start gap-2">
                                             @foreach ($panaroma->panaromaImages as $item)
                                                 <div class="list-image">
-                                                    <img src="{{ asset($item->thumbnail) }}" alt="{{$item->title}}">
+                                                    <img src="{{ asset($item->thumbnail) }}" alt="{{$item->title}}" loading="lazy" decoding="async">
                                                     <i class="fa-solid fa-xmark" onclick="deletePhoto({{$item->id}},'{{route('delete_panaroma_image')}}')"></i>
                                                 </div>
                                             @endforeach
@@ -262,7 +262,7 @@
             $.each(files, function (i, file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const img = $('<img>')
+                    const img = $('<img>', { loading: 'lazy', decoding: 'async' })
                     .attr('src', e.target.result)
                     .css({
                         width: '200px',

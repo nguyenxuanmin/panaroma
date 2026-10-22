@@ -51,14 +51,14 @@
                                     <label for="logo" class="form-label">Logo</label>
                                     <input type="file" class="form-control mb-3" name="logo" id="logo" accept="image/*">
                                     <div class="logoContent">
-                                        <img id="logoContent" src="@if (!empty($company->logo)){{asset('storage/company/logo/'.$company->logo)}}@else{{asset('library/admin/default-image.png')}}@endif" alt="Logo preview" style="max-width: 100%; max-height: 150px;">
+                                        <img id="logoContent" src="@if (!empty($company->logo)){{asset('storage/company/logo/'.$company->logo)}}@else{{asset('library/admin/default-image.png')}}@endif" alt="Logo preview" style="max-width: 100%; max-height: 150px;" loading="lazy" decoding="async">
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="favicon" class="form-label">Favicon</label>
                                     <input type="file" class="form-control mb-3" name="favicon" id="favicon" accept="image/*">
                                     <div class="faviconContent">
-                                        <img id="faviconContent" src="@if (!empty($company->favicon)){{asset('storage/company/favicon/'.$company->favicon)}}@else{{asset('library/admin/default-image.png')}}@endif" alt="Favicon preview" style="max-width: 100%; max-height: 100px;">
+                                        <img id="faviconContent" src="@if (!empty($company->favicon)){{asset('storage/company/favicon/'.$company->favicon)}}@else{{asset('library/admin/default-image.png')}}@endif" alt="Favicon preview" style="max-width: 100%; max-height: 100px;" loading="lazy" decoding="async">
                                     </div>
                                 </div>
                             </div>

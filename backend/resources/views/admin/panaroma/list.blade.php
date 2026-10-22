@@ -45,9 +45,9 @@
                             <td valign="middle" class="text-center">{{$key+1}}</td>
                             <td valign="middle" class="text-center">
                                 @if (!empty($panaroma->thumbnail))
-                                    <img src="{{ asset($panaroma->thumbnail) }}" alt="{{$panaroma->name}}" class="object-fit-cover" style="max-width: 100%; max-height: 150px;">
+                                    <img src="{{ asset($panaroma->thumbnail) }}" alt="{{$panaroma->name}}" class="object-fit-cover" style="max-width: 100%; max-height: 150px;" loading="lazy" decoding="async">
                                 @else
-                                    <img src="{{asset('library/admin/default-image.png')}}" alt="{{$panaroma->name}}" style="max-width: 100%; max-height: 150px;">
+                                    <img src="{{asset('library/admin/default-image.png')}}" alt="{{$panaroma->name}}" style="max-width: 100%; max-height: 150px;" loading="lazy" decoding="async">
                                 @endif
                             </td>
                             <td valign="middle">{{$panaroma->name}}</td>
