@@ -44,25 +44,27 @@ if (!function_exists('getYoutubeId')) {
 }
 
 if (!function_exists('mapVideoForApi')) {
-    function mapVideoForApi($video): array {
-        $link = $video->link ?? '';
-        $ytId = getYoutubeId($link);
-        $thumbnail = null;
-        if ($ytId) {
-            $thumbnail = "https://img.youtube.com/vi/{$ytId}/hqdefault.jpg";
-        }
-        return [
-            'id' => (string) $video->id,
-            'title' => $video->title ?? 'Video',
-            'label' => $video->title ?? 'Video',
-            'description' => $video->title ?? '',
-            'thumbnail' => $thumbnail,
-            'videoUrl' => $link,
-            // keep original field for backward compat
-            'link' => $link,
-            'project_id' => $video->project_id,
-        ];
+function mapVideoForApi($video): array {
+    $link = $video->link ?? '';
+    $ytId = getYoutubeId($link);
+    $thumbnail = null;
+    if ($ytId) {
+        $thumbnail = "https://img.youtube.com/vi/{$ytId}/hqdefault.jpg";
     }
+    // Video upload file (storage/...) -> URL tuyệt đối để frontend <video> play được
+    $videoUrl = str_starts_with($link, 'http') ? $link : normalizeStorageUrl($link);
+    return [
+        'id' => (string) $video->id,
+        'title' => $video->title ?? 'Video',
+        'label' => $video->title ?? 'Video',
+        'description' => $video->title ?? '',
+        'thumbnail' => $thumbnail,
+        'videoUrl' => $videoUrl,
+        // keep original field for backward compat
+        'link' => $videoUrl,
+        'project_id' => $video->project_id,
+    ];
+}
 }
 
 function mapPanaromaForApi($panaroma) {

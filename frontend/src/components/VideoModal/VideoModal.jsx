@@ -88,7 +88,7 @@ export default function VideoModal({
 
   const activeVideo = selectedVideo && videos.find((v) => String(v.id) === String(selectedVideo.id)) ? selectedVideo : videos[0];
   const activeUrl = getVideoUrl(activeVideo);
-  const isDirectVideo = activeUrl?.match(/\.(mp4|webm|ogg)$/i);
+  const isDirectVideo = activeUrl?.match(/\.(mp4|webm|ogg|m4v|mov)(\?|$)/i);
   const embedUrl = getEmbedUrl(activeUrl);
 
   return (
@@ -117,14 +117,6 @@ export default function VideoModal({
                   className={`video-playlist-card ${isActive ? "active" : ""}`}
                   onClick={() => setSelectedVideo(vid)}
                 >
-                  <div className="video-card-thumb-wrap">
-                    <img
-                      src={getThumbUrl(vid)}
-                      alt={vid.title}
-                      className="video-card-thumb"
-                    />
-                    <div className="video-card-play-icon">▶</div>
-                  </div>
                   <div className="video-card-title-bar">
                     {vid.title || vid.label}
                   </div>

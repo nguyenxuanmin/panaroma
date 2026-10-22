@@ -5,10 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Video;
+use App\Services\AdminService;
 use App\Models\Project;
 
 class VideoController extends Controller
 {
+    public function __construct()
+    {
+        $this->adminService = new AdminService;
+    }
+    
     public function show(){
         $videos = Video::orderBy('title','asc')->paginate(20);
         return view('admin.video.list',[
@@ -43,15 +49,9 @@ class VideoController extends Controller
     public function save(Request $request){
         $title = $request->title;
         $link = $request->link;
+        $videoFile = $request->file('video_file');
         $action = $request->action;
         $project_id = $request->project;
-
-        if (empty($link)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'The link cannot be left blank.'
-            ]);
-        }
 
         if (!isset($project_id)) {
             return response()->json([
@@ -60,15 +60,43 @@ class VideoController extends Controller
             ]);
         }
 
+        if (empty($link) && empty($videoFile)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please upload a video file.'
+            ]);
+        }
+
         if ($action === 'add') {
             $video = new Video();
         } else {
             $video = Video::find($request->id);
         }
-        
+
+        // Ưu tiên file upload nếu có; ngược lại dùng link (YouTube)
+        $filePath = null;
+        if (!empty($videoFile)) {
+            $messageError = $this->adminService->generateVideo($videoFile, 'videos');
+            if ($messageError != "") {
+                return response()->json([
+                    'success' => false,
+                    'message' => $messageError
+                ]);
+            }
+            $extension = strtolower($videoFile->getClientOriginalExtension());
+            if (empty($extension)) {
+                $extension = strtolower(pathinfo($videoFile->getClientOriginalName(), PATHINFO_EXTENSION));
+            }
+            $filePath = 'storage/videos/' . time() . '_' . basename($videoFile->getClientOriginalName());
+            // Xóa file video cũ nếu trước đó là file upload
+            if (!empty($video->link) && preg_match('#^storage/(videos|panaromas)/#', $video->link) && file_exists(public_path($video->link)) && is_file(public_path($video->link))) {
+                unlink(public_path($video->link));
+            }
+        }
+
         $video->project_id = $project_id;
         $video->title = $title;
-        $video->link = $link;
+        $video->link = $filePath ?: $link;
         $video->save();
 
         return response()->json([
@@ -79,7 +107,10 @@ class VideoController extends Controller
 
     public function delete(Request $request){
         $video = Video::find($request->id);
-        $video->delete();
+        if ($video && !empty($video->link) && !str_starts_with($video->link, 'http') && file_exists(public_path($video->link)) && is_file(public_path($video->link))) {
+            unlink(public_path($video->link));
+        }
+        $video?->delete();
         return response()->json([
             'success' => true
         ]);
