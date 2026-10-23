@@ -32,7 +32,7 @@
 /* ===== Unified Minimap in Panaroma (thay thế MiniMap cũ - Image2 thay Image3) ===== */
 .pano-unified-minimap-wrap {
   position: absolute;
-  top: 44px;
+  top: 47px;
   right: 8px;
   z-index: 45;
   display: flex;
@@ -45,8 +45,8 @@
   gap: 6px;
 }
 .pano-unified-minimap-wrap .mm-ctrl-btn {
-  width: 26px;
-  height: 26px;
+  width: 35px;
+  height: 35px;
   background: #5a5a5a;
   color: #fff;
   border: none;
