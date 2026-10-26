@@ -26,6 +26,8 @@
 .map-image-wrapper {
   position: relative;
   display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
   line-height: 0;
   flex-shrink: 0;
 }
@@ -34,6 +36,8 @@
   display: block;
   width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   border: none;
 }
