@@ -13,7 +13,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   };
   const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panaroma));
   const [showMinimap, setShowMinimap] = useState(true);
-  const [miniScale, setMiniScale] = useState(1);
+  const [miniScale, setMiniScale] = useState(2.6);
   const [transitionPhase, setTransitionPhase] = useState("idle");
   const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";
@@ -173,7 +173,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
               onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
               title="Zoom in on minimap"
             >
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="11" cy="11" r="7" />
                 <line x1="11" y1="8" x2="11" y2="14" />
                 <line x1="8" y1="11" x2="14" y2="11" />

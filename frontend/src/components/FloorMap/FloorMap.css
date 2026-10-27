@@ -132,7 +132,7 @@
 /* Minimap wrap top-right - Ảnh 2 đỏ */
 .map-minimap-wrap {
   position: absolute;
-  top: 47px;
+  top: 52px;
   right: 8px;
   z-index: 45;
   display: flex;
@@ -148,8 +148,8 @@
 }
 
 .mm-ctrl-btn {
-  width: 35px;
-  height: 35px;
+  width: 60px;
+  height: 50px;
   background: #5a5a5a;
   color: #fff;
   border: none;
@@ -157,7 +157,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 20px;
   line-height: 1;
 }
 .mm-ctrl-btn:hover { background: #6e6e6e; }
