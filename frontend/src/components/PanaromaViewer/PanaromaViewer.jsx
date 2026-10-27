@@ -130,10 +130,10 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
               yaw: `${hotspot.yaw}deg`,
               pitch: `${hotspot.pitch}deg`,
               zoom: 75,
-              speed: 800,
+              speed: 300,
             });
           } catch {}
-          setTimeout(() => onHotspotClick(targetId), 800);
+          setTimeout(() => onHotspotClick(targetId), 500);
         } else {
           withFadeTransition(() => onHotspotClick(targetId));
         }
