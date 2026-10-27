@@ -64,10 +64,15 @@
                                     </select>
                                 </div>
                                 <div class="mb-3" id="floorPlanContainer" style="display: none;">
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="angleMinus" title="Avert -5°">&#10227; -5&deg;</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="anglePlus" title="Avert +5°">&#10227; +5&deg;</button>
+                                    </div>
                                     <label class="form-label" id="mapLabel">Position on map</label>
                                     <div id="floorPlan" style="position: relative; cursor: crosshair; line-height: 0;">
                                         <img id="floorPlanImage" src="" alt="Sơ đồ map" style="display: block; max-width: 100%; height: auto;">
                                         <span id="floorPlanMarker" aria-hidden="true" style="display: none; position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%; background: #dc3545; box-shadow: 0 0 0 1px #000;"></span>
+                                        <span id="floorPlanCone" aria-hidden="true" style="display: none; position: absolute; width: 90px; height: 90px; margin: -90px 0 0 -45px; transform-origin: 50% 100%; background: radial-gradient(circle at 50% 100%, rgba(249,115,22,0.7) 0%, rgba(249,115,22,0.15) 70%, transparent 100%); clip-path: polygon(50% 100%, 0% 0%, 100% 0%); pointer-events: none; z-index: 5;"></span>
                                     </div>
                                     <small class="text-muted">Click on the diagram to select a panaroma location.</small>
                                 </div>
@@ -127,6 +132,7 @@
             const floorPlan = document.getElementById('floorPlan');
             const floorPlanImage = document.getElementById('floorPlanImage');
             const floorPlanMarker = document.getElementById('floorPlanMarker');
+            const floorPlanCone = document.getElementById('floorPlanCone');
             const mapLabel = document.getElementById('mapLabel');
             const mapX = document.querySelector('[name="map_x"]');
             const mapY = document.querySelector('[name="map_y"]');
@@ -180,7 +186,20 @@
                 }
                 floorPlanImage.src = imageUrl;
                 floorPlanContainer.style.display = imageUrl ? '' : 'none';
-                if (!imageUrl) floorPlanMarker.style.display = 'none';
+                if (!imageUrl) { floorPlanMarker.style.display = 'none'; floorPlanCone.style.display = 'none'; }
+            }
+
+            function updateDirectionCone() {
+                if (floorPlanMarker.style.display === 'none' || mapAngle.value === '') {
+                    floorPlanCone.style.display = 'none';
+                    return;
+                }
+                const angle = parseFloat(mapAngle.value) || 0;
+                // giống minimap frontend: cone gốc chỉ Bắc, +90 để khớp map_angle 0°=Đông (sang phải), 90°=Nam
+                floorPlanCone.style.transform = `rotate(${(angle + 90) % 360}deg)`;
+                floorPlanCone.style.left = `${mapX.value}%`;
+                floorPlanCone.style.top = `${mapY.value}%`;
+                floorPlanCone.style.display = 'block';
             }
 
             function restoreMarker() {
@@ -190,6 +209,7 @@
                 floorPlanMarker.style.left = `${mapX.value}%`;
                 floorPlanMarker.style.top = `${mapY.value}%`;
                 floorPlanMarker.style.display = 'block';
+                updateDirectionCone();
             }
 
             function handleBuildingChange(resetCoords = true) {
@@ -217,6 +237,7 @@
                 if (resetCoords) {
                     [mapX, mapY, mapAngle, yaw, pitch].forEach(f => f.value = '');
                     floorPlanMarker.style.display = 'none';
+                    floorPlanCone.style.display = 'none';
                 }
                 updateMapImage();
             }
@@ -227,6 +248,7 @@
                     field.value = '';
                 });
                 floorPlanMarker.style.display = 'none';
+                floorPlanCone.style.display = 'none';
                 updateMapImage();
             });
             floorPlan.addEventListener('click', function (event) {
@@ -244,6 +266,27 @@
                 floorPlanMarker.style.left = `${x}%`;
                 floorPlanMarker.style.top = `${y}%`;
                 floorPlanMarker.style.display = 'block';
+                updateDirectionCone();
+            });
+
+            // ---- Xoay hướng: dùng nút ±5° ----
+            const angleMinus = document.getElementById('angleMinus');
+            const anglePlus = document.getElementById('anglePlus');
+
+            function setAngle(deg) {
+                const normalized = ((Math.round(deg * 100) / 100) % 360 + 360) % 360;
+                mapAngle.value = normalized.toFixed(2);
+                yaw.value = (normalized > 180 ? normalized - 360 : normalized).toFixed(2);
+                updateDirectionCone();
+            }
+
+            angleMinus.addEventListener('click', function () {
+                if (mapAngle.value === '') return;
+                setAngle(parseFloat(mapAngle.value) - 5);
+            });
+            anglePlus.addEventListener('click', function () {
+                if (mapAngle.value === '') return;
+                setAngle(parseFloat(mapAngle.value) + 5);
             });
 
             floorPlanImage.addEventListener('load', restoreMarker);
