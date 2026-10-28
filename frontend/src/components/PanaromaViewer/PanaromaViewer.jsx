@@ -216,7 +216,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
           plugins={plugins}
           onReady={handleReady}
           defaultYaw={`${getInitialAngle(displayPanaroma)}deg`}
-          defaultPitch={`${displayPanaroma?.defaultView?.pitch || 0}deg`}
+          defaultPitch={`0deg`}
         />
       </div>
 
