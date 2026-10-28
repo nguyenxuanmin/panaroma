@@ -4,7 +4,7 @@ import MapMinimap from "../MapMinimap/MapMinimap";
 import "./FloorMap.css";
 
 export default function FloorMap({ floor, building, activePanaroma, onSelectPanaroma }) {
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [showMinimap, setShowMinimap] = useState(false);
   const [miniScale, setMiniScale] = useState(2.6);
 
   return (

@@ -63,6 +63,10 @@
                                         @endif
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Numerical Order</label>
+                                    <input type="number" class="form-control" name="order" id="order" value="@if (isset($building) && !empty($building->order)){{$building->order}}@else{{1}}@endif" min="1" step="1">
+                                </div>
                                 <div class="mb-3" id="buildingImageWrapper">
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">
@@ -94,6 +98,14 @@
         if (typeSelect) {
             typeSelect.addEventListener('change', toggleImage);
             toggleImage();
+        }
+    });
+
+    let input = document.getElementById('order');
+    input.addEventListener('input', () => {
+        input.value = input.value.replace(/[^0-9]/g, '');
+        if (input.value !== '' && Number(input.value) <= 0) {
+            input.value = '';
         }
     });
 </script>

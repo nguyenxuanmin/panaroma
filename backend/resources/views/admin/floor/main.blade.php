@@ -49,6 +49,10 @@
                                         @endif
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Numerical Order</label>
+                                    <input type="number" class="form-control" name="order" id="order" value="@if (isset($floor) && !empty($floor->order)){{$floor->order}}@else{{1}}@endif" min="1" step="1">
+                                </div>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Image</label>
@@ -65,4 +69,16 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        let input = document.getElementById('order');
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (input.value !== '' && Number(input.value) <= 0) {
+                input.value = '';
+            }
+        });
+    </script>
 @endsection

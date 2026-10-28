@@ -111,7 +111,7 @@ function mapPanaromaForApi($panaroma) {
 function mapBuildingForApi($building, $videos) {
     $type = $building->type ?? 'single';
     if ($type === 'group') {
-        $floors = $building->floors()->with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
+        $floors = $building->floors()->with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('order')->orderBy('id')->get();
         return [
             'id' => (string) $building->id,
             'name' => $building->name ?? ('Building ' . $building->id),
@@ -151,7 +151,7 @@ function mapBuildingForApi($building, $videos) {
 
 function mapProjectToFrontend($project) {
     // Load buildings with nested relations
-    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots','floors.panaromas.panaromaImages', 'panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
+    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots','floors.panaromas.panaromaImages', 'panaromas.hotspots','panaromas.panaromaImages'])->orderBy('order')->orderBy('id')->get();
     $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
     $buildings = $buildingsRel->map(fn($b) => mapBuildingForApi($b, $videos))->values();
 

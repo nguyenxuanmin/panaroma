@@ -19,6 +19,7 @@ class FloorController extends Controller
         $allowedSorts = [
             'title'    => 'floors.name',
             'category' => 'buildings_name',
+            'floor' => 'floors.order',
             'project'  => 'projects_name',
         ];
         $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
@@ -66,12 +67,20 @@ class FloorController extends Controller
         $buildingId = $request->building_id;
         $image = $request->file('image');
         $imageName = $image ? $image->getClientOriginalName() : '';
+        $order = $request->order;
         $action = $request->action;
 
         if (empty($title)) {
             return response()->json([
                 'success' => false,
                 'message' => 'The title cannot be left blank.'
+            ]);
+        }
+
+        if (empty($order)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The numerical order cannot be left blank.'
             ]);
         }
 
@@ -125,6 +134,7 @@ class FloorController extends Controller
         $floor->building_id = $building->id;
         $floor->name = $title;
         $floor->plan_image = $imageUrl;
+        $floor->order = $order;
         $floor->save();
 
         return response()->json([

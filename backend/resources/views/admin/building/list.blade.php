@@ -29,6 +29,7 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
                         <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
+                        <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
                         <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'type', 'label' => 'Type'])</th>
                         <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'project', 'label' => 'Project'])</th>
                         <th scope="col" width="200px" class="text-center">Action</th>
@@ -51,6 +52,7 @@
                                 @endif
                             </td>
                             <td valign="middle">{{$building->name}}</td>
+                            <td valign="middle" class="text-center">{{$building->order}}</td>
                             <td valign="middle" class="text-center">{{$building->type}}</td>
                             <td valign="middle" class="text-center">{{$building->project->name}}</td>
                             <td valign="middle" class="text-center">

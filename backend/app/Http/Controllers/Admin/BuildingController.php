@@ -19,6 +19,7 @@ class BuildingController extends Controller
         $allowedSorts = [
             'title'   => 'buildings.name',
             'type'    => 'buildings.type',
+            'order' => 'buildings.order',
             'project' => 'projects_name',
         ];
         $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
@@ -67,6 +68,7 @@ class BuildingController extends Controller
         $image = $request->file('image');
         $imageName = $image ? $image->getClientOriginalName() : '';
         $project = $request->project;
+        $order = $request->order;
         $action = $request->action;
 
         if (empty($title)) {
@@ -87,6 +89,13 @@ class BuildingController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'The image field cannot be left blank for single building.'
+            ]);
+        }
+
+        if (empty($order)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The numerical order cannot be left blank.'
             ]);
         }
 
@@ -134,6 +143,7 @@ class BuildingController extends Controller
         $building->name = $title;
         $building->type = $type;
         $building->plan_image = $imageUrl;
+        $building->order = $order;
         $building->save();
 
         return response()->json([
