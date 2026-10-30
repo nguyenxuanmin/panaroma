@@ -195,7 +195,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
   useEffect(() => {
     const current = projects.find((p) => p.id === selectedProjectId);
     if (current?.name) {
-      document.title = current.name;
+      document.title = 'LINX B gallery_KHPB-SB';
     }
   }, [selectedProjectId, projects]);
 
