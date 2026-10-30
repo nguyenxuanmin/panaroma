@@ -2,7 +2,7 @@
     <div class="sidebar-brand">
         <a href="{{route('admin')}}" class="brand-link">
             @if (!empty($company->logo))
-                <img src="{{asset('storage/company/logo/'.$company->logo)}}" alt="{{$company->name}}" class="brand-image opacity-75 shadow" />
+                <img src="{{asset($company->logo)}}" alt="{{$company->name}}" class="brand-image opacity-75 shadow" />
             @else
                 <img src="{{asset('library/admin/AdminLTEFullLogo.png')}}" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
             @endif
@@ -39,6 +39,11 @@
                 <li class="nav-item">
                     <a href="{{route('list_video')}}" class="nav-link @if (request()->is('admin/video*')) active @endif">
                         <p>Video</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('company')}}" class="nav-link @if (request()->is('admin/company*')) active @endif">
+                        <p>Company</p>
                     </a>
                 </li>
             </ul>

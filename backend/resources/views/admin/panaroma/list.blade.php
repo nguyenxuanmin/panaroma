@@ -29,9 +29,10 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="300px"></th>
                         <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
+                        <th scope="col" width="180px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
                         <th scope="col" width="250px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'category', 'label' => 'Panaroma Category'])</th>
                         <th scope="col" width="250px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'subcategory', 'label' => 'Panaroma Sub-Category'])</th>
-                        <th scope="col" width="200px" class="text-center">Action</th>
+                        <th scope="col" width="180px" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,6 +52,7 @@
                                 @endif
                             </td>
                             <td valign="middle">{{$panaroma->name}}</td>
+                            <td valign="middle" class="text-center">{{$panaroma->order}}</td>
                             <td valign="middle" class="text-center">
                                 @if (!empty($panaroma->building_id))
                                     {{ $panaroma->building->name ?? '—' }} <small class="badge bg-info">single</small>

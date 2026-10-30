@@ -3,7 +3,8 @@ namespace App\Services;
 
 class AdminService
 {
-    public function generateImage($image,$folder) {        $message = "";
+    public function generateImage($image,$folder) {
+        $message = "";
         if (!$image->isValid()) {
             $message = "Invalid upload.";
             return $message;

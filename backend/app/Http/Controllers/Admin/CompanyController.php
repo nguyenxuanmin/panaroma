@@ -26,66 +26,66 @@ class CompanyController extends Controller
         $address = $request->address;
         $hotline = $request->hotline;
         $email = $request->email;
-        $map = $request->map;
-        if (isset($_FILES["logo"])) {
-            $logo = $_FILES["logo"]["name"];
-        }else{
-            $logo = "";
-        }
-        if (isset($_FILES["favicon"])) {
-            $favicon = $_FILES["favicon"]["name"];
-        }else{
-            $favicon = "";
-        }
+        $logo = $request->file('logo');
+        $logoName = $logo ? $logo->getClientOriginalName() : '';
+        $favicon = $request->file('favicon');
+        $faviconName = $favicon ? $favicon->getClientOriginalName() : '';
         
         if (empty($name)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tên công ty không được để trống.'
+                'message' => 'The company name cannot be left blank.'
             ]);
         }
 
         $company = Company::find($request->id);
-
-        if (!empty($logo)) {
-            $imagePath = public_path('storage/company/logo/' . $company->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+        
+        if (!empty($logoName)) {
+            $logoPath = public_path($company->logo);
+            if (file_exists($logoPath) && is_file($logoPath)) {
+                unlink($logoPath);
             }
-            $messageError = $this->adminService->generateImage($_FILES["logo"],'company/logo');
-            if($messageError != ""){
-                return response()->json([
-                    'success' => false,
-                    'message' => $messageError
-                ]);
-            }
-        }else{
-            $logo = $company->logo;
+            $logoUrl = 'storage/company/logo/' . time() . '_' . $logoName;
+        } else {
+            $logoUrl = $company->logo;
         }
 
-        if (!empty($favicon)) {
-            $imagePath = public_path('storage/company/favicon/' . $company->favicon);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-            $messageError = $this->adminService->generateImage($_FILES["favicon"],'company/favicon');
+        if (isset($logo)) {
+            $messageError = $this->adminService->generateImage($logo,'company/logo');
             if($messageError != ""){
                 return response()->json([
                     'success' => false,
                     'message' => $messageError
                 ]);
             }
-        }else{
-            $favicon = $company->favicon;
+        }
+
+        if (!empty($faviconName)) {
+            $faviconPath = public_path($company->favicon);
+            if (file_exists($faviconPath) && is_file($faviconPath)) {
+                unlink($faviconPath);
+            }
+            $faviconUrl = 'storage/company/favicon/' . time() . '_' . $faviconName;
+        } else {
+            $faviconUrl = $company->favicon;
+        }
+
+        if (isset($favicon)) {
+            $messageError = $this->adminService->generateImage($favicon,'company/favicon');
+            if($messageError != ""){
+                return response()->json([
+                    'success' => false,
+                    'message' => $messageError
+                ]);
+            }
         }
         
         $company->name = $name;
         $company->address = $address;
         $company->hotline = $hotline;
         $company->email = $email;
-        $company->map = $map;
-        $company->logo = $logo;
-        $company->favicon = $favicon;
+        $company->logo = $logoUrl;
+        $company->favicon = $faviconUrl;
         $company->save();
 
         return response()->json([

@@ -7,7 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @if (!empty($company->favicon))
-            <link rel="icon" href="{{asset('storage/company/favicon/'.$company->favicon)}}" type="favicon">
+            <link rel="icon" href="{{asset($company->favicon)}}" type="favicon">
         @endif
         <title>@yield('title')</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous"/>
@@ -30,7 +30,7 @@
             }
             .list-image{
                 position: relative;
-                width: 250px;
+                width: 205px;
             }
             .list-image img{
                 width: 100%;

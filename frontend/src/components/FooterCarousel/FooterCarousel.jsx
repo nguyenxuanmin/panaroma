@@ -1,14 +1,45 @@
 import React, { useState } from "react";
+import { frontViewThumbFromImage } from "../../utils/thumbCrop";
 import "./FooterCarousel.css";
 
 const VISIBLE_COUNT = 6;
 
+// Cache thumb đã crop (canvas)
+const thumbCache = new Map();
+
 export default function FooterCarousel({ panaromas, activePanaroma, onSelectPanaroma, floorId }) {
   const [collapsed, setCollapsed] = useState(false);
   const [start, setStart] = useState(0);
+  const [thumbs, setThumbs] = useState({});
   const [stateKey, setStateKey] = useState({ floorId, activeId: activePanaroma?.id ?? null });
 
   const list = React.useMemo(() => panaromas || [], [panaromas]);
+
+  // Crop mặt chính diện từ ảnh 360 bằng canvas làm thumbnail (theo hướng nhìn mặc định)
+  React.useEffect(() => {
+    let cancelled = false;
+    const generate = async () => {
+      for (const pano of list) {
+        const src = pano.url || pano.thumbnail;
+        if (!src) continue;
+        const yaw = pano.defaultView?.yaw ?? 0;
+        const key = `${pano.id}|${src}|${yaw}`;
+        if (thumbCache.has(key)) {
+          const cached = thumbCache.get(key);
+          if (cached) setThumbs((prev) => (prev[key] === cached ? prev : { ...prev, [key]: cached }));
+          continue;
+        }
+        const cropped = await frontViewThumbFromImage(src, yaw);
+        if (cancelled) return;
+        thumbCache.set(key, cropped || null);
+        if (cropped) setThumbs((prev) => ({ ...prev, [key]: cropped }));
+      }
+    };
+    generate();
+    return () => {
+      cancelled = true;
+    };
+  }, [list]);
 
   // Đổi tầng → về đầu danh sách; đổi pano active (chọn từ map/sidebar) → dồn cửa sổ cho thấy nó
   const activeId = activePanaroma?.id ?? null;
@@ -44,10 +75,12 @@ export default function FooterCarousel({ panaromas, activePanaroma, onSelectPana
           <div className="carousel-track">
             {visiblePanaromas.map((pano) => {
               const isActive = activePanaroma?.id === pano.id;
+              const fallbackKey = `${pano.id}|${pano.url || pano.thumbnail}|${pano.defaultView?.yaw ?? 0}`;
+              const thumbSrc = thumbs[fallbackKey] || pano.thumbnail || pano.url;
               return (
                 <div key={pano.id} className={`carousel-card ${isActive ? "active" : ""}`} onClick={() => onSelectPanaroma(pano)} title={`${pano.name}`}>
                   <div className="card-thumb-wrapper">
-                    <img src={pano.thumbnail || pano.url} alt={pano.name} className="card-thumb-img" loading="lazy" />
+                    <img src={thumbSrc} alt={pano.name} className="card-thumb-img" loading="lazy" />
                   </div>
                   <div className="card-title-bar"><span className="card-title-text">{pano.name}</span></div>
                 </div>

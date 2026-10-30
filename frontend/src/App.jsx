@@ -462,7 +462,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
 
       <main className="main-viewport">
         {viewMode === "map" ? (
-          <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} />
+          <FloorMap floor={activeFloor} building={activeBuilding} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} onLogout={onLogout} />
         ) : (
           activePanaroma ? (
             <PanaromaViewer
@@ -473,6 +473,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
               onSelectPanaroma={(pano) => setActivePanaroma(pano)}
               onReturnToMap={() => setViewMode("map")}
               showLeftToolbar={showSidebar}
+              onLogout={onLogout}
             />
           ) : (
             // Chưa có panaroma -> vẫn hiện ảnh mặt bằng tổng thể của tầng

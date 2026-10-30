@@ -3,9 +3,13 @@ import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import MapMinimap from "../MapMinimap/MapMinimap";
+import { frontViewThumbFromImage } from "../../utils/thumbCrop";
 import "./PanaromaViewer.css";
 
-export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap }) {
+// Cache crop canvas cho option chưa có thumbUrl từ server
+const optThumbCache = new Map();
+
+export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap, onLogout }) {
   const viewerRef = useRef(null);
   const getInitialAngle = (p) => {
     if (typeof p?.mapPosition?.angle === "number") return p.mapPosition.angle;
@@ -50,6 +54,39 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   const activeOption = imageOptions[activeOptionIdx] || imageOptions[0] || null;
   const currentUrl = activeOption?.url || panaroma?.url || defaultImage;
   const currentThumb = activeOption?.thumbnail || panaroma?.thumbnail || panaroma?.url;
+
+  // Crop mặt chính diện bằng canvas làm thumbnail (theo hướng nhìn mặc định của panaroma)
+  const [optThumbs, setOptThumbs] = useState({});
+  // Hướng nhìn mặc định của panaroma, dùng chung cho main + các option
+  const optYaw = panaroma?.defaultView?.yaw ?? 0;
+  useEffect(() => {
+    let cancelled = false;
+    const generate = async () => {
+      for (const opt of imageOptions) {
+        const src = opt.thumbnail || opt.url;
+        if (!src) continue;
+        const key = `${opt.id}|${src}|${optYaw}`;
+        if (optThumbCache.has(key)) {
+          const cached = optThumbCache.get(key);
+          if (cached) setOptThumbs((prev) => (prev[key] === cached ? prev : { ...prev, [key]: cached }));
+          continue;
+        }
+        const cropped = await frontViewThumbFromImage(src, optYaw);
+        if (cancelled) return;
+        optThumbCache.set(key, cropped || null);
+        if (cropped) setOptThumbs((prev) => ({ ...prev, [key]: cropped }));
+      }
+    };
+    generate();
+    return () => {
+      cancelled = true;
+    };
+  }, [imageOptions, optYaw]);
+
+  const optThumbSrc = (opt) => {
+    const src = opt.thumbnail || opt.url;
+    return optThumbs[`${opt.id}|${src}|${optYaw}`] || opt.thumbnail || opt.url;
+  };
 
   // Preload khi đổi panaroma (theo id) — giữ logic cũ nhưng dùng currentUrl khi cần
   useEffect(() => {
@@ -173,13 +210,22 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
               onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
               title="Zoom in on minimap"
             >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor">
                 <circle cx="11" cy="11" r="7" />
                 <line x1="11" y1="8" x2="11" y2="14" />
                 <line x1="8" y1="11" x2="14" y2="11" />
                 <line x1="21" y1="21" x2="16.5" y2="16.5" />
               </svg>
             </button>
+            {onLogout && (
+              <button className="mm-ctrl-btn" onClick={onLogout} title="Logout">
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -197,7 +243,10 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
                   onClick={() => setActiveOptionIdx(idx)}
                   title={opt.title}
                 >
-                  <img src={opt.thumbnail || opt.url} alt={opt.title} className="pano-image-opt-thumb" loading="lazy" />
+                  <img src={optThumbSrc(opt)} alt={opt.title} className="pano-image-opt-thumb" loading="lazy" />
+                  <div class="pano-image-opt-title">
+                    <span>{opt.title}</span>
+                  </div>
                 </button>
               );
             })}

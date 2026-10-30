@@ -2,15 +2,14 @@
 .building-sidebar {
   position: absolute;
   right:8px;
-  top: 60%;
-  transform: translateY(-50%);
+  top: 430px;
   z-index: 40;
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 160px;
-  max-height: calc(100vh - 160px);
-  max-height: calc(100dvh - 160px);
+  max-height: calc(100vh - 450px);
+  max-height: calc(100dvh - 450px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -19,6 +18,7 @@
   overscroll-behavior: contain;
   pointer-events: auto;
   font-family: "Hiragino Kaku Gothic Pro", "Meiryo", Arial, sans-serif;
+  background: rgba(0, 0, 0, 0.3);
 }
 .building-sidebar::-webkit-scrollbar { width: 4px; }
 .building-sidebar::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 2px; }
@@ -27,9 +27,9 @@
 .bs-btn {
   width: 100%;
   padding: 7px 8px;
-  background: #6a6a6a;
+  background: rgba(0, 0, 0, 0.1);
   color: #fff;
-  border: 1px solid #6a6a6a;
+  border: 1px solid transparent;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.3px;
@@ -41,16 +41,13 @@
 }
 
 .bs-btn:hover {
-  background: #7a7a7a;
-  border-color: #7a7a7a;
+  background: rgba(255, 255, 255, 0.4);
+  border-color: transparent;
 }
 
 .bs-btn.active {
-  background: #ffffff;
-  color: #1a1a1a;
-  border-color: #1a1a1a;
-  font-weight: 700;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  background: rgba(255, 255, 255, 0.4);
+  border-color: transparent;
 }
 
 /* group */
@@ -58,7 +55,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 7px 6px 6px;
+  padding: 5px 0;
   border: 1px solid #6a6a6a;
   background: transparent;
 }
@@ -70,7 +67,7 @@
 .bs-group-label {
   text-align: center;
   font-size: 11px;
-  color: #333;
+  color: white;
   padding: 2px 0 4px;
   font-weight: 600;
   letter-spacing: 0.2px;

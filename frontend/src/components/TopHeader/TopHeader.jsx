@@ -22,6 +22,16 @@ export default function TopHeader({
     onToggleViewMode(viewMode === "map" ? "panaroma" : "map");
   };
 
+  // If activePanaroma has a external link => open new tab, otherwise disabled
+  const panaromaLink = activePanaroma?.link || null;
+  const handleLinkBoxClick = () => {
+    if (!panaromaLink) return;
+    const url = /^https?:\/\//i.test(panaromaLink) || panaromaLink.startsWith("/")
+      ? panaromaLink
+      : `https://${panaromaLink}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <header className="top-header-image">
       <div className="th-left">
@@ -43,25 +53,33 @@ export default function TopHeader({
         {showTopButtons && (
           <>
             <button className={`th-icon-btn ${viewMode === "map" ? "active" : ""}`} onClick={() => onToggleViewMode("map")} title="Home">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             </button>
             <button className="th-icon-btn" onClick={onOpenVideo} title="Video">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
             </button>
             <button className={`th-icon-btn ${viewMode !== "map" ? "active" : ""}`} onClick={handleImageClick} title="Image">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M21 19V5c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v14c0 .55.45 1 1 1h16c.55 0 1-.45 1-1zM18 7l-4 5-3-3-4 6h12z"/></svg>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M21 19V5c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v14c0 .55.45 1 1 1h16c.55 0 1-.45 1-1zM18 7l-4 5-3-3-4 6h12z"/></svg>
+            </button>
+            <button
+              className="th-icon-btn"
+              onClick={handleLinkBoxClick}
+              title={panaromaLink ? `Open link: ${panaromaLink}` : "Link Box"}
+              disabled={!panaromaLink}
+            >
+              <svg viewBox="0 0 24 24" width="30" height="30"
+                  fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
             </button>
             <button className="th-icon-btn" onClick={onOpenGoogleMap} title="Location">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             </button>
-            {/* <button className="th-icon-btn" title="Help" onClick={() => alert("Help: Home=Map, Video=ムービー, Image=Toggle 2D/360, Pin=Google Map, ⛶=Fullscreen, ☰=Show/hide sidebar")}>?</button> */}
-            {user?.role === 'admin' && (
-              <a className="th-icon-btn" href="/admin" title="Admin" style={{ textDecoration: 'none' }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4a3 3 0 110 6 3 3 0 010-6zm-4 8c0 1.5 1.5 3 4 3s4-1.5 4-3v-1H8v1z"/></svg>
-              </a>
-            )}
             <button className="th-icon-btn" onClick={onToggleFullscreen} title="Fullscreen">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
           </>
         )}

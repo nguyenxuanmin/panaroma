@@ -84,6 +84,7 @@ function mapPanaromaForApi($panaroma) {
         'number' => (int) $panaroma->number,
         'thumbnail' => normalizeStorageUrl($panaroma->thumbnail),
         'url' => normalizeStorageUrl($panaroma->url ?? $panaroma->thumbnail),
+        'link' => $panaroma->link,
         'mapPosition' => [
             'x' => (float) ($panaroma->map_x ?? 0),
             'y' => (float) ($panaroma->map_y ?? 0),
@@ -132,7 +133,7 @@ function mapBuildingForApi($building, $videos) {
         ];
     }
     // single: panaromas trực tiếp building
-    $panaromas = $building->panaromas()->with(['hotspots','panaromaImages'])->orderBy('number')->get();
+    $panaromas = $building->panaromas()->with(['hotspots','panaromaImages'])->orderBy('order')->orderBy('id')->get();
     // fallback: nếu single nhưng chưa có panaroma trực tiếp, lấy từ floors đầu (compat data cũ)
     if ($panaromas->isEmpty()) {
         $firstFloor = $building->floors()->with('panaromas.hotspots')->first();

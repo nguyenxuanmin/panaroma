@@ -57,6 +57,16 @@
                                     </select>
                                     <small class="text-muted">Single: Panorama attached directly to the Panaroma Category. Group: Must also select a Panaroma Sub-Category.</small>
                                 </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <label class="form-label">Numerical Order</label>
+                                        <input type="number" class="form-control" name="order" id="order" value="@if (isset($panaroma) && !empty($panaroma->order)){{$panaroma->order}}@else{{1}}@endif" min="1" step="1">
+                                    </div>
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <label class="form-label">Link Box</label>
+                                        <input type="text" class="form-control" name="link" value="@if (isset($panaroma)){{$panaroma->link}}@endif">
+                                    </div>
+                                </div>
                                 <div class="mb-3" id="floorWrapper" style="display:none;">
                                     <label class="form-label">Panaroma Sub-Category (only when Panaroma Category = group)</label>
                                     <select class="form-select" name="floor_id" id="floorSelect">
@@ -96,6 +106,8 @@
                                                 <div class="list-image">
                                                     <img src="{{ asset($item->thumbnail) }}" alt="{{$item->title}}" loading="lazy" decoding="async">
                                                     <i class="fa-solid fa-xmark" onclick="deletePhoto({{$item->id}},'{{route('delete_panaroma_image')}}')"></i>
+                                                    <input type="name" class="form-control mt-1" name="titlePanaromaImage[]" value="{{$item->title}}">
+                                                    <input type="hidden" class="form-control" name="idPanaromaImage[]" value="{{$item->id}}">
                                                 </div>
                                             @endforeach
                                         </div>
@@ -262,7 +274,7 @@
                 mapY.value = y.toFixed(2);
                 mapAngle.value = normalizedAngle.toFixed(2);
                 yaw.value = (normalizedAngle > 180 ? normalizedAngle - 360 : normalizedAngle).toFixed(2);
-                pitch.value = (50 - y).toFixed(2);
+                pitch.value = (0).toFixed(2);
                 floorPlanMarker.style.left = `${x}%`;
                 floorPlanMarker.style.top = `${y}%`;
                 floorPlanMarker.style.display = 'block';
@@ -305,58 +317,99 @@
             $.each(files, function (i, file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
+                    const wrapper = $('<div>').css({
+                        display: 'inline-flex',
+                        'flex-direction': 'column',
+                        'align-items': 'center',
+                        margin: '5px'
+                    });
+
                     const img = $('<img>', { loading: 'lazy', decoding: 'async' })
                     .attr('src', e.target.result)
                     .css({
                         width: '200px',
                         height: 'auto',
-                        margin: '5px',
                         border: '1px solid #ccc',
                         'object-fit': 'cover',
                         'border-radius': '5px'
                     });
-                    preview.append(img);
+                    const titleInput = $('<input>')
+                        .attr({
+                            type: 'title',
+                            name: 'titlePanaromaImage[]',
+                            value: ''
+                        })
+                        .css({
+                            width: '200px',
+                            'margin-top': '5px',
+                        })
+                        .addClass(
+                            'form-control stt'
+                        );
+                    const idInput = $('<input>')
+                        .attr({
+                            type: 'hidden',
+                            name: 'idPanaromaImage[]',
+                            value: ''
+                        })
+                        .addClass(
+                            'form-control stt'
+                        );
+
+                    wrapper.append(img);
+                    wrapper.append(titleInput);
+                    wrapper.append(idInput);
+
+                    preview.append(wrapper);
                 };
                 reader.readAsDataURL(file);
             });
         });
 
         function deletePhoto(id,url) {
-                Swal.fire({
-                    text: 'Do you want to delete this image?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Delete',
-                    cancelButtonText: 'Cancel',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: url,
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken
-                            },
-                            type: 'POST',
-                            data: {id: id},
-                            success: function(response) {
-                                Swal.fire({
-                                    text: "Image deleted successfully!",
-                                    icon: "success",
-                                    showConfirmButton: false,
-                                    timer: 1500,
-                                    allowOutsideClick: false,
-                                    allowEscapeKey: false
-                                }).then((result) => {
-                                    location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                console.log(xhr);
-                            }
-                        });
-                    }
-                });
+            Swal.fire({
+                text: 'Do you want to delete this image?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        type: 'POST',
+                        data: {id: id},
+                        success: function(response) {
+                            Swal.fire({
+                                text: "Image deleted successfully!",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1500,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                        }
+                    });
+                }
+            });
+        }
+
+        let input = document.getElementById('order');
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (input.value !== '' && Number(input.value) <= 0) {
+                input.value = '';
             }
+        });
     </script>
 @endsection

@@ -14,6 +14,22 @@ export default function LoginScreen({ onLogin, initialId = "", lockId = false, p
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("");
+
+  // Logo công ty từ site-settings (chỉ hiện khi có dữ liệu)
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/site-settings", { headers: { Accept: "application/json" } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.logo_url) return;
+        setLogoUrl(data.logo_url);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,6 +69,7 @@ export default function LoginScreen({ onLogin, initialId = "", lockId = false, p
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={handleSubmit} autoComplete="off">
+        {logoUrl && <img src={logoUrl} alt="Company logo" className="login-logo" loading="lazy" decoding="async"/>}
         <div className="login-title">{projectName ? "PROJECT LOGIN" : "WELCOME"}</div>
 
         {projectName && (

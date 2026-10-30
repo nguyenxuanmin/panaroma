@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @if (!empty($company->favicon))
-            <link rel="icon" href="{{asset('storage/company/favicon/'.$company->favicon)}}" type="favicon">
+            <link rel="icon" href="{{asset($company->favicon)}}" type="favicon">
         @endif
         <title>Login</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous"/>
@@ -14,15 +14,15 @@
     </head>
     <body class="login-page bg-body-secondary">
         <div class="login-box">
-            <div class="login-logo">
-                @if (!empty($company->favicon))
-                    <img src="{{asset('storage/company/logo/'.$company->logo)}}" alt="{{$company->name}}" class="brand-image" />
-                @else
-                    <img src="{{asset('library/admin/AdminLTEFullLogo.png')}}" alt="AdminLTE Logo" class="brand-image" />
-                @endif
-            </div>
             <div class="card">
                 <div class="card-body login-card-body">
+                    <div class="login-logo">
+                        @if (!empty($company->favicon))
+                            <img src="{{asset($company->logo)}}" alt="{{$company->name}}" class="brand-image" height="100px" />
+                        @else
+                            <img src="{{asset('library/admin/AdminLTEFullLogo.png')}}" alt="AdminLTE Logo" class="brand-image" />
+                        @endif
+                    </div>
                     <p class="login-box-msg">Log in to start the session.</p>
                     <form id="formLogIn">
                         <div class="input-group mb-3">

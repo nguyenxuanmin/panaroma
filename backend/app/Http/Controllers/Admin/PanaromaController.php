@@ -21,6 +21,7 @@ class PanaromaController extends Controller
         // Sort theo header: sort in whitelist, dir chỉ asc/desc
         $allowedSorts = [
             'title'       => 'panaromas.name',
+            'order'       => 'panaromas.order',
             'category'    => 'buildings_name',
             'subcategory' => 'floors_name',
         ];
@@ -77,6 +78,10 @@ class PanaromaController extends Controller
         $imageName = $image ? $image->getClientOriginalName() : '';
         $panaromaImages = $request->file('panaromaImages');
         $action = $request->action;
+        $order = $request->order;
+        $link = $request->link;
+        $idPanaromaImages = $request->input('idPanaromaImage');
+        $titlePanaromaImages = $request->input('titlePanaromaImage');
 
         if (empty($title)) {
             return response()->json([
@@ -116,6 +121,13 @@ class PanaromaController extends Controller
             if (!$targetFloor) {
                 return response()->json(['success'=>false,'message'=>'Panaroma Sub-Category does not belong to selected Panaroma Category.']);
             }
+        }
+
+        if (empty($order)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The numerical order cannot be left blank.'
+            ]);
         }
 
         if ($action == 'add' && empty($imageName)) {
@@ -164,18 +176,6 @@ class PanaromaController extends Controller
             }
         }
 
-        if (isset($panaromaImages)) {
-            foreach ($panaromaImages as $panaromaImage) {
-                $messageError = $this->adminService->generateImage($panaromaImage,'panaroma-images');
-                if($messageError != ""){
-                    return response()->json([
-                        'success' => false,
-                        'message' => $messageError
-                    ]);
-                }
-            }
-        }
-
         if ($isSingle) {
             $panaroma->building_id = $targetBuilding->id;
             $panaroma->floor_id = null;
@@ -193,17 +193,31 @@ class PanaromaController extends Controller
         $panaroma->map_angle = $map_angle;
         $panaroma->default_yaw = $yaw;
         $panaroma->default_pitch = $pitch;
+        $panaroma->order = $order;
+        $panaroma->link = $link;
         $panaroma->save();
 
-        if (isset($panaromaImages)) {
-            foreach ($panaromaImages as $panaromaImage) {
-                $panaromaImageName = time() . '_' . $panaromaImage->getClientOriginalName();
-                $panaromaImageUrl = 'storage/panaroma-images/' . $panaromaImageName;
-                $filepanaromaImage = new PanaromaImage();
-                $filepanaromaImage->title = $panaromaImageName;
-                $filepanaromaImage->thumbnail = $panaromaImageUrl;
-                $filepanaromaImage->panaroma_id = $panaroma->id;
-                $filepanaromaImage->save();
+        if (isset($idPanaromaImages)) {
+            foreach ($idPanaromaImages as $key => $item) {
+                if (isset($item)) {
+                    $filePanaromaImage = PanaromaImage::find($item);
+                }else{
+                    $filePanaromaImage = new PanaromaImage();
+                    if (isset($panaromaImages[$key])) {
+                        $panaromaImage = $panaromaImages[$key];
+                        $panaromaImageName = time() . '_' . basename($panaromaImage->getClientOriginalName());
+                        $uploadDir = public_path('storage/panaroma-images/');
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
+                        }
+                        $panaromaImage->move($uploadDir, $panaromaImageName);
+                        $panaromaImageUrl = 'storage/panaroma-images/' . $panaromaImageName;
+                        $filePanaromaImage->thumbnail = $panaromaImageUrl;
+                    }
+                }
+                $filePanaromaImage->title = trim($titlePanaromaImages[$key]);
+                $filePanaromaImage->panaroma_id = $panaroma->id;
+                $filePanaromaImage->save();
             }
         }
 

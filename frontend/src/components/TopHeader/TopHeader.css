@@ -58,7 +58,7 @@
 }
 
 .th-icon-btn {
-  width: 80px;
+  width: 75px;
   height: 50px;
   background: #5a5a5a;
   color: #fff;
@@ -67,12 +67,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 30px;
   transition: background 0.12s;
 }
 
 .th-icon-btn:hover { background: #6e6e6e; }
 .th-icon-btn.active { background: #3a3a3a; }
+.th-icon-btn:disabled { opacity: 0.45; cursor: default; }
+.th-icon-btn:disabled:hover { background: #5a5a5a; }
 
 .th-menu-btn {
   background: #5a5a5a;
