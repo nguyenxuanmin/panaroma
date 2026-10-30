@@ -2,14 +2,14 @@
 .building-sidebar {
   position: absolute;
   right:8px;
-  top: 430px;
+  top: 300px;
   z-index: 40;
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 160px;
-  max-height: calc(100vh - 450px);
-  max-height: calc(100dvh - 450px);
+  max-height: calc(100vh - 350px);
+  max-height: calc(100dvh - 350px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;

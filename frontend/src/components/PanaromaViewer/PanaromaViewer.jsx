@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
+import * as THREE from "three";
 import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
@@ -9,7 +10,7 @@ import "./PanaromaViewer.css";
 // Cache crop canvas cho option chưa có thumbUrl từ server
 const optThumbCache = new Map();
 
-export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap, onLogout }) {
+export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap, onLogout, showImageOptions = true }) {
   const viewerRef = useRef(null);
   const getInitialAngle = (p) => {
     if (typeof p?.mapPosition?.angle === "number") return p.mapPosition.angle;
@@ -17,7 +18,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   };
   const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panaroma));
   const [showMinimap, setShowMinimap] = useState(true);
-  const [miniScale, setMiniScale] = useState(2.6);
+  const [miniScale, setMiniScale] = useState(2);
   const [transitionPhase, setTransitionPhase] = useState("idle");
   const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";
@@ -151,6 +152,36 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
 
   const handleReady = (instance) => {
     viewerRef.current = instance;
+
+    // Chống nhiễu/răng cưa: cap devicePixelRatio <= 2
+    const threeRenderer = instance.renderer?.renderer;
+    if (threeRenderer) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      threeRenderer.setPixelRatio(dpr);
+      threeRenderer.setSize(
+        threeRenderer.domElement.clientWidth || 1,
+        threeRenderer.domElement.clientHeight || 1,
+        false
+      );
+    }
+
+    // Chống shimmering khi minify texture: bật mipmap + anisotropic filtering
+    instance.addEventListener("panorama-loaded", () => {
+      try {
+        const threeR = instance.renderer?.renderer;
+        const tex = instance.state?.textureData?.texture;
+        if (tex) {
+          tex.generateMipmaps = true;
+          tex.minFilter = THREE.LinearMipmapLinearFilter;
+          tex.anisotropy = threeR ? Math.min(8, threeR.capabilities.getMaxAnisotropy()) : 2;
+          tex.needsUpdate = true;
+          instance.needsUpdate();
+        }
+      } catch {
+        // texture patch lỗi sẽ tự fallback vào cấu hình mặc định của PSV
+      }
+    });
+
     instance.addEventListener("position-updated", (e) => {
       if (e.position) setCurrentYaw((e.position.yaw * (180 / Math.PI)) % 360);
     });
@@ -207,7 +238,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
             </button>
             <button
               className="mm-ctrl-btn"
-              onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
+              onClick={() => setMiniScale((s) => (s === 1 ? 1.5 : s === 1.5 ? 2 : 1))}
               title="Zoom in on minimap"
             >
               <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor">
@@ -230,27 +261,29 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
         </div>
       )}
 
-      {/* Đa option ảnh cho 1 vị trí - hiển thị khi có >1 ảnh */}
+      {/* Đa option ảnh cho 1 vị trí - hiển thị khi có >1 ảnh; ẩn/hiện theo nút footer-collapse-bar */}
       {hasMultipleOptions && (
         <div className="pano-image-options">
-          <div className="pano-image-options-track">
-            {imageOptions.map((opt, idx) => {
-              const isActive = idx === activeOptionIdx;
-              return (
-                <button
-                  key={opt.id}
-                  className={`pano-image-opt ${isActive ? "active" : ""}`}
-                  onClick={() => setActiveOptionIdx(idx)}
-                  title={opt.title}
-                >
-                  <img src={optThumbSrc(opt)} alt={opt.title} className="pano-image-opt-thumb" loading="lazy" />
-                  <div class="pano-image-opt-title">
-                    <span>{opt.title}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          {showImageOptions && (
+            <div className="pano-image-options-track">
+              {imageOptions.map((opt, idx) => {
+                const isActive = idx === activeOptionIdx;
+                return (
+                  <button
+                    key={opt.id}
+                    className={`pano-image-opt ${isActive ? "active" : ""}`}
+                    onClick={() => setActiveOptionIdx(idx)}
+                    title={opt.title}
+                  >
+                    <img src={optThumbSrc(opt)} alt={opt.title} className="pano-image-opt-thumb" loading="lazy" />
+                    <div className="pano-image-opt-title">
+                      <span>{opt.title}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -266,6 +299,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
           onReady={handleReady}
           defaultYaw={`${getInitialAngle(displayPanaroma)}deg`}
           defaultPitch={`0deg`}
+          rendererParameters={{ antialias: true, powerPreference: "high-performance" }}
         />
       </div>
 

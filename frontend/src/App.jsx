@@ -100,6 +100,8 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
   );
   const [activePanaroma, setActivePanaroma] = useState(null);
   const [viewMode, setViewMode] = useState("map");
+  // Collapsed của footer list: 1 nút điều khiển chung list panaroma + pano-image-options
+  const [footerCollapsed, setFooterCollapsed] = useState(false);
   // Đổi project yêu cầu login lại: project chờ xác thực + lỗi khi sai tài khoản
   const [pendingProjectId, setPendingProjectId] = useState(null);
   const [switchError, setSwitchError] = useState("");
@@ -474,6 +476,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
               onReturnToMap={() => setViewMode("map")}
               showLeftToolbar={showSidebar}
               onLogout={onLogout}
+              showImageOptions={!footerCollapsed}
             />
           ) : (
             // Chưa có panaroma -> vẫn hiện ảnh mặt bằng tổng thể của tầng
@@ -496,7 +499,14 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
             onSelectFloor={handleSelectFloor}
           />
         )}
-        <FooterCarousel panaromas={activeFloor?.panaromas || []} activePanaroma={activePanaroma} onSelectPanaroma={handleMapPanaromaClick} floorId={activeFloor?.id} />
+        <FooterCarousel
+          panaromas={activeFloor?.panaromas || []}
+          activePanaroma={activePanaroma}
+          onSelectPanaroma={handleMapPanaromaClick}
+          floorId={activeFloor?.id}
+          collapsed={footerCollapsed}
+          onCollapseChange={setFooterCollapsed}
+        />
       </main>
 
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />

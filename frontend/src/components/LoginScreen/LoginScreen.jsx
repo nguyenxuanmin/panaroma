@@ -89,7 +89,7 @@ export default function LoginScreen({ onLogin, initialId = "", lockId = false, p
             <span className="login-input-icon">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             </span>
-            <input className="login-input" placeholder="Enter your ID" value={id} onChange={(e) => setId(e.target.value)} readOnly={lockId} style={lockId ? { background: "#f3f4f6", color: "#6b7280" } : undefined} />
+            <input className="login-input" placeholder="Enter your ID" onChange={(e) => setId(e.target.value)} />
           </div>
         </div>
 

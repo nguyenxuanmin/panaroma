@@ -7,8 +7,21 @@ const VISIBLE_COUNT = 6;
 // Cache thumb đã crop (canvas)
 const thumbCache = new Map();
 
-export default function FooterCarousel({ panaromas, activePanaroma, onSelectPanaroma, floorId }) {
-  const [collapsed, setCollapsed] = useState(false);
+export default function FooterCarousel({
+  panaromas,
+  activePanaroma,
+  onSelectPanaroma,
+  floorId,
+  // Controlled collapse: dùng chung 1 nút footer-collapse-bar với các khu vực khác (pano-image-options)
+  collapsed: collapsedProp,
+  onCollapseChange,
+}) {
+  const [collapsedState, setCollapsedState] = useState(false);
+  const collapsed = collapsedProp ?? collapsedState;
+  const toggleCollapsed = () => {
+    if (onCollapseChange) onCollapseChange(!collapsed);
+    else setCollapsedState((v) => !v);
+  };
   const [start, setStart] = useState(0);
   const [thumbs, setThumbs] = useState({});
   const [stateKey, setStateKey] = useState({ floorId, activeId: activePanaroma?.id ?? null });
@@ -94,7 +107,7 @@ export default function FooterCarousel({ panaromas, activePanaroma, onSelectPana
           )}
         </footer>
       )}
-      <button className="footer-collapse-bar" onClick={() => setCollapsed((v) => !v)} title={collapsed ? "Open panaroma list" : "Close panaroma list"}>
+      <button className="footer-collapse-bar" onClick={toggleCollapsed} title={collapsed ? "Open panaroma list" : "Close panaroma list"}>
         <span className={`collapse-icon ${collapsed ? "up" : "down"}`}>{collapsed ? "︿" : "﹀"}</span>
       </button>
     </div>

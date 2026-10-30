@@ -5,7 +5,7 @@ import "./FloorMap.css";
 
 export default function FloorMap({ floor, building, activePanaroma, onSelectPanaroma, onLogout }) {
   const [showMinimap, setShowMinimap] = useState(false);
-  const [miniScale, setMiniScale] = useState(2.6);
+  const [miniScale, setMiniScale] = useState(2);
 
   return (
     <div className="floor-map-container">
@@ -18,7 +18,7 @@ export default function FloorMap({ floor, building, activePanaroma, onSelectPana
           </button>
           <button
             className="mm-ctrl-btn"
-            onClick={() => setMiniScale((s) => (s === 1 ? 1.75 : s === 1.75 ? 2.6 : 1))}
+            onClick={() => setMiniScale((s) => (s === 1 ? 1.5 : s === 1.5 ? 2 : 1))}
             title="Zoom in on minimap"
           >
             <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor">
