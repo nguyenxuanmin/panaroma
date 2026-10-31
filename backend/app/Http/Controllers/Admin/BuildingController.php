@@ -110,6 +110,16 @@ class BuildingController extends Controller
             if (!$building) {
                 return response()->json(['success'=>false,'message'=>'Building not found.'],404);
             }
+
+            $checkType = Building::with('panaromas')->where('id',$request->id)->where('type',"!=",$type)->first();
+            
+            if(isset($checkType->panaromas)){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Panaromas already exist within the Panaroma Category, the type cannot be changed.'
+                ]);
+            }
+            
             if ($type === 'group') {
                 if (!empty($building->plan_image)) {
                     $old = public_path($building->plan_image);

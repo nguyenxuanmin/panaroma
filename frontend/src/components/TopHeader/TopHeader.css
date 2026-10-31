@@ -51,14 +51,14 @@
 .th-right {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4.6px;
   background: #5a5a5a;
   pointer-events: auto;
   margin-left: auto;
 }
 
 .th-icon-btn {
-  width: 56px;
+  width: 60px;
   height: 50px;
   background: #5a5a5a;
   color: #fff;
@@ -78,6 +78,5 @@
 
 .th-menu-btn {
   background: #5a5a5a;
-  margin-left: 2px;
-  width: 80px;
+  width: 60px;
 }

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
+import { EquirectangularAdapter } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import MapMinimap from "../MapMinimap/MapMinimap";
@@ -9,6 +10,29 @@ import "./PanaromaViewer.css";
 
 // Cache crop canvas cho option chưa có thumbUrl từ server
 const optThumbCache = new Map();
+
+// Số phân đoạn mặt cầu của PSV (mặc định 64). Phải là luỹ thừa của 2: 128 hoặc 256.
+// Đặt NGOÀI component để tham chiếu không đổi giữa các lần render.
+const EQUI_ADAPTER = [EquirectangularAdapter, { resolution: 256 }];
+
+// Bật mipmap + anisotropic filtering cho texture hiện tại của viewer
+const applyTexQuality = (instance) => {
+  try {
+    const r = instance.renderer?.renderer;
+    const tex =
+      instance.state?.textureData?.texture ??
+      instance.renderer?.mesh?.material?.map;
+    if (!tex || !r) return;
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.anisotropy = r.capabilities.getMaxAnisotropy();
+    tex.needsUpdate = true;
+    instance.needsUpdate();
+  } catch {
+    // texture patch lỗi sẽ tự fallback vào cấu hình mặc định của PSV
+  }
+};
 
 export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap, onLogout, showImageOptions = true }) {
   const viewerRef = useRef(null);
@@ -44,7 +68,10 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
     return [main, ...extraOpts];
   }, [panaroma]);
 
-  const hasMultipleOptions = imageOptions.length > 1;
+  // Chỉ các option con (không kèm ảnh gốc) đã lọc ra
+  const extraOptions = useMemo(() => imageOptions.filter((opt) => !opt.isMain), [imageOptions]);
+
+  const hasMultipleOptions = extraOptions.length > 0;
   const [activeOptionIdx, setActiveOptionIdx] = useState(0);
 
   // Reset option khi đổi vị trí panaroma
@@ -165,22 +192,11 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
       );
     }
 
-    // Chống shimmering khi minify texture: bật mipmap + anisotropic filtering
-    instance.addEventListener("panorama-loaded", () => {
-      try {
-        const threeR = instance.renderer?.renderer;
-        const tex = instance.state?.textureData?.texture;
-        if (tex) {
-          tex.generateMipmaps = true;
-          tex.minFilter = THREE.LinearMipmapLinearFilter;
-          tex.anisotropy = threeR ? Math.min(8, threeR.capabilities.getMaxAnisotropy()) : 2;
-          tex.needsUpdate = true;
-          instance.needsUpdate();
-        }
-      } catch {
-        // texture patch lỗi sẽ tự fallback vào cấu hình mặc định của PSV
-      }
-    });
+    // Chống shimmering khi minify texture: bật mipmap + anisotropic filtering.
+    // Áp dụng NGAY cho ảnh vừa load (sự kiện "ready" bắn sau "panorama-loaded" của ảnh đầu tiên,
+    // nên listener đăng ký ở đây sẽ bỏ lỡ ảnh đó), và giữ listener cho các ảnh load sau.
+    applyTexQuality(instance);
+    instance.addEventListener("panorama-loaded", () => applyTexQuality(instance));
 
     instance.addEventListener("position-updated", (e) => {
       if (e.position) setCurrentYaw((e.position.yaw * (180 / Math.PI)) % 360);
@@ -266,7 +282,8 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
         <div className="pano-image-options">
           {showImageOptions && (
             <div className="pano-image-options-track">
-              {imageOptions.map((opt, idx) => {
+              {extraOptions.map((opt) => {
+                const idx = imageOptions.findIndex((o) => o.id === opt.id);
                 const isActive = idx === activeOptionIdx;
                 return (
                   <button
@@ -291,6 +308,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
         <ReactPhotoSphereViewer
           key={`${displayPanaroma?.id}__opt_${activeOptionIdx}__${preloadedUrl}`}
           src={preloadedUrl || currentUrl || defaultImage}
+          adapter={EQUI_ADAPTER}
           height={"100%"}
           width={"100%"}
           container={""}

@@ -161,6 +161,9 @@ function mapProjectToFrontend($project) {
         'name' => $project->name ?? ('Project ' . $project->id),
         'slug' => $project->slug,
         'map' => $project->map,
+        // Link ngoài theo từng project (link 1 / link 2 ở TopHeader)
+        'link1' => $project->link1,
+        'link2' => $project->link2,
         'buildings' => $buildings,
         'videos' => $videos->values(),
     ];

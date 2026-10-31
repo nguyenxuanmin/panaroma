@@ -33,7 +33,7 @@
                                 @endif
                                 <a href="{{route('list_project')}}" class="btn btn-dark">Back</a>
                             </div>
-                            <div class="col-12 col-md-5">
+                            <div class="col-12 col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Project Name</label>
                                     <input type="text" class="form-control" name="name" value="@if (isset($project)){{$project->name}}@endif">
@@ -58,8 +58,12 @@
                                     <input type="hidden" class="form-control" name="confirm" value="">
                                 @endif
                             </div>
-                            <div class="col-12 col-md-7">
-                                <div class="mb-3 position-relative">
+                            <div class="col-12 col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Link 1</label>
+                                    <input type="text" class="form-control" name="link1" value="@if (isset($project)){{$project->link1}}@endif">
+                                </div>
+                                <div class="mb-3 position-relative d-none">
                                     <label for="mapLinkInput" class="form-label">Link Google Maps</label>
                                     <input type="text" class="form-control" id="mapLinkInput" name="map" value="@if (isset($project)){{$project->map}}@endif" placeholder="Paste the Google Maps link (Share -> Embed a map)">
                                     <small class="form-text text-muted">Tip: Go to Google Maps -> Share -> Embed a map -> Copy HTML, then paste it here to preview.</small>
@@ -70,6 +74,12 @@
                                         </div>
                                         <small id="mapPreviewHint" class="text-warning d-none">This link is not in the correct embed format. Please use a link in the format <code>https://www.google.com/maps/embed?pb=...</code> to display correctly.</small>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Link 2</label>
+                                    <input type="text" class="form-control" name="link2" value="@if (isset($project)){{$project->link2}}@endif">
                                 </div>
                             </div>
                         </div>

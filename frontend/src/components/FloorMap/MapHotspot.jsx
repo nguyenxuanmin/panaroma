@@ -1,10 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { frontViewThumbFromImage } from "../../utils/thumbCrop";
+
+// Cache thumb đã crop (canvas) — khuôn giống card-thumb-img của FooterCarousel
+const previewCache = new Map();
 
 export default function MapHotspot({ panaroma, isActive, onClick, onHover }) {
   const { mapPosition, name, label } = panaroma;
   const displayLabel = label || name;
   const [hovered, setHovered] = useState(false);
-  const previewSrc = panaroma.thumbnail || panaroma.url || null;
+
+  // Crop mặt chính diện từ ảnh 360 làm preview (giống card-thumb-img)
+  const [cropped, setCropped] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    const generate = async () => {
+      const raw = panaroma.thumbnail || panaroma.url || null;
+      const src = panaroma.url || raw;
+      if (!raw) return;
+      const yaw = panaroma.defaultView?.yaw ?? 0;
+      const key = `${panaroma.id}|${src}|${yaw}`;
+      const cached = previewCache.get(key);
+      if (previewCache.has(key)) {
+        if (cached) setCropped(cached);
+        return;
+      }
+      const result = await frontViewThumbFromImage(src, yaw);
+      previewCache.set(key, result || null);
+      if (!cancelled && result) setCropped(result);
+    };
+    generate();
+    return () => {
+      cancelled = true;
+    };
+  }, [panaroma?.id, panaroma?.thumbnail, panaroma?.url, panaroma?.defaultView?.yaw]);
+
+  // Chưa crop xong thì tạm dùng ảnh gốc
+  const previewSrc = cropped || panaroma.thumbnail || panaroma.url || null;
 
   const handleEnter = () => {
     setHovered(true);

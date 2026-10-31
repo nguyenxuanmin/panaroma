@@ -97,6 +97,8 @@ class ProjectController extends Controller
             $password = $request->password;
             $confirm = $request->confirm;
             $map = $request->map;
+            $link1 = $request->link1;
+            $link2 = $request->link2;
 
             if (empty($name)) {
                 return response()->json([
@@ -172,6 +174,8 @@ class ProjectController extends Controller
             $project->slug = $slug;
             $project->user_name = $username;
             $project->map = $map;
+            $project->link1 = $link1;
+            $project->link2 = $link2;
         }
 
         $project->save();

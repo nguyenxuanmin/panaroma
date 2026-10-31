@@ -62,7 +62,7 @@
                                         <label class="form-label">Numerical Order</label>
                                         <input type="number" class="form-control" name="order" id="order" value="@if (isset($panaroma) && !empty($panaroma->order)){{$panaroma->order}}@else{{1}}@endif" min="1" step="1">
                                     </div>
-                                    <div class="col-12 col-md-6 mb-3">
+                                    <div class="col-12 col-md-6 mb-3 d-none">
                                         <label class="form-label">Link Box</label>
                                         <input type="text" class="form-control" name="link" value="@if (isset($panaroma)){{$panaroma->link}}@endif">
                                     </div>

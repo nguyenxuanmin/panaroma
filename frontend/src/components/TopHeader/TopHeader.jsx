@@ -4,10 +4,8 @@ import "./TopHeader.css";
 export default function TopHeader({
   activeBuilding,
   activeFloor,
-  activePanaroma,
   viewMode,
   onToggleViewMode,
-  onOpenGoogleMap,
   onOpenVideo,
   onToggleFullscreen,
   onToggleSidebar,
@@ -22,15 +20,19 @@ export default function TopHeader({
     onToggleViewMode(viewMode === "map" ? "panaroma" : "map");
   };
 
-  // If activePanaroma has a external link => open new tab, otherwise disabled
-  const panaromaLink = activePanaroma?.link || null;
-  const handleLinkBoxClick = () => {
-    if (!panaromaLink) return;
-    const url = /^https?:\/\//i.test(panaromaLink) || panaromaLink.startsWith("/")
-      ? panaromaLink
-      : `https://${panaromaLink}`;
+  // Nút Link Box: mở link 1; nút Location: mở link 2 — đều lấy từ project đang chọn
+  const project = projects.find((p) => p.id === selectedProjectId) || null;
+  const panaromaLink = project?.link1 || null;
+  const mapLink = project?.link2 || null;
+  const openExternalLink = (link) => {
+    if (!link) return;
+    const url = /^https?:\/\//i.test(link) || link.startsWith("/")
+      ? link
+      : `https://${link}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
+  const handleLinkBoxClick = () => openExternalLink(panaromaLink);
+  const handleLocationClick = () => openExternalLink(mapLink);
 
   return (
     <header className="top-header-image">
@@ -64,7 +66,7 @@ export default function TopHeader({
             <button
               className="th-icon-btn"
               onClick={handleLinkBoxClick}
-              title={panaromaLink ? `Open link: ${panaromaLink}` : "Link Box"}
+              title={panaromaLink ? `Open link: ${panaromaLink}` : "Link 1"}
               disabled={!panaromaLink}
             >
               <svg viewBox="0 0 24 24" width="30" height="30"
@@ -75,8 +77,19 @@ export default function TopHeader({
                   <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
             </button>
-            <button className="th-icon-btn" onClick={onOpenGoogleMap} title="Location">
-              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <button
+              className="th-icon-btn"
+              onClick={handleLocationClick}
+              title={mapLink ? `Open link: ${mapLink}` : "Link 2"}
+              disabled={!mapLink}
+            >
+              <svg viewBox="0 0 24 24" width="30" height="30"
+                  fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
             </button>
             <button className="th-icon-btn" onClick={onToggleFullscreen} title="Fullscreen">
               <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
