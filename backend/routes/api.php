@@ -115,7 +115,11 @@ function mapPanaromaForApi($panaroma) {
 function mapBuildingForApi($building, $videos) {
     $type = $building->type ?? 'single';
     if ($type === 'group') {
-        $floors = $building->floors()->with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('order')->orderBy('name')->get();
+        $floors = $building->floors()->with([
+            'panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+            'panaromas.hotspots',
+            'panaromas.panaromaImages',
+        ])->orderBy('order')->orderBy('name')->get();
         return [
             'id' => (string) $building->id,
             'name' => $building->name ?? ('Building ' . $building->id),
@@ -140,7 +144,11 @@ function mapBuildingForApi($building, $videos) {
     // fallback: nếu single nhưng chưa có panaroma trực tiếp, lấy từ floors đầu (compat data cũ)
     if ($panaromas->isEmpty()) {
         $firstFloor = $building->floors()->with('panaromas.hotspots')->first();
-        if ($firstFloor) $panaromas = $firstFloor->panaromas;
+        if ($firstFloor) {
+            $panaromas = $firstFloor->panaromas
+                ->sortBy([['order', 'asc'], ['name', 'asc']])
+                ->values();
+        }
     }
     return [
         'id' => (string) $building->id,
@@ -155,7 +163,14 @@ function mapBuildingForApi($building, $videos) {
 
 function mapProjectToFrontend($project) {
     // Load buildings with nested relations
-    $buildingsRel = $project->buildings()->with(['floors.panaromas.hotspots','floors.panaromas.panaromaImages', 'panaromas.hotspots','panaromas.panaromaImages'])->orderBy('order')->orderBy('name')->get();
+    $buildingsRel = $project->buildings()->with([
+        'floors.panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'floors.panaromas.hotspots',
+        'floors.panaromas.panaromaImages',
+        'panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'panaromas.hotspots',
+        'panaromas.panaromaImages',
+    ])->orderBy('order')->orderBy('name')->get();
     $videos = Video::where('project_id', $project->id)->orderBy('title')->get()->map(fn($v) => mapVideoForApi($v))->values();
     $buildings = $buildingsRel->map(fn($b) => mapBuildingForApi($b, $videos))->values();
 
@@ -288,7 +303,16 @@ Route::post('/auth/logout', function () {
 
 // Projects - main endpoint for frontend useProjects hook
 Route::get('/projects', function () {
-    $projects = Project::with(['buildings.floors.panaromas.hotspots','buildings.floors.panaromas.panaromaImages','buildings.panaromas.hotspots','buildings.panaromas.panaromaImages'])->orderBy('id')->get();
+    $projects = Project::with([
+        'buildings' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'buildings.floors' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'buildings.floors.panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'buildings.floors.panaromas.hotspots',
+        'buildings.floors.panaromas.panaromaImages',
+        'buildings.panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'buildings.panaromas.hotspots',
+        'buildings.panaromas.panaromaImages',
+    ])->orderBy('id')->get();
 
     if ($projects->isEmpty()) {
         return response()->json(['data' => []]);
@@ -335,7 +359,11 @@ Route::get('/projects/{slug}/videos', function (string $slug) {
 
 // Keep original floors endpoint for backward compat + better shape
 Route::get('/floors', function () {
-    $floors = Floor::with(['panaromas.hotspots','panaromas.panaromaImages'])->orderBy('id')->get();
+    $floors = Floor::with([
+        'panaromas' => fn($q) => $q->orderBy('order')->orderBy('name'),
+        'panaromas.hotspots',
+        'panaromas.panaromaImages',
+    ])->orderBy('id')->get();
 
     $data = $floors->map(function ($floor) {
         return [
