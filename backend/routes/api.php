@@ -76,7 +76,10 @@ function mapPanaromaForApi($panaroma) {
             'thumbnail' => normalizeStorageUrl($img->thumbnail),
             'url' => normalizeStorageUrl($img->thumbnail),
         ];
-    })->values();
+    })
+    // Sắp option ảnh theo tên (title = tên file upload) - A→Z, không phân biết hoa/thường
+    ->sortBy(fn ($img) => mb_strtolower($img['title']))
+    ->values();
     return [
         'id' => (string) $panaroma->id,
         'name' => $panaroma->name,

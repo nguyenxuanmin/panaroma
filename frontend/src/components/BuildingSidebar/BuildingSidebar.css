@@ -46,6 +46,22 @@
   color: #000;
 }
 
+/* Disabled: building/floor không có panaroma */
+.bs-btn:disabled,
+.bs-btn:disabled:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: transparent;
+  color: #fff;
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.bs-btn:disabled.active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: #000;
+  color: #000;
+  opacity: 0.6;
+}
+
 /* group */
 .bs-group {
   display: flex;

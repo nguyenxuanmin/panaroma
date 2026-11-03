@@ -34,7 +34,7 @@ class PanaromaController extends Controller
             ->select('panaromas.*', 'buildings.name as buildings_name', 'floors.name as floors_name')
             ->with(['building', 'floor.building'])
             ->orderByRaw($allowedSorts[$sortKey] . ' ' . $dir . ', panaromas.id asc')
-            ->paginate(20);
+            ->paginate(10);
         $panaromas->appends(request()->query());
         return view('admin.panaroma.list',[
             'panaromas' => $panaromas

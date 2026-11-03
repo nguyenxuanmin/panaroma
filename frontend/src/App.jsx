@@ -85,6 +85,21 @@ function resolveInitialProjectId(projects, urlSlug, user) {
   return projects[0].id;
 }
 
+/* ===== Default building/floor: luôn ưu tiên building có panaroma =====
+ - Building đầu tiên mà không có panaroma -> bỏ qua, chọn building có panaroma kế tiếp.
+ - Không building nào có panaroma -> fallback về building đầu tiên. */
+function buildingHasPanaroma(b) {
+  if (!b) return false;
+  if (b.type === "group") return (b.floors || []).some((f) => (f.panaromas || []).length > 0);
+  return (b.panaromas || []).length > 0 || (b.floors || []).some((f) => (f.panaromas || []).length > 0);
+}
+function firstBuildingWithPanaroma(bs) {
+  return bs.find(buildingHasPanaroma) || bs[0] || null;
+}
+function firstFloorWithPanaroma(b) {
+  return (b?.floors || []).find((f) => (f.panaromas || []).length > 0) || null;
+}
+
 function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) {
   const [selectedProjectId, setSelectedProjectId] = useState(() =>
     resolveInitialProjectId(projects, urlSlug ?? getProjectSlugFromPath(), user)
@@ -94,10 +109,13 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
   const buildings = selectedProject.buildings || [];
   const hasBuildings = buildings.length > 0;
 
-  const [activeBuilding, setActiveBuilding] = useState(hasBuildings ? buildings[0] : null);
-  const [activeFloorId, setActiveFloorId] = useState(
-    hasBuildings && buildings[0].type === "group" ? buildings[0].floors?.[0]?.id ?? null : null
-  );
+  const [activeBuilding, setActiveBuilding] = useState(hasBuildings ? firstBuildingWithPanaroma(buildings) : null);
+  const [activeFloorId, setActiveFloorId] = useState(() => {
+    if (!hasBuildings) return null;
+    const b = firstBuildingWithPanaroma(buildings);
+    if (!b) return null;
+    return b.type === "group" ? firstFloorWithPanaroma(b)?.id ?? null : null;
+  });
   const [activePanaroma, setActivePanaroma] = useState(null);
   const [viewMode, setViewMode] = useState("map");
   // Collapsed của footer list: 1 nút điều khiển chung list panaroma + pano-image-options
@@ -201,7 +219,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
     }
   }, [selectedProjectId, projects]);
 
-  // Sync khi đổi project: reset building/floor - building tách rời nên có thể rỗng
+  // Sync khi đổi project: reset building/floor - ưu tiên building có panaroma (building tách rời nên có thể rỗng)
   useEffect(() => {
     const bs = selectedProject.buildings || [];
     if (!bs.length) {
@@ -209,10 +227,10 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
       setActiveFloorId(null);
       return;
     }
-    const nb = bs.find((b) => b.id === activeBuilding?.id) || bs[0];
     if (!bs.find((b) => b.id === activeBuilding?.id)) {
+      const nb = bs.find((b) => b.id === activeBuilding?.id) || firstBuildingWithPanaroma(bs);
       setActiveBuilding(nb);
-      const fid = nb.type === "group" ? nb.floors?.[0]?.id ?? null : null;
+      const fid = nb && nb.type === "group" ? firstFloorWithPanaroma(nb)?.id ?? null : null;
       setActiveFloorId(fid);
     }
   }, [selectedProjectId]); // eslint-disable-line react-hooks/exhaustive-deps
