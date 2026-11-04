@@ -3,7 +3,7 @@ import "./MapMinimap.css";
 
 export default function MapMinimap({ floor, activePanaroma, onSelectPanaroma, scale = 1, currentYaw }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const baseW = isMobile ? 140 : 190;
+  const baseW = isMobile ? 140 : 380;
   // Khung minimap theo tỉ lệ ảnh 16:9 (height = width * 9/16)
   const baseH = Math.round((baseW * 9) / 16);
   const coneSize = Math.round(56 * Math.min(scale, 2.2));

@@ -19,6 +19,7 @@ class BuildingController extends Controller
         $allowedSorts = [
             'title'   => 'buildings.name',
             'type'    => 'buildings.type',
+            'status'  => 'buildings.status',
             'order' => 'buildings.order',
             'project' => 'projects_name',
         ];
@@ -70,6 +71,11 @@ class BuildingController extends Controller
         $project = $request->project;
         $order = $request->order;
         $action = $request->action;
+        if (isset($request->status)) {
+            $status = 1;
+        } else {
+            $status = 0;
+        }
 
         if (empty($title)) {
             return response()->json([
@@ -154,6 +160,7 @@ class BuildingController extends Controller
         $building->type = $type;
         $building->plan_image = $imageUrl;
         $building->order = $order;
+        $building->status = $status;
         $building->save();
 
         return response()->json([

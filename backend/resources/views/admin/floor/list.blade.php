@@ -29,16 +29,17 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
                         <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
-                        <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
+                        <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
+                        <th scope="col" width="100px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'status', 'label' => 'Status'])</th>
                         <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'category', 'label' => 'Panaroma Category'])</th>
                         <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'project', 'label' => 'Project'])</th>
-                        <th scope="col" width="200px" class="text-center">Action</th>
+                        <th scope="col" width="150px" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (count($floors) == 0)
                         <tr>
-                            <td valign="middle" class="text-center" colspan="6">No data available</td>
+                            <td valign="middle" class="text-center" colspan="8">No data available</td>
                         </tr>
                     @endif
                     @foreach ($floors as $key => $floor)
@@ -53,6 +54,11 @@
                             </td>
                             <td valign="middle">{{$floor->name}}</td>
                             <td valign="middle" class="text-center">{{$floor->order}}</td>
+                            <td valign="middle" class="text-center">
+                                <span class="badge {{ $floor->status == 1 ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $floor->status == 1 ? 'Show' : 'Hide' }}
+                                </span>
+                            </td>
                             <td valign="middle" class="text-center">{{$floor->building->name ?? ''}}</td>
                             <td valign="middle" class="text-center">{{$floor->building->project->name ?? ''}}</td>
                             <td valign="middle" class="text-center">

@@ -53,6 +53,10 @@
                                     <label class="form-label">Numerical Order</label>
                                     <input type="number" class="form-control" name="order" id="order" value="@if (isset($floor) && !empty($floor->order)){{$floor->order}}@else{{1}}@endif" min="1" step="1">
                                 </div>
+                                <div class="mb-3 form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch"  name='status' id="status"  @if ((isset($floor) && $floor->status == 1) or !isset($floor)) checked @endif>
+                                    <label class="form-check-label" for="status">Hide/Show</label>
+                                </div>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Image</label>

@@ -5,7 +5,7 @@ import "./FloorMap.css";
 
 export default function FloorMap({ floor, building, activePanaroma, onSelectPanaroma, onLogout }) {
   const [showMinimap, setShowMinimap] = useState(false);
-  const [miniScale, setMiniScale] = useState(2);
+  const [miniScale, setMiniScale] = useState(1);
 
   return (
     <div className="floor-map-container">

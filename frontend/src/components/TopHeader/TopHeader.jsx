@@ -73,8 +73,11 @@ export default function TopHeader({
                   fill="none" stroke="currentColor"
                   strokeWidth="2" strokeLinecap="round"
                   strokeLinejoin="round">
-                  <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                  <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V9h6v12"/>
+                    <path d="M11 21V3h8v18"/>
+                    <path d="M8 12h0M8 15h0M8 18h0"/>
+                    <path d="M14 7h2M14 11h2M14 15h2"/>
               </svg>
             </button>
             <button
@@ -87,8 +90,7 @@ export default function TopHeader({
                   fill="none" stroke="currentColor"
                   strokeWidth="2" strokeLinecap="round"
                   strokeLinejoin="round">
-                  <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                  <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
               </svg>
             </button>
             <button className="th-icon-btn" onClick={onToggleFullscreen} title="Fullscreen">

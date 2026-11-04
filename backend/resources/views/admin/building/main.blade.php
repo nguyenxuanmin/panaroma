@@ -67,6 +67,10 @@
                                     <label class="form-label">Numerical Order</label>
                                     <input type="number" class="form-control" name="order" id="order" value="@if (isset($building) && !empty($building->order)){{$building->order}}@else{{1}}@endif" min="1" step="1">
                                 </div>
+                                <div class="mb-3 form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch"  name='status' id="status"  @if ((isset($building) && $building->status == 1) or !isset($building)) checked @endif>
+                                    <label class="form-check-label" for="status">Hide/Show</label>
+                                </div>
                                 <div class="mb-3" id="buildingImageWrapper">
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control mb-3" name="image" id="imageUpload" accept="image/*">

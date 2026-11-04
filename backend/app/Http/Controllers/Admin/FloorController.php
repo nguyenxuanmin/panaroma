@@ -19,7 +19,8 @@ class FloorController extends Controller
         $allowedSorts = [
             'title'    => 'floors.name',
             'category' => 'buildings_name',
-            'floor' => 'floors.order',
+            'order' => 'floors.order',
+            'status' => 'floors.status',
             'project'  => 'projects_name',
         ];
         $dir = strtolower(request()->query('dir')) === 'desc' ? 'desc' : 'asc';
@@ -69,6 +70,11 @@ class FloorController extends Controller
         $imageName = $image ? $image->getClientOriginalName() : '';
         $order = $request->order;
         $action = $request->action;
+        if (isset($request->status)) {
+            $status = 1;
+        } else {
+            $status = 0;
+        }
 
         if (empty($title)) {
             return response()->json([
@@ -135,6 +141,7 @@ class FloorController extends Controller
         $floor->name = $title;
         $floor->plan_image = $imageUrl;
         $floor->order = $order;
+        $floor->status = $status;
         $floor->save();
 
         return response()->json([

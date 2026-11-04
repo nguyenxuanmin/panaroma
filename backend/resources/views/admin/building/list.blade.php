@@ -29,16 +29,17 @@
                         <th scope="col" width="80px" class="text-center">No</th>
                         <th scope="col" width="200px"></th>
                         <th scope="col">@include('admin.layouts._sort-link', ['key' => 'title', 'label' => 'Title'])</th>
-                        <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
-                        <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'type', 'label' => 'Type'])</th>
+                        <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'order', 'label' => 'Numerical Order'])</th>
+                        <th scope="col" width="100px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'status', 'label' => 'Status'])</th>
+                        <th scope="col" width="150px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'type', 'label' => 'Type'])</th>
                         <th scope="col" width="200px" class="text-center">@include('admin.layouts._sort-link', ['key' => 'project', 'label' => 'Project'])</th>
-                        <th scope="col" width="200px" class="text-center">Action</th>
+                        <th scope="col" width="150px" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (count($buildings) == 0)
                         <tr>
-                            <td valign="middle" class="text-center" colspan="6">No data available</td>
+                            <td valign="middle" class="text-center" colspan="8">No data available</td>
                         </tr>
                     @endif
                     @foreach ($buildings as $key => $building)
@@ -53,6 +54,11 @@
                             </td>
                             <td valign="middle">{{$building->name}}</td>
                             <td valign="middle" class="text-center">{{$building->order}}</td>
+                            <td valign="middle" class="text-center">
+                                <span class="badge {{ $building->status == 1 ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $building->status == 1 ? 'Show' : 'Hide' }}
+                                </span>
+                            </td>
                             <td valign="middle" class="text-center">{{$building->type}}</td>
                             <td valign="middle" class="text-center">{{$building->project->name}}</td>
                             <td valign="middle" class="text-center">

@@ -38,7 +38,7 @@
                 <tbody>
                     @if (count($panaromas) == 0)
                         <tr>
-                            <td valign="middle" class="text-center" colspan="6">No data available</td>
+                            <td valign="middle" class="text-center" colspan="7">No data available</td>
                         </tr>
                     @endif
                     @foreach ($panaromas as $key => $panaroma)

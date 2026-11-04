@@ -120,18 +120,21 @@ function mapBuildingForApi($building, $videos) {
             'panaromas.hotspots',
             'panaromas.panaromaImages',
         ])->orderBy('order')->orderBy('name')->get();
-        return [
-            'id' => (string) $building->id,
-            'name' => $building->name ?? ('Building ' . $building->id),
-            'type' => 'group',
-            'planImage' => null,
-            'floors' => $floors->map(function ($floor) use ($videos) {
-                return [
-                    'id' => (string) $floor->id,
-                    'name' => $floor->name,
-                    'shortLabel' => $floor->short_label,
-                    'description' => $floor->description,
-                    'planImage' => normalizeStorageUrl($floor->plan_image),
+            return [
+                'id' => (string) $building->id,
+                'name' => $building->name ?? ('Building ' . $building->id),
+                'type' => 'group',
+                'status' => (int) ($building->status ?? 1),
+                'planImage' => null,
+                'floors' => $floors->map(function ($floor) use ($videos) {
+                    return [
+                        'id' => (string) $floor->id,
+                        'name' => $floor->name,
+                        'shortLabel' => $floor->short_label,
+                        'description' => $floor->description,
+                        // Frontend dùng để enable/disable nút tầng (0 = disable)
+                        'status' => (int) ($floor->status ?? 1),
+                        'planImage' => normalizeStorageUrl($floor->plan_image),
                     'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
                     'videos' => $videos->values(),
                     'panaromas' => $floor->panaromas->map(fn($p) => mapPanaromaForApi($p))->values(),
@@ -154,6 +157,8 @@ function mapBuildingForApi($building, $videos) {
         'id' => (string) $building->id,
         'name' => $building->name ?? ('Building ' . $building->id),
         'type' => 'single',
+        // Frontend dùng để enable/disable nút building (0 = disable)
+        'status' => (int) ($building->status ?? 1),
         'planImage' => normalizeStorageUrl($building->plan_image),
         'defaultPanaromaId' => $panaromas->first()?->id ? (string) $panaromas->first()->id : null,
         'videos' => $videos->values(),
@@ -371,6 +376,7 @@ Route::get('/floors', function () {
             'name' => $floor->name,
             'shortLabel' => $floor->short_label,
             'description' => $floor->description,
+            'status' => (int) ($floor->status ?? 1),
             'planImage' => normalizeStorageUrl($floor->plan_image),
             'defaultPanaromaId' => $floor->panaromas->first()?->id ? (string) $floor->panaromas->first()->id : null,
             'videos' => [],

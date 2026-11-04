@@ -15,15 +15,15 @@ export default function BuildingSidebar({ buildings, activeBuilding, activeFloor
         // single building button - building tách rời nên activeBuilding có thể null
         if (b.type === "single") {
           const isActive = activeBuilding?.id === b.id;
-          // Building không có panaroma -> disabled
-          const hasPanaroma = (b.panaromas || []).length > 0;
+          // Building bị ẩn (status = 0) -> disabled
+          const enabled = b.status !== 0;
           return (
             <button
               key={b.id}
               className={`bs-btn ${isActive ? "active" : ""}`}
-              onClick={() => hasPanaroma && onSelectBuilding(b)}
-              disabled={!hasPanaroma}
-              title={hasPanaroma ? b.name : `${b.name} - no panaroma`}
+              onClick={() => enabled && onSelectBuilding(b)}
+              disabled={!enabled}
+              title={enabled ? b.name : `${b.name} - hidden`}
             >
               {b.name}
             </button>
@@ -37,8 +37,8 @@ export default function BuildingSidebar({ buildings, activeBuilding, activeFloor
             <div className="bs-group-list">
               {b.floors.map((f) => {
                 const isActive = isGroupActive && activeFloor?.id === f.id;
-                // Floor không có panaroma -> disabled (tương đương building empty của single)
-                const hasPanaroma = (f.panaromas || []).length > 0;
+                // Floor bị ẩn (status = 0) -> disabled
+                const enabled = f.status !== 0;
                 return (
                   <button
                     key={f.id}
@@ -47,8 +47,8 @@ export default function BuildingSidebar({ buildings, activeBuilding, activeFloor
                       if (!isGroupActive) onSelectBuilding(b);
                       onSelectFloor(f);
                     }}
-                    disabled={!hasPanaroma}
-                    title={hasPanaroma ? f.name : `${f.name} - no panaroma`}
+                    disabled={!enabled}
+                    title={enabled ? f.name : `${f.name} - hidden`}
                   >
                     {f.name}
                   </button>

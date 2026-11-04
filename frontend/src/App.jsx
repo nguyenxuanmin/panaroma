@@ -93,11 +93,24 @@ function buildingHasPanaroma(b) {
   if (b.type === "group") return (b.floors || []).some((f) => (f.panaromas || []).length > 0);
   return (b.panaromas || []).length > 0 || (b.floors || []).some((f) => (f.panaromas || []).length > 0);
 }
+// Building/floor có status = 0 -> ẩn (data cũ không có status => coi như hiển thị)
+function isBuildingHidden(b) {
+  return b?.status === 0;
+}
+function isFloorHidden(f) {
+  return f?.status === 0;
+}
 function firstBuildingWithPanaroma(bs) {
-  return bs.find(buildingHasPanaroma) || bs[0] || null;
+  return bs.find((b) => !isBuildingHidden(b) && buildingHasPanaroma(b))
+    || bs.find((b) => !isBuildingHidden(b))
+    || bs[0]
+    || null;
 }
 function firstFloorWithPanaroma(b) {
-  return (b?.floors || []).find((f) => (f.panaromas || []).length > 0) || null;
+  const fs = b?.floors || [];
+  return fs.find((f) => !isFloorHidden(f) && (f.panaromas || []).length > 0)
+    || fs.find((f) => !isFloorHidden(f))
+    || null;
 }
 
 function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) {
@@ -146,11 +159,11 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
         setViewMode("map");
         return;
       }
-      const nb = bs[0];
+      const nb = firstBuildingWithPanaroma(bs);
       setActiveBuilding(nb);
-      const fid = nb.type === "group" ? nb.floors?.[0]?.id ?? null : null;
+      const fid = nb.type === "group" ? firstFloorWithPanaroma(nb)?.id ?? null : null;
       setActiveFloorId(fid);
-      const nf = fid ? nb.floors[0] : nb;
+      const nf = fid ? nb.floors.find((f) => f.id === fid) : nb;
       setActivePanaroma(nf?.panaromas?.[0] ?? null);
       setViewMode("map");
     },
@@ -235,6 +248,17 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
     }
   }, [selectedProjectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Floor đang active bị ẩn (status = 0, admin đổi lúc đang xem) -> chuyển sang tầng hiển thị kế tiếp
+  useEffect(() => {
+    if (!activeBuilding || activeBuilding.type !== "group") return;
+    const fs = activeBuilding.floors || [];
+    const cur = fs.find((f) => f.id === activeFloorId);
+    if (cur && isFloorHidden(cur)) {
+      const nf = firstFloorWithPanaroma(activeBuilding) || fs.find((f) => !isFloorHidden(f));
+      if (nf && nf.id !== activeFloorId) setActiveFloorId(nf.id);
+    }
+  }, [activeBuilding, activeFloorId]);
+
   const getActiveFloor = (b, fid) => {
     if (!b) return null;
     return getActiveFloorHelper(b, fid);
@@ -260,13 +284,18 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
 
   const handleSelectBuilding = (building) => {
     if (!building) return;
+    // Building bị ẩn (status = 0) thì không chọn được
+    if (isBuildingHidden(building)) return;
     setActiveBuilding(building);
+    // Đang xem panorama mà đổi building -> quay về chế độ xem map (Building/Floor)
+    setViewMode("map");
     if (building.type === "single") {
       setActiveFloorId(null);
       if (building.panaromas?.length) setActivePanaroma(building.panaromas[0]);
       else setActivePanaroma(null);
     } else {
-      const first = building.floors?.[0];
+      // Ưu tiên tầng không bị ẩn (status != 0)
+      const first = firstFloorWithPanaroma(building) || building.floors?.[0];
       if (first) {
         setActiveFloorId(first.id);
         if (first.panaromas?.length) setActivePanaroma(first.panaromas[0]);
@@ -279,7 +308,10 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
   };
 
   const handleSelectFloor = (floor) => {
+    if (isFloorHidden(floor)) return;
     setActiveFloorId(floor.id);
+    // Đang xem panorama mà đổi floor -> quay về chế độ xem map (Building/Floor)
+    setViewMode("map");
     if (floor.panaromas?.length) setActivePanaroma(floor.panaromas[0]);
     else setActivePanaroma(null);
   };

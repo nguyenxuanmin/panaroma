@@ -42,7 +42,7 @@
 .bs-btn:hover,
 .bs-btn.active {
   background: rgba(255, 255, 255, 0.3);
-  border-color: #000;
+  border-color: #fff;
   color: #000;
 }
 

@@ -42,7 +42,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   };
   const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panaroma));
   const [showMinimap, setShowMinimap] = useState(true);
-  const [miniScale, setMiniScale] = useState(2);
+  const [miniScale, setMiniScale] = useState(1);
   const [transitionPhase, setTransitionPhase] = useState("idle");
   const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";

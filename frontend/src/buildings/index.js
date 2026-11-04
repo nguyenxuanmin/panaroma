@@ -39,12 +39,15 @@ export function findPanaromaById(panaromaId) {
 }
 
 // Lấy floor hiện tại đang active để render map - building tách rời nên có thể null
+// Floor bị ẩn (status = 0) bị loại khỏi pool fallback, ưu tiên tầng hiển thị
 export function getActiveFloor(building, floorId) {
   if (!building) return null;
   if (building.type === "single") return building;
   if (!building.floors || building.floors.length === 0) return building;
-  if (!floorId) return building.floors[0];
-  return building.floors.find((f) => f.id === floorId) || building.floors[0];
+  const visible = building.floors.filter((f) => f.status !== 0);
+  const pool = visible.length ? visible : building.floors;
+  if (!floorId) return pool[0];
+  return pool.find((f) => f.id === floorId) || pool[0];
 }
 
 export default buildings;
