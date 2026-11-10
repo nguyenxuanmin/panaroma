@@ -34,12 +34,18 @@ function App() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#fff" }}>
         <div style={{ width: 28, height: 28, border: "3px solid #e5e7eb", borderTopColor: "#6b7280", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style>
+        <RotatePrompt />
       </div>
     );
   }
 
   if (!user) {
-    return <LoginScreen onLogin={login} initialId={urlSlug || ""} />;
+    return (
+      <>
+        <LoginScreen onLogin={login} initialId={urlSlug || ""} />
+        <RotatePrompt />
+      </>
+    );
   }
 
   // Loading state khi chờ API
@@ -49,6 +55,7 @@ function App() {
         <div style={{ width: 36, height: 36, border: "3px solid #334155", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <span style={{ fontSize: 13, opacity: 0.8 }}>Loading panaroma data...</span>
         <style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style>
+        <RotatePrompt />
       </div>
     );
   }
@@ -402,15 +409,18 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
     : null;
   if (pendingProject && !isFallback) {
     return (
-      <LoginScreen
-        key={pendingProject.id}
-        onLogin={handleSwitchLogin}
-        initialId={pendingProject.slug || String(pendingProject.id)}
-        lockId
-        projectName={pendingProject.name}
-        onCancel={handleCancelSwitch}
-        externalError={switchError}
-      />
+      <>
+        <LoginScreen
+          key={pendingProject.id}
+          onLogin={handleSwitchLogin}
+          initialId={pendingProject.slug || String(pendingProject.id)}
+          lockId
+          projectName={pendingProject.name}
+          onCancel={handleCancelSwitch}
+          externalError={switchError}
+        />
+        <RotatePrompt />
+      </>
     );
   }
 
@@ -438,6 +448,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
             Back to {projects[0]?.name || "home"}
           </button>
         </main>
+        <RotatePrompt />
       </div>
     );
   }
@@ -483,6 +494,7 @@ function AppContent({ projects, isFallback, user, onLogin, onLogout, urlSlug }) 
         <main className="main-viewport" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8 }}>
           <span style={{ fontSize: 13, color: "#64748b" }}>Building "{activeBuilding.name}" has no Floor/Panaroma</span>
         </main>
+        <RotatePrompt />
       </div>
     );
   }

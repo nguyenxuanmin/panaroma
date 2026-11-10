@@ -4,6 +4,7 @@ import { ReactPhotoSphereViewer } from "react-photo-sphere-viewer";
 import { EquirectangularAdapter } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
+import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
 import MapMinimap from "../MapMinimap/MapMinimap";
 import { frontViewThumbFromImage } from "../../utils/thumbCrop";
 import "./PanaromaViewer.css";
@@ -34,18 +35,48 @@ const applyTexQuality = (instance) => {
   }
 };
 
+// Phone/tablet: minimap mặc định ẩn khi vào panorama (PC luôn show)
+const checkTouchDevice = () => {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  const isTouch = navigator.maxTouchPoints > 1;
+  return /Android|iPhone|iPod|Mobile|Silk/i.test(ua) || (/iPad|Macintosh/.test(ua) && isTouch);
+};
+
 export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSelectPanaroma, showLeftToolbar = true, onReturnToMap, onLogout, showImageOptions = true }) {
   const viewerRef = useRef(null);
   const getInitialAngle = (p) => {
     if (typeof p?.mapPosition?.angle === "number") return p.mapPosition.angle;
     return p?.defaultView?.yaw ?? 0;
   };
-  const [currentYaw, setCurrentYaw] = useState(getInitialAngle(panaroma));
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [currentYaw, setCurrentYaw] = useState(((getInitialAngle(panaroma) % 360) + 360) % 360);
+  const [showMinimap, setShowMinimap] = useState(!checkTouchDevice());
   const [miniScale, setMiniScale] = useState(1);
   const [transitionPhase, setTransitionPhase] = useState("idle");
   const [visiblePanaroma, setVisiblePanaroma] = useState(panaroma);
   const defaultImage = "https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg";
+
+  // ---- Cảm biến xoay (Gyroscope) - chỉ hiện trên smartphone/tablet ----
+  const [gyroSupported, setGyroSupported] = useState(false);
+  const [gyroOn, setGyroOn] = useState(false);
+  const gyroWantedRef = useRef(false);
+
+  // Đẩy scale minimap ra CSS var --mm-scale để building-sidebar tự dịch xuống tương ứng
+  // Hide minimap («) -> giá trị 1 để building-sidebar trở lại vị trí default
+  useEffect(() => {
+    const value = showMinimap ? String(miniScale) : "1";
+    document.documentElement.style.setProperty("--mm-scale", value);
+    return () => {
+      document.documentElement.style.setProperty("--mm-scale", "1");
+    };
+  }, [miniScale, showMinimap]);
+  const isMobileDevice = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    const ua = navigator.userAgent;
+    const isTouch = navigator.maxTouchPoints > 1;
+    // smartphone + tablet (iPad desktop-mode: Macintosh + multi-touch)
+    return /Android|iPhone|iPod|Mobile|Silk/i.test(ua) || (/iPad|Macintosh/.test(ua) && isTouch);
+  }, []);
 
   // ---- Đa option ảnh cho 1 vị trí ----
   const imageOptions = useMemo(() => {
@@ -198,14 +229,34 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
     applyTexQuality(instance);
     instance.addEventListener("panorama-loaded", () => applyTexQuality(instance));
 
+    // Cập nhật yaw: lọc bước nhảy <2° để tránh re-render liên tục khi gyro chạy
+    let lastYaw = null;
     instance.addEventListener("position-updated", (e) => {
-      if (e.position) setCurrentYaw((e.position.yaw * (180 / Math.PI)) % 360);
+      if (!e.position) return;
+      const deg = (((e.position.yaw * 180) / Math.PI) % 360 + 360) % 360;
+      if (lastYaw !== null && Math.abs(deg - lastYaw) < 2) return;
+      lastYaw = deg;
+      setCurrentYaw(deg);
     });
+
+    // Gyroscope plugin: kiểm tra hỗ trợ + đồng bộ state bật/tắt cảm biến
+    const gyro = instance.getPlugin(GyroscopePlugin);
+    if (gyro) {
+      gyro.isSupported().then(setGyroSupported).catch(() => setGyroSupported(false));
+      gyro.addEventListener("gyroscope-updated", (e) => setGyroOn(e.gyroscopeEnabled));
+      setGyroOn(false);
+      // Tuỳ chọn: tự bật lại sau khi chuyển vị trí. iOS có thể từ chối, lúc đó người dùng bấm lại nút.
+      if (gyroWantedRef.current) gyro.start().catch(() => (gyroWantedRef.current = false));
+    }
+
     const markersPlugin = instance.getPlugin(MarkersPlugin);
     if (markersPlugin) {
       markersPlugin.addEventListener("select-marker", (e) => {
         const targetId = e.marker.data?.targetPanaroma;
         if (!targetId || !onHotspotClick) return;
+        // Gyro đang bật sẽ ghi đè animate() mỗi khung hình -> tắt tạm trước khi chuyển vị trí
+        const gyroNow = viewerRef.current?.getPlugin(GyroscopePlugin);
+        if (gyroNow?.isEnabled()) gyroNow.stop();
         const markerId = e.marker.id;
         const hotspot = displayPanaroma?.hotspots?.find((h) => h.id === markerId || h.targetPanaroma === targetId);
         if (hotspot && viewerRef.current) {
@@ -229,7 +280,27 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
   const handlePanoZoomOut = () => viewerRef.current?.zoom(viewerRef.current.getZoomLevel() - 15);
   const handleToggleFullscreen = () => viewerRef.current?.toggleFullscreen();
 
-  const plugins = [[MarkersPlugin, { markers }]];
+  // Bật/tắt cảm biến xoay: gọi start() ngay trong onClick (không await gì trước),
+  // iPhone chỉ hiện hộp xin quyền khi nó nằm trực tiếp trong lần bấm của người dùng.
+  const handleToggleGyro = () => {
+    const gyro = viewerRef.current?.getPlugin(GyroscopePlugin);
+    if (!gyro) return;
+    if (gyro.isEnabled()) {
+      gyroWantedRef.current = false;
+      gyro.stop();
+    } else {
+      gyroWantedRef.current = true;
+      gyro.start().catch(() => {
+        gyroWantedRef.current = false;
+        alert("Không bật được cảm biến. Hãy cho phép truy cập chuyển động/hướng của thiết bị.");
+      });
+    }
+  };
+
+  const plugins = [
+    [MarkersPlugin, { markers }],
+    [GyroscopePlugin, { touchmove: true, moveMode: "smooth" }],
+  ];
 
   return (
     <div className="panaroma-viewer-container">
@@ -264,6 +335,21 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
                 <line x1="21" y1="21" x2="16.5" y2="16.5" />
               </svg>
             </button>
+            {gyroSupported && isMobileDevice ? (
+              <button
+                className={`mm-ctrl-btn gyro-btn ${gyroOn ? "active" : ""}`}
+                onClick={handleToggleGyro}
+                title="Rotate with the phone"
+              >
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+              </svg>
+              </button>
+            ) : (
+              /* PC: chừa chỗ trống đúng size nút, giữ Logout ở dưới nó */
+              <span className="mm-ctrl-btn gyro-placeholder" aria-hidden="true" />
+            )}
             {onLogout && (
               <button className="mm-ctrl-btn" onClick={onLogout} title="Logout">
                 <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

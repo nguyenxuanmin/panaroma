@@ -2,11 +2,21 @@
   display: none;
   position: fixed;
   inset: 0;
+  /* Đủ bề cao cả khi address-bar thu gọn (iPhone/Android) */
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   background: #3a3c3e;
   z-index: 9999;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  /* Chặn mọi thao tác với app phía sau khi chưa xoay ngang */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 .rotate-content {
@@ -16,8 +26,11 @@
   gap: 18px;
 }
 
-.phone-rotate-anim {
-  animation: rotate-bounce 2s ease-in-out infinite;
+/* Chỉ xoay cái phone dọc cho dễ hiểu ("phone của bạn -> xoay thế này") */
+.phone-rotate-anim rect:first-of-type,
+.phone-rotate-anim rect:nth-of-type(2) {
+  transform-origin: 30px 40px;
+  animation: rotate-phone 2s ease-in-out infinite;
 }
 
 .rotate-text {
@@ -26,6 +39,8 @@
   letter-spacing: 0.2em;
   font-family: "Hiragino Kaku Gothic Pro", "Meiryo", sans-serif;
   margin: 0;
+  text-align: center;
+  line-height: 1.8;
 }
 
 @keyframes rotate-bounce {
@@ -33,7 +48,18 @@
   50% { transform: rotate(-6deg); }
 }
 
-/* Chỉ hiện khi portrait trên mobile/tablet */
+@keyframes rotate-phone {
+  0%, 15% { transform: rotate(0deg); }
+  60%, 100% { transform: rotate(-90deg); }
+}
+
+/* Chỉ hiện khi portrait: mobile + tablet (đến iPad portrait 1024px) */
 @media (orientation: portrait) and (max-width: 1024px) {
   .rotate-overlay { display: flex; }
+}
+
+/* iPad không cần ép xoay ngang (màn đủ rộng đọc được app dọc):
+   chỉ ép với tay cầm hẹp hơn 768px */
+@media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
+  .rotate-overlay { display: none; }
 }

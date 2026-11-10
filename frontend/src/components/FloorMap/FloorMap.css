@@ -160,6 +160,16 @@
   line-height: 1;
 }
 .mm-ctrl-btn:hover { background: #6e6e6e; }
+/* Chỗ trống thay nút cảm biến (map view) - không hiện nền, Logout vẫn nằm dưới */
+.mm-ctrl-btn.gyro-placeholder,
+.mm-ctrl-btn.gyro-placeholder:hover {
+  background: transparent;
+}
+
+/* PC (chuột + hover): không cần chừa chỗ trống cho nút cảm biến - Logout kéo lên ngay */
+@media (hover: hover) and (pointer: fine) {
+  .mm-ctrl-btn.gyro-placeholder { display: none; }
+}
 
 /* Map Controls - hidden, moved to topHeader */
 .map-controls { display: none; }
