@@ -406,14 +406,6 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
           rendererParameters={{ antialias: true, powerPreference: "high-performance" }}
         />
       </div>
-
-      {showLeftToolbar && (
-        <div className="pano-bottomleft-toolbar">
-          <button className="bottom-tool-btn" onClick={handlePanoZoomIn} title="Zoom in 360">+</button>
-          <button className="bottom-tool-btn" onClick={handlePanoZoomOut} title="Zoom out 360">-</button>
-          <button className="bottom-tool-btn" onClick={handleToggleFullscreen} title="Full screen">⛶</button>
-        </div>
-      )}
     </div>
   );
 }
