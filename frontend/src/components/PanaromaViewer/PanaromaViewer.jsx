@@ -6,7 +6,6 @@ import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import "@photo-sphere-viewer/markers-plugin/index.css";
 import { GyroscopePlugin } from "@photo-sphere-viewer/gyroscope-plugin";
 import MapMinimap from "../MapMinimap/MapMinimap";
-import { GYRO_BUTTON_ENABLED } from "../../utils/featureFlags";
 import { frontViewThumbFromImage } from "../../utils/thumbCrop";
 import "./PanaromaViewer.css";
 
@@ -336,7 +335,7 @@ export default function PanaromaViewer({ panaroma, floor, onHotspotClick, onSele
                 <line x1="21" y1="21" x2="16.5" y2="16.5" />
               </svg>
             </button>
-            {GYRO_BUTTON_ENABLED && gyroSupported && isMobileDevice ? (
+            {gyroSupported && isMobileDevice ? (
               <button
                 className={`mm-ctrl-btn gyro-btn ${gyroOn ? "active" : ""}`}
                 onClick={handleToggleGyro}
